@@ -1,0 +1,553 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Student Dashboard - EduSight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #2C5AA0 0%, #17A2B8 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .completion-bar {
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .completion-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #20c997);
+        transition: width 0.3s ease;
+    }
+    
+    .metric-card {
+        border-left: 4px solid;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .metric-card.academic { border-left-color: #007bff; }
+    .metric-card.psychological { border-left-color: #28a745; }
+    .metric-card.physical { border-left-color: #ffc107; }
+    .metric-card.epr { border-left-color: #dc3545; }
+    
+    .step-indicator {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .step-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+    
+    .step-number.completed { background: #28a745; color: white; }
+    .step-number.current { background: #007bff; color: white; }
+    .step-number.pending { background: #e9ecef; color: #6c757d; }
+    
+    .upload-zone {
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        transition: border-color 0.3s ease;
+    }
+    
+    .upload-zone:hover {
+        border-color: #007bff;
+    }
+    
+    .issue-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .issue-critical { background: #dc3545; }
+    .issue-high { background: #fd7e14; }
+    .issue-medium { background: #ffc107; }
+    .issue-low { background: #28a745; }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 1rem 0;
+    }
+    
+    .quick-action-btn {
+        border: none;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 0.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        text-decoration: none;
+    }
+    
+    .performance-band {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: bold;
+        text-align: center;
+        margin: 0.5rem 0;
+    }
+    
+    .band-thriving { background: #d4edda; color: #155724; }
+    .band-healthy { background: #cce5ff; color: #004085; }
+    .band-support { background: #fff3cd; color: #856404; }
+    .band-risk { background: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">Welcome back, {{ user.first_name|default:user.username }}!</h1>
+                <p class="mb-3">Your personalized EduSight assessment dashboard</p>
+                
+                <!-- Data Completion Progress -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Data Completion</span>
+                        <span class="fw-bold">{{ completion_percentage|floatformat:0 }}%</span>
+                    </div>
+                    <div class="completion-bar bg-light">
+                        <div class="completion-progress" style="width: {{ completion_percentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="text-white-50">Plan: {{ profile.plan_type|title }}</div>
+                <div class="text-white-50">Academic Year: {{ profile.current_academic_year }}</div>
+                {% if latest_epr %}
+                    <div class="mt-2">
+                        <h3 class="text-white">EPR Score: {{ latest_epr|floatformat:1 }}</h3>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Key Metrics Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card metric-card academic h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Academic</h6>
+                            <h4 class="mb-0">{{ profile.overall_academic_average|floatformat:1|default:"--" }}%</h4>
+                        </div>
+                        <i class="fas fa-graduation-cap fa-2x text-primary opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card psychological h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Psychological</h6>
+                            <h4 class="mb-0">{{ profile.emotional_wellbeing_score|floatformat:1|default:"--" }}</h4>
+                        </div>
+                        <i class="fas fa-brain fa-2x text-success opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card physical h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Physical</h6>
+                            <h4 class="mb-0">{{ profile.fitness_level|floatformat:1|default:"--" }}</h4>
+                        </div>
+                        <i class="fas fa-heartbeat fa-2x text-warning opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card epr h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">EPR Score</h6>
+                            <h4 class="mb-0">{{ latest_epr|floatformat:1|default:"--" }}</h4>
+                            {% if latest_epr %}
+                                {% if latest_epr >= 85 %}
+                                    <small class="performance-band band-thriving">Thriving</small>
+                                {% elif latest_epr >= 70 %}
+                                    <small class="performance-band band-healthy">Healthy Progress</small>
+                                {% elif latest_epr >= 50 %}
+                                    <small class="performance-band band-support">Needs Support</small>
+                                {% else %}
+                                    <small class="performance-band band-risk">At-Risk</small>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <i class="fas fa-chart-line fa-2x text-danger opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Next Steps -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Next Steps</h5>
+                </div>
+                <div class="card-body">
+                    {% if next_steps %}
+                        {% for step in next_steps %}
+                            <div class="step-indicator">
+                                {% if step.priority == 'high' %}
+                                    <div class="step-number current">!</div>
+                                {% elif step.priority == 'medium' %}
+                                    <div class="step-number pending">{{ forloop.counter }}</div>
+                                {% else %}
+                                    <div class="step-number pending">{{ forloop.counter }}</div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-1">{{ step.title }}</h6>
+                                    <p class="text-muted mb-1">{{ step.description }}</p>
+                                    <a href="{% url step.url %}" class="btn btn-sm btn-outline-primary">
+                                        Start Now <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5>All caught up!</h5>
+                            <p class="text-muted">No immediate actions required. Keep monitoring your progress.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_uploads %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>File</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for upload in recent_uploads %}
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-file me-2"></i>
+                                                {{ upload.original_filename|truncatechars:30 }}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">{{ upload.file_type|upper }}</span>
+                                            </td>
+                                            <td>
+                                                {% if upload.processing_status == 'completed' %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% elif upload.processing_status == 'processing' %}
+                                                    <span class="badge bg-primary">Processing</span>
+                                                {% elif upload.processing_status == 'failed' %}
+                                                    <span class="badge bg-danger">Failed</span>
+                                                {% elif upload.processing_status == 'needs_review' %}
+                                                    <span class="badge bg-warning">Needs Review</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ upload.created_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                {% if upload.processing_status == 'needs_review' %}
+                                                    <a href="{% url 'data_validation' %}" class="btn btn-sm btn-outline-warning">Review</a>
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-secondary" onclick="viewUploadDetails({{ upload.id }})">View</button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end">
+                            <a href="{% url 'data_upload' %}" class="btn btn-outline-primary">View All Uploads</a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-upload fa-3x text-muted mb-3"></i>
+                            <h5>No uploads yet</h5>
+                            <p class="text-muted">Start by uploading your academic records or assessment data</p>
+                            <a href="{% url 'data_upload' %}" class="btn btn-primary">Upload Data</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Yearly Progress -->
+            {% if yearly_summaries %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Yearly Progress</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for summary in yearly_summaries %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">{{ summary.academic_year }}</h6>
+                                        <h4 class="text-primary">{{ summary.annual_epr_score|floatformat:1 }}</h4>
+                                        <small class="text-muted">{{ summary.epr_performance_band }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body p-2">
+                    <a href="{% url 'data_upload' %}" class="quick-action-btn bg-primary text-white">
+                        <i class="fas fa-upload me-2"></i>Upload New Data
+                    </a>
+                    <a href="{% url 'data_analysis' %}" class="quick-action-btn bg-success text-white">
+                        <i class="fas fa-chart-bar me-2"></i>View Analysis
+                    </a>
+                    {% if completion_percentage >= 70 %}
+                        <a href="{% url 'report_generation' %}" class="quick-action-btn bg-info text-white">
+                            <i class="fas fa-file-pdf me-2"></i>Generate Report
+                        </a>
+                    {% endif %}
+                    {% if pending_issues %}
+                        <a href="{% url 'data_validation' %}" class="quick-action-btn bg-warning text-dark">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Fix Data Issues ({{ pending_issues|length }})
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Data Issues -->
+            {% if pending_issues %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                        Data Issues ({{ pending_issues|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for issue in pending_issues %}
+                        <div class="d-flex align-items-start mb-3">
+                            <span class="issue-badge me-2 issue-{{ issue.severity }}">{{ issue.severity|upper }}</span>
+                            <div>
+                                <h6 class="mb-1">{{ issue.field_name|title }}</h6>
+                                <p class="text-muted small mb-1">{{ issue.description }}</p>
+                                <small class="text-muted">{{ issue.created_at|timesince }} ago</small>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr class="my-2">{% endif %}
+                    {% endfor %}
+                    <div class="text-end mt-3">
+                        <a href="{% url 'data_validation' %}" class="btn btn-sm btn-warning">Resolve All Issues</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Plan Features -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Your Plan: {{ profile.plan_type|title }}</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Max Uploads: {{ plan_features.max_uploads }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Reports/Month: {{ plan_features.reports_per_month }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Data Retention: {{ plan_features.data_retention_months }} months
+                        </li>
+                        {% if plan_features.advanced_analytics %}
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Advanced Analytics
+                        </li>
+                        {% endif %}
+                        {% if plan_features.prediction_analysis %}
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Prediction Analysis
+                        </li>
+                        {% endif %}
+                        {% if plan_features.career_mapping %}
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Career Mapping
+                        </li>
+                        {% endif %}
+                    </ul>
+                    {% if profile.plan_type == 'basic' %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'pricing_plans' %}" class="btn btn-outline-primary btn-sm">Upgrade Plan</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Help & Support -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Need Help?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Get started with our comprehensive guides</p>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-book me-2"></i>User Guide
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-video me-2"></i>Video Tutorials
+                        </a>
+                        <a href="{% url 'website_contact' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-envelope me-2"></i>Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Progress Chart
+    {% if yearly_summaries %}
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [{% for summary in yearly_summaries %}'{{ summary.academic_year }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'EPR Score',
+                data: [{% for summary in yearly_summaries %}{{ summary.annual_epr_score|default:0 }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                borderColor: '#2C5AA0',
+                backgroundColor: 'rgba(44, 90, 160, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    // Upload details modal
+    function viewUploadDetails(uploadId) {
+        // This would open a modal with upload details
+        alert('Upload details for ID: ' + uploadId);
+    }
+
+    // Auto-refresh completion status
+    setInterval(function() {
+        fetch('/api/completion-status/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.completion_percentage !== {{ completion_percentage }}) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.log('Auto-refresh error:', error));
+    }, 30000); // Check every 30 seconds
+
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+</script>
+{% endblock %}

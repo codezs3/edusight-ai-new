@@ -47,6 +47,7 @@ urlpatterns = [
     
     # Admin Management Panel
     path('admin-panel/', include('admin_dashboard.urls')),
+    path('student-portal/', include('student_portal.urls')),
     
     # API endpoints
     path('api/dashboard/', dashboard_api, name='dashboard_api'),

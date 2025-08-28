@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'ml_predictions',
     'crm',
     'admin_dashboard',
+    'student_portal',
     'epr_system',
     'workflow_system',
 ]

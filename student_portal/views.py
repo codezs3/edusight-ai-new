@@ -30,10 +30,6 @@ from epr_system.file_processors import FileProcessor, DataValidator
 from epr_system.algorithms import EPRScoringAlgorithms
 from students.models import User
 
-# Import report generation
-from .report_generator import EPRReportGenerator
-from .analytics_engine import AnalyticsEngine, BenchmarkingService
-
 @login_required
 def customer_dashboard(request):
     """Main customer dashboard after payment"""
@@ -88,7 +84,7 @@ def customer_dashboard(request):
         'plan_features': get_plan_features(profile.plan_type),
     }
     
-    return render(request, 'customer_dashboard/dashboard.html', context)
+    return render(request, 'student_portal/dashboard.html', context)
 
 @login_required
 def data_upload(request):
@@ -125,7 +121,7 @@ def data_upload(request):
         ]
     }
     
-    return render(request, 'customer_dashboard/data_upload.html', context)
+    return render(request, 'student_portal/data_upload.html', context)
 
 @login_required
 def data_validation(request):
@@ -161,7 +157,7 @@ def data_validation(request):
         'physical_entries': physical_entries,
     }
     
-    return render(request, 'customer_dashboard/data_validation.html', context)
+    return render(request, 'student_portal/data_validation.html', context)
 
 @login_required
 def data_analysis(request):
@@ -170,6 +166,7 @@ def data_analysis(request):
     profile = get_object_or_404(StudentDataProfile, student=request.user)
     
     # Initialize analytics engine
+    from .analytics_engine import AnalyticsEngine
     analytics = AnalyticsEngine(request.user)
     
     # Get comprehensive analysis
@@ -189,183 +186,7 @@ def data_analysis(request):
         'can_proceed': analysis_results.get('data_sufficient', False),
     }
     
-    return render(request, 'customer_dashboard/data_analysis.html', context)
-
-@login_required
-def benchmark_comparison(request):
-    """Step 4: Comparison with benchmarks"""
-    
-    profile = get_object_or_404(StudentDataProfile, student=request.user)
-    
-    # Initialize benchmarking service
-    benchmarking = BenchmarkingService()
-    
-    # Get student's current data
-    student_data = benchmarking.get_student_data(request.user)
-    
-    # Compare with benchmarks
-    comparisons = benchmarking.compare_with_benchmarks(student_data, request.user)
-    
-    # Get percentile rankings
-    rankings = benchmarking.get_percentile_rankings(student_data)
-    
-    context = {
-        'profile': profile,
-        'student_data': student_data,
-        'comparisons': comparisons,
-        'rankings': rankings,
-        'benchmark_categories': ['national', 'state', 'local', 'school_type'],
-    }
-    
-    return render(request, 'customer_dashboard/benchmark_comparison.html', context)
-
-@login_required
-def prediction_analysis(request):
-    """Step 5: Prediction plots and future insights"""
-    
-    profile = get_object_or_404(StudentDataProfile, student=request.user)
-    
-    # Initialize analytics engine
-    analytics = AnalyticsEngine(request.user)
-    
-    # Generate predictions
-    predictions = analytics.generate_predictions()
-    
-    # Get trend projections
-    projections = analytics.get_trend_projections()
-    
-    # Generate recommendation insights
-    recommendations = analytics.generate_recommendations()
-    
-    context = {
-        'profile': profile,
-        'predictions': predictions,
-        'projections': projections,
-        'recommendations': recommendations,
-        'prediction_timeframes': ['6_months', '1_year', '2_years', '5_years'],
-    }
-    
-    return render(request, 'customer_dashboard/prediction_analysis.html', context)
-
-@login_required
-def epr_calculation(request):
-    """Step 6: EPR score calculation"""
-    
-    profile = get_object_or_404(StudentDataProfile, student=request.user)
-    
-    if request.method == 'POST':
-        return handle_epr_calculation(request)
-    
-    # Get current EPR scores
-    current_scores = get_current_epr_scores(request.user)
-    
-    # Get historical EPR data
-    historical_scores = get_historical_epr_scores(request.user)
-    
-    # Check if calculation is possible
-    can_calculate = check_epr_calculation_readiness(request.user)
-    
-    context = {
-        'profile': profile,
-        'current_scores': current_scores,
-        'historical_scores': historical_scores,
-        'can_calculate': can_calculate,
-        'epr_components': ['academic', 'psychological', 'physical'],
-        'scoring_weights': {
-            'academic': 40,
-            'psychological': 30,
-            'physical': 30
-        }
-    }
-    
-    return render(request, 'customer_dashboard/epr_calculation.html', context)
-
-@login_required
-def advanced_analytics(request):
-    """Step 7: Advanced filter-based analytics"""
-    
-    profile = get_object_or_404(StudentDataProfile, student=request.user)
-    
-    # Get filter parameters
-    filters = {
-        'academic_year': request.GET.get('academic_year', ''),
-        'subject': request.GET.get('subject', ''),
-        'assessment_type': request.GET.get('assessment_type', ''),
-        'date_from': request.GET.get('date_from', ''),
-        'date_to': request.GET.get('date_to', ''),
-        'metric': request.GET.get('metric', 'all'),
-    }
-    
-    # Initialize analytics engine
-    analytics = AnalyticsEngine(request.user)
-    
-    # Apply filters and get analytics
-    filtered_analytics = analytics.get_filtered_analytics(filters)
-    
-    # Get available filter options
-    filter_options = analytics.get_filter_options()
-    
-    context = {
-        'profile': profile,
-        'filtered_analytics': filtered_analytics,
-        'filter_options': filter_options,
-        'current_filters': filters,
-        'available_visualizations': [
-            'performance_trends', 'subject_comparison', 'percentile_tracking',
-            'correlation_analysis', 'improvement_tracking', 'benchmark_comparison'
-        ]
-    }
-    
-    return render(request, 'customer_dashboard/advanced_analytics.html', context)
-
-@login_required
-def report_generation(request):
-    """Step 8: Professional PDF report generation"""
-    
-    profile = get_object_or_404(StudentDataProfile, student=request.user)
-    
-    if request.method == 'POST':
-        return handle_report_generation(request)
-    
-    # Get available report templates
-    report_templates = get_available_report_templates(profile.plan_type)
-    
-    # Get report history
-    generated_reports = get_report_history(request.user)
-    
-    context = {
-        'profile': profile,
-        'report_templates': report_templates,
-        'generated_reports': generated_reports,
-        'plan_type': profile.plan_type,
-    }
-    
-    return render(request, 'customer_dashboard/report_generation.html', context)
-
-@login_required
-def reports_dashboard(request):
-    """Step 9 & 10: Reports dashboard and data management"""
-    
-    profile = get_object_or_404(StudentDataProfile, student=request.user)
-    
-    # Get all generated reports
-    reports = get_user_reports(request.user)
-    
-    # Get dashboard statistics
-    dashboard_stats = get_dashboard_statistics(request.user)
-    
-    # Get recent activities
-    recent_activities = get_recent_activities(request.user)
-    
-    context = {
-        'profile': profile,
-        'reports': reports,
-        'dashboard_stats': dashboard_stats,
-        'recent_activities': recent_activities,
-        'yearly_summaries': YearwiseDataSummary.objects.filter(student=request.user).order_by('-academic_year'),
-    }
-    
-    return render(request, 'customer_dashboard/reports_dashboard.html', context)
+    return render(request, 'student_portal/data_analysis.html', context)
 
 # Helper functions
 
@@ -672,59 +493,321 @@ def get_plan_features(plan_type: str) -> Dict[str, Any]:
     
     return features.get(plan_type, features['basic'])
 
-# Additional helper functions for other workflow steps...
-
 def handle_validation_action(request):
     """Handle validation issue resolution"""
-    # Implementation for handling validation actions
-    pass
+    try:
+        action = request.POST.get('action')
+        issue_id = request.POST.get('issue_id')
+        
+        if action == 'resolve':
+            issue = get_object_or_404(DataValidationIssue, id=issue_id, student=request.user)
+            issue.status = 'resolved'
+            issue.resolved_at = timezone.now()
+            issue.save()
+            
+            return JsonResponse({'success': True, 'message': 'Issue resolved successfully'})
+        
+        elif action == 'dismiss':
+            issue = get_object_or_404(DataValidationIssue, id=issue_id, student=request.user)
+            issue.status = 'dismissed'
+            issue.resolved_at = timezone.now()
+            issue.save()
+            
+            return JsonResponse({'success': True, 'message': 'Issue dismissed'})
+        
+        return JsonResponse({'success': False, 'error': 'Invalid action'})
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
-def handle_epr_calculation(request):
-    """Handle EPR score calculation"""
-    # Implementation for EPR calculation
-    pass
+@login_required
+def get_completion_status(request):
+    """API endpoint to get current completion status"""
+    try:
+        profile = get_object_or_404(StudentDataProfile, student=request.user)
+        completion_percentage = profile.get_completion_percentage()
+        
+        return JsonResponse({
+            'success': True,
+            'completion_percentage': completion_percentage,
+            'academic_complete': profile.academic_data_complete,
+            'psychological_complete': profile.psychological_data_complete,
+            'physical_complete': profile.physical_data_complete
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
-def handle_report_generation(request):
-    """Handle report generation request"""
-    # Implementation for report generation
-    pass
+@login_required
+def get_analytics_data(request):
+    """API endpoint to get analytics data for charts"""
+    try:
+        from .analytics_engine import AnalyticsEngine
+        analytics = AnalyticsEngine(request.user)
+        
+        chart_type = request.GET.get('type', 'comprehensive')
+        timeframe = request.GET.get('timeframe', '6_months')
+        
+        if chart_type == 'academic_trends':
+            data = analytics.create_visualization_data('academic_trends')
+        elif chart_type == 'epr_forecast':
+            data = analytics.create_visualization_data('epr_forecast')
+        elif chart_type == 'growth_patterns':
+            data = analytics.create_visualization_data('growth_patterns')
+        else:
+            analysis = analytics.generate_comprehensive_analysis()
+            data = {'analysis': analysis}
+        
+        return JsonResponse({'success': True, 'data': data})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
-def get_current_epr_scores(user):
-    """Get current EPR scores for user"""
-    # Implementation for getting current scores
-    pass
+@login_required
+def get_predictions_data(request):
+    """API endpoint to get prediction data"""
+    try:
+        from .prediction_engine import PredictionEngine
+        predictions = PredictionEngine(request.user)
+        
+        prediction_type = request.GET.get('type', 'academic')
+        timeframe = request.GET.get('timeframe', '6_months')
+        
+        if prediction_type == 'academic':
+            data = predictions.generate_academic_predictions(timeframe)
+        elif prediction_type == 'epr':
+            data = predictions.generate_epr_forecast(timeframe)
+        elif prediction_type == 'career':
+            data = predictions.generate_career_aptitude_predictions()
+        else:
+            data = predictions.analyze_growth_patterns()
+        
+        return JsonResponse({'success': True, 'data': data})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
-def get_historical_epr_scores(user):
-    """Get historical EPR scores"""
-    # Implementation for getting historical scores
-    pass
+@login_required
+def report_management(request):
+    """Report management page"""
+    profile = get_object_or_404(StudentDataProfile, student=request.user)
+    
+    # Get available reports (would be stored in database)
+    reports = []  # Placeholder for generated reports
+    
+    context = {
+        'profile': profile,
+        'reports': reports,
+        'can_generate': profile.get_completion_percentage() >= 50
+    }
+    
+    return render(request, 'student_portal/reports.html', context)
 
-def check_epr_calculation_readiness(user):
-    """Check if EPR calculation is possible"""
-    # Implementation for readiness check
-    pass
+@login_required
+def generate_report(request):
+    """Generate new report"""
+    if request.method == 'POST':
+        try:
+            from .report_generator import EPRReportGenerator
+            
+            report_type = request.POST.get('report_type', 'comprehensive')
+            generator = EPRReportGenerator(request.user, report_type)
+            
+            if report_type == 'quick':
+                result = generator.generate_quick_report()
+            else:
+                result = generator.generate_comprehensive_report()
+            
+            if result['success']:
+                return JsonResponse({
+                    'success': True,
+                    'filename': result['filename'],
+                    'message': 'Report generated successfully',
+                    'download_url': f"/student-portal/reports/download/{result['filename']}/"
+                })
+            else:
+                return JsonResponse({'success': False, 'error': 'Report generation failed'})
+                
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-def get_available_report_templates(plan_type):
-    """Get available report templates for plan"""
-    # Implementation for getting templates
-    pass
+@login_required
+def download_report(request, report_id):
+    """Download generated report"""
+    try:
+        # In production, this would validate report ownership and serve the file
+        import os
+        from django.http import FileResponse
+        from django.conf import settings
+        
+        # Placeholder implementation
+        report_path = os.path.join(settings.MEDIA_ROOT, 'temp_reports', report_id)
+        
+        if os.path.exists(report_path):
+            response = FileResponse(
+                open(report_path, 'rb'),
+                content_type='application/pdf'
+            )
+            response['Content-Disposition'] = f'attachment; filename="{report_id}"'
+            return response
+        else:
+            raise Http404("Report not found")
+            
+    except Exception as e:
+        raise Http404("Report not available")
 
-def get_report_history(user):
-    """Get user's report generation history"""
-    # Implementation for getting report history
-    pass
+@login_required
+def edit_data_entry(request, entry_type, entry_id):
+    """Edit data entry"""
+    if request.method == 'POST':
+        try:
+            from .incremental_processor import IncrementalProcessor
+            
+            # Get corrections from form data
+            corrections = {}
+            for key, value in request.POST.items():
+                if key.startswith('field_'):
+                    field_name = key.replace('field_', '')
+                    corrections[field_name] = value
+            
+            # Process corrections
+            processor = IncrementalProcessor(request.user)
+            result = processor.handle_data_correction(entry_type, entry_id, corrections)
+            
+            if result['success']:
+                messages.success(request, 'Data updated successfully')
+            else:
+                messages.error(request, f'Error updating data: {result.get("error", "Unknown error")}')
+                
+        except Exception as e:
+            messages.error(request, f'Error updating data: {str(e)}')
+    
+    return redirect('student_portal:dashboard')
 
-def get_user_reports(user):
-    """Get all user reports"""
-    # Implementation for getting user reports
-    pass
+@login_required
+def delete_data_entry(request, entry_type, entry_id):
+    """Delete data entry"""
+    if request.method == 'POST':
+        try:
+            entry = get_entry_by_type_and_id(entry_type, entry_id, request.user)
+            if entry:
+                entry.delete()
+                
+                # Trigger recalculation
+                from .incremental_processor import IncrementalProcessor
+                processor = IncrementalProcessor(request.user)
+                processor.recalculate_all_metrics()
+                
+                messages.success(request, 'Data entry deleted successfully')
+            else:
+                messages.error(request, 'Data entry not found')
+                
+        except Exception as e:
+            messages.error(request, f'Error deleting data: {str(e)}')
+    
+    return redirect('student_portal:dashboard')
 
-def get_dashboard_statistics(user):
-    """Get dashboard statistics"""
-    # Implementation for getting statistics
-    pass
+@login_required
+def detailed_insights(request):
+    """Detailed insights page"""
+    from .analytics_engine import AnalyticsEngine
+    
+    analytics = AnalyticsEngine(request.user)
+    analysis = analytics.generate_comprehensive_analysis()
+    trends = analytics.get_trends_analysis()
+    patterns = analytics.identify_performance_patterns()
+    
+    context = {
+        'analysis': analysis,
+        'trends': trends,
+        'patterns': patterns
+    }
+    
+    return render(request, 'student_portal/insights.html', context)
 
-def get_recent_activities(user):
-    """Get recent user activities"""
-    # Implementation for getting activities
-    pass
+@login_required
+def benchmark_comparison(request):
+    """Benchmark comparison page"""
+    from .analytics_engine import BenchmarkingService
+    
+    benchmarking = BenchmarkingService()
+    student_data = benchmarking.get_student_data(request.user)
+    comparisons = benchmarking.compare_with_benchmarks(student_data, request.user)
+    percentiles = benchmarking.get_percentile_rankings(student_data)
+    
+    context = {
+        'student_data': student_data,
+        'comparisons': comparisons,
+        'percentiles': percentiles
+    }
+    
+    return render(request, 'student_portal/benchmarks.html', context)
+
+@login_required
+def prediction_dashboard(request):
+    """Prediction dashboard page"""
+    from .prediction_engine import PredictionEngine
+    
+    predictions = PredictionEngine(request.user)
+    academic_predictions = predictions.generate_academic_predictions()
+    epr_forecast = predictions.generate_epr_forecast()
+    growth_patterns = predictions.analyze_growth_patterns()
+    career_aptitude = predictions.generate_career_aptitude_predictions()
+    
+    context = {
+        'academic_predictions': academic_predictions,
+        'epr_forecast': epr_forecast,
+        'growth_patterns': growth_patterns,
+        'career_aptitude': career_aptitude
+    }
+    
+    return render(request, 'student_portal/predictions.html', context)
+
+@login_required
+def profile_settings(request):
+    """Profile settings page"""
+    profile = get_object_or_404(StudentDataProfile, student=request.user)
+    
+    if request.method == 'POST':
+        # Handle settings updates
+        pass
+    
+    context = {
+        'profile': profile
+    }
+    
+    return render(request, 'student_portal/settings.html', context)
+
+@login_required
+def notification_center(request):
+    """Notification center"""
+    # Get notifications for the user
+    notifications = []  # Placeholder
+    
+    context = {
+        'notifications': notifications
+    }
+    
+    return render(request, 'student_portal/notifications.html', context)
+
+@login_required
+def help_center(request):
+    """Help center page"""
+    return render(request, 'student_portal/help.html')
+
+@login_required
+def interactive_tutorial(request):
+    """Interactive tutorial page"""
+    return render(request, 'student_portal/tutorial.html')
+
+# Helper functions
+
+def get_entry_by_type_and_id(entry_type: str, entry_id: int, student: User):
+    """Get entry by type and ID"""
+    if entry_type == 'academic':
+        return AcademicDataEntry.objects.filter(id=entry_id, student=student).first()
+    elif entry_type == 'psychological':
+        return PsychologicalDataEntry.objects.filter(id=entry_id, student=student).first()
+    elif entry_type == 'physical':
+        return PhysicalDataEntry.objects.filter(id=entry_id, student=student).first()
+    else:
+        return None
