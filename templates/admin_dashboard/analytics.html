@@ -1,0 +1,338 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Monitor website performance and user engagement metrics.</p>
+{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Metrics Overview -->
+<div class="row mb-4">
+    <div class="col-md-2 mb-3">
+        <div class="stats-card">
+            <div class="stats-number text-success">{{ metrics.leads_today }}</div>
+            <div class="stats-label">Leads Today</div>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="stats-card">
+            <div class="stats-number text-primary">{{ metrics.leads_week }}</div>
+            <div class="stats-label">Leads This Week</div>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="stats-card">
+            <div class="stats-number text-info">{{ metrics.leads_month }}</div>
+            <div class="stats-label">Leads This Month</div>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="stats-card">
+            <div class="stats-number text-warning">{{ metrics.appointments_today }}</div>
+            <div class="stats-label">Appointments Today</div>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="stats-card">
+            <div class="stats-number text-secondary">{{ metrics.appointments_week }}</div>
+            <div class="stats-label">Appointments Week</div>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="stats-card">
+            <div class="stats-number text-danger">{{ metrics.conversion_rate }}%</div>
+            <div class="stats-label">Conversion Rate</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Leads Over Time
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="leadsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-calendar me-2"></i>
+                    Appointments Over Time
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="appointmentsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Traffic Sources -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-globe me-2"></i>
+                    Traffic Sources
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Visitors</th>
+                                <th>Leads</th>
+                                <th>Conversion</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <i class="fab fa-google text-primary me-2"></i>
+                                    Organic Search
+                                </td>
+                                <td>1,247</td>
+                                <td>89</td>
+                                <td>7.1%</td>
+                                <td><i class="fas fa-arrow-up text-success"></i> +12%</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fas fa-link text-info me-2"></i>
+                                    Direct
+                                </td>
+                                <td>892</td>
+                                <td>67</td>
+                                <td>7.5%</td>
+                                <td><i class="fas fa-arrow-up text-success"></i> +8%</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fab fa-facebook text-primary me-2"></i>
+                                    Social Media
+                                </td>
+                                <td>453</td>
+                                <td>23</td>
+                                <td>5.1%</td>
+                                <td><i class="fas fa-arrow-down text-danger"></i> -3%</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fas fa-envelope text-warning me-2"></i>
+                                    Email
+                                </td>
+                                <td>234</td>
+                                <td>19</td>
+                                <td>8.1%</td>
+                                <td><i class="fas fa-arrow-up text-success"></i> +15%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-mobile-alt me-2"></i>
+                    Device Breakdown
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="deviceChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popular Pages -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-file-alt me-2"></i>
+                    Most Visited Pages
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-home text-primary me-2"></i>
+                            Homepage
+                        </div>
+                        <span class="badge bg-primary rounded-pill">2,847</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-money-bill text-success me-2"></i>
+                            Pricing
+                        </div>
+                        <span class="badge bg-success rounded-pill">1,203</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            About Us
+                        </div>
+                        <span class="badge bg-info rounded-pill">876</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-phone text-warning me-2"></i>
+                            Contact
+                        </div>
+                        <span class="badge bg-warning rounded-pill">654</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-brain text-secondary me-2"></i>
+                            DMIT Info
+                        </div>
+                        <span class="badge bg-secondary rounded-pill">432</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Real-time Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>Active Users</span>
+                    <span class="badge bg-success">12 online</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>Page Views (Last Hour)</span>
+                    <span class="badge bg-primary">47</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>New Leads (Today)</span>
+                    <span class="badge bg-warning">{{ metrics.leads_today }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>Bounce Rate</span>
+                    <span class="badge bg-info">32.5%</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Avg. Session Duration</span>
+                    <span class="badge bg-secondary">3m 42s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Leads Chart
+const leadsCtx = document.getElementById('leadsChart').getContext('2d');
+new Chart(leadsCtx, {
+    type: 'line',
+    data: {
+        labels: {{ chart_data.leads|safe }}.map(item => item.date),
+        datasets: [{
+            label: 'Leads',
+            data: {{ chart_data.leads|safe }}.map(item => item.count),
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Appointments Chart
+const appointmentsCtx = document.getElementById('appointmentsChart').getContext('2d');
+new Chart(appointmentsCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ chart_data.appointments|safe }}.map(item => item.date),
+        datasets: [{
+            label: 'Appointments',
+            data: {{ chart_data.appointments|safe }}.map(item => item.count),
+            backgroundColor: '#10b981',
+            borderColor: '#059669',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Device Chart
+const deviceCtx = document.getElementById('deviceChart').getContext('2d');
+new Chart(deviceCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Desktop', 'Mobile', 'Tablet'],
+        datasets: [{
+            data: [45, 40, 15],
+            backgroundColor: ['#2563eb', '#10b981', '#f59e0b'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

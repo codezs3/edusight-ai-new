@@ -1,0 +1,311 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Manage website navigation menus and links.</p>
+{% endblock %}
+
+{% block content %}
+<!-- Menu Management Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bars me-2"></i>
+                    Menu Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <button class="btn btn-primary me-2 mb-2">
+                            <i class="fas fa-plus me-2"></i>
+                            Add Menu Item
+                        </button>
+                        <button class="btn btn-outline-success me-2 mb-2">
+                            <i class="fas fa-save me-2"></i>
+                            Save Menu Order
+                        </button>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-outline-warning me-2 mb-2">
+                            <i class="fas fa-undo me-2"></i>
+                            Reset to Default
+                        </button>
+                        <button class="btn btn-outline-info mb-2">
+                            <i class="fas fa-eye me-2"></i>
+                            Preview Menu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Menu Items -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Main Navigation Menu
+                </h5>
+                <span class="badge bg-primary">{{ main_menu_items|length }} items</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="40">Order</th>
+                                <th>Menu Item</th>
+                                <th>URL</th>
+                                <th>Status</th>
+                                <th>Submenu</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menuItemsList">
+                            {% for item in main_menu_items %}
+                            <tr data-menu-id="{{ forloop.counter }}">
+                                <td>
+                                    <i class="fas fa-grip-vertical text-muted drag-handle" style="cursor: move;"></i>
+                                    <span class="ms-2">{{ forloop.counter }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-link text-primary me-2"></i>
+                                        <strong>{{ item.name }}</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <code>{{ item.url }}</code>
+                                </td>
+                                <td>
+                                    {% if item.active %}
+                                        <span class="badge status-active">Active</span>
+                                    {% else %}
+                                        <span class="badge status-inactive">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.has_submenu %}
+                                        <span class="badge bg-info">Has Submenu</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary action-btn" title="Edit" onclick="editMenuItem('{{ item.name }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success action-btn" title="Toggle Status" onclick="toggleMenuItem('{{ item.name }}')">
+                                        <i class="fas fa-toggle-{% if item.active %}on{% else %}off{% endif %}"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger action-btn" title="Delete" onclick="deleteMenuItem('{{ item.name }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Menu Settings -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cog me-2"></i>
+                    Menu Settings
+                </h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Menu Style</label>
+                        <select class="form-select">
+                            <option value="horizontal">Horizontal</option>
+                            <option value="vertical">Vertical</option>
+                            <option value="mega">Mega Menu (Current)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Maximum Depth</label>
+                        <select class="form-select">
+                            <option value="1">1 Level</option>
+                            <option value="2" selected>2 Levels</option>
+                            <option value="3">3 Levels</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="showIcons" checked>
+                            <label class="form-check-label" for="showIcons">
+                                Show icons in menu
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="stickyMenu" checked>
+                            <label class="form-check-label" for="stickyMenu">
+                                Sticky navigation
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Save Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Menu Preview
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="menu-preview" style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 2px dashed #e2e8f0;">
+                    <div style="background: white; padding: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <nav class="navbar navbar-expand-lg">
+                            <div class="navbar-nav">
+                                {% for item in main_menu_items %}
+                                    {% if item.active %}
+                                    <a class="nav-link {% if forloop.first %}active{% endif %}" href="{{ item.url }}">
+                                        {{ item.name }}
+                                        {% if item.has_submenu %}
+                                        <i class="fas fa-chevron-down ms-1"></i>
+                                        {% endif %}
+                                    </a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+                <small class="text-muted mt-2 d-block">
+                    <i class="fas fa-info-circle me-1"></i>
+                    This is how your menu will appear on the website.
+                </small>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-mobile-alt me-2"></i>
+                    Mobile Menu
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="mobileMenu" checked>
+                    <label class="form-check-label" for="mobileMenu">
+                        Enable mobile hamburger menu
+                    </label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="mobileCollapse" checked>
+                    <label class="form-check-label" for="mobileCollapse">
+                        Auto-collapse on mobile
+                    </label>
+                </div>
+                <button class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-mobile-alt me-2"></i>
+                    Preview Mobile
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Menu Item Modal -->
+<div class="modal fade" id="addMenuModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Menu Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMenuForm">
+                    <div class="mb-3">
+                        <label class="form-label">Menu Text</label>
+                        <input type="text" class="form-control" name="menu_text" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL</label>
+                        <input type="url" class="form-control" name="menu_url" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Parent Menu</label>
+                        <select class="form-select" name="parent_menu">
+                            <option value="">Top Level</option>
+                            {% for item in main_menu_items %}
+                            <option value="{{ item.name }}">{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Icon (Font Awesome class)</label>
+                        <input type="text" class="form-control" name="menu_icon" placeholder="fas fa-home">
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="menu_active" checked>
+                            <label class="form-check-label">
+                                Active (visible in menu)
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitAddMenu()">Add Menu Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editMenuItem(itemName) {
+    alert('Edit menu item "' + itemName + '" functionality will be implemented.');
+}
+
+function toggleMenuItem(itemName) {
+    alert('Toggle status for "' + itemName + '" functionality will be implemented.');
+}
+
+function deleteMenuItem(itemName) {
+    if (confirm('Are you sure you want to delete menu item "' + itemName + '"?')) {
+        alert('Delete menu item functionality will be implemented.');
+    }
+}
+
+function submitAddMenu() {
+    alert('Add menu item functionality will be implemented.');
+}
+
+// Make menu items sortable (drag and drop)
+document.addEventListener('DOMContentLoaded', function() {
+    // Add drag and drop functionality here if needed
+    console.log('Menu management loaded');
+});
+</script>
+{% endblock %}

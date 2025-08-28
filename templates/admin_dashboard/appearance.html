@@ -1,0 +1,420 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Customize the look and feel of your website.</p>
+{% endblock %}
+
+{% block content %}
+<!-- Theme Selection -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-palette me-2"></i>
+                    Theme Selection
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for theme in themes %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 {% if theme.active %}border-primary{% endif %}">
+                            <div class="position-relative">
+                                <div style="height: 120px; background: linear-gradient(135deg, {{ theme.preview }} 0%, {{ theme.preview }}80 100%); border-radius: 8px 8px 0 0;"></div>
+                                {% if theme.active %}
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <span class="badge bg-primary">Current</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title">{{ theme.name }}</h6>
+                                {% if theme.active %}
+                                    <button class="btn btn-primary btn-sm w-100" disabled>
+                                        <i class="fas fa-check me-2"></i>
+                                        Active Theme
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-outline-primary btn-sm w-100" onclick="activateTheme('{{ theme.name }}')">
+                                        <i class="fas fa-paint-brush me-2"></i>
+                                        Activate
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Color Customization -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-fill-drip me-2"></i>
+                    Color Customization
+                </h5>
+            </div>
+            <div class="card-body">
+                {% csrf_token %}
+                <form class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3">Primary Colors</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Primary Color</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" name="primary_color" value="{{ current_colors.primary }}">
+                                <input type="text" class="form-control" value="{{ current_colors.primary }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Secondary Color</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" name="secondary_color" value="{{ current_colors.secondary }}">
+                                <input type="text" class="form-control" value="{{ current_colors.secondary }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Success Color</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" name="success_color" value="{{ current_colors.success }}">
+                                <input type="text" class="form-control" value="{{ current_colors.success }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3">Accent Colors</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Warning Color</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" name="warning_color" value="{{ current_colors.warning }}">
+                                <input type="text" class="form-control" value="{{ current_colors.warning }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Danger Color</label>
+                            <div class="input-group">
+                                <input type="color" class="form-control form-control-color" name="danger_color" value="{{ current_colors.danger }}">
+                                <input type="text" class="form-control" value="{{ current_colors.danger }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-secondary w-100" onclick="resetColors()">
+                                <i class="fas fa-undo me-2"></i>
+                                Reset to Defaults
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button type="button" class="btn btn-primary" onclick="saveColors()">
+                            <i class="fas fa-save me-2"></i>
+                            Save Color Scheme
+                        </button>
+                        <button type="button" class="btn btn-outline-info ms-2" onclick="previewColors()">
+                            <i class="fas fa-eye me-2"></i>
+                            Preview Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-eye me-2"></i>
+                    Live Preview
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="preview-container" style="background: #f8fafc; padding: 15px; border-radius: 8px;">
+                    <div class="mb-3">
+                        <button class="btn btn-primary btn-sm me-2">Primary</button>
+                        <button class="btn btn-success btn-sm">Success</button>
+                    </div>
+                    <div class="mb-3">
+                        <button class="btn btn-warning btn-sm me-2">Warning</button>
+                        <button class="btn btn-danger btn-sm">Danger</button>
+                    </div>
+                    <div class="progress mb-3">
+                        <div class="progress-bar" style="width: 75%; background-color: {{ current_colors.primary }};"></div>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>This is how your colors will appear on the website.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Typography & Layout -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-font me-2"></i>
+                    Typography
+                </h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Primary Font</label>
+                        <select class="form-select" name="primary_font">
+                            <option value="system" selected>System Default</option>
+                            <option value="roboto">Roboto</option>
+                            <option value="open-sans">Open Sans</option>
+                            <option value="lato">Lato</option>
+                            <option value="montserrat">Montserrat</option>
+                            <option value="poppins">Poppins</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Heading Font</label>
+                        <select class="form-select" name="heading_font">
+                            <option value="inherit" selected>Same as Primary</option>
+                            <option value="playfair">Playfair Display</option>
+                            <option value="merriweather">Merriweather</option>
+                            <option value="source-serif">Source Serif Pro</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Font Size</label>
+                        <select class="form-select" name="font_size">
+                            <option value="small">Small (14px)</option>
+                            <option value="medium" selected>Medium (16px)</option>
+                            <option value="large">Large (18px)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Save Typography
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-mobile-alt me-2"></i>
+                    Layout Options
+                </h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Container Width</label>
+                        <select class="form-select" name="container_width">
+                            <option value="fluid">Full Width</option>
+                            <option value="xl" selected>Extra Large (1200px)</option>
+                            <option value="lg">Large (992px)</option>
+                            <option value="md">Medium (768px)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="rounded_corners" checked>
+                            <label class="form-check-label">
+                                Rounded Corners
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="box_shadows" checked>
+                            <label class="form-check-label">
+                                Box Shadows
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="animations" checked>
+                            <label class="form-check-label">
+                                Animations
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Save Layout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-code me-2"></i>
+                    Custom CSS
+                </h5>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="formatCSS()">
+                        <i class="fas fa-magic me-1"></i>
+                        Format
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-sm" onclick="validateCSS()">
+                        <i class="fas fa-check me-1"></i>
+                        Validate
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <textarea class="form-control" name="custom_css" rows="10" placeholder="/* Add your custom CSS here */&#10;&#10;.custom-header {&#10;    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);&#10;    color: white;&#10;}&#10;&#10;.btn-custom {&#10;    background-color: #ff6b6b;&#10;    border-color: #ff6b6b;&#10;    color: white;&#10;}"></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Add custom CSS to override default styles. Changes will be applied site-wide.
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                Save Custom CSS
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary ms-2" onclick="previewCSS()">
+                                <i class="fas fa-eye me-2"></i>
+                                Preview
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger" onclick="clearCustomCSS()">
+                            <i class="fas fa-trash me-2"></i>
+                            Clear All
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function activateTheme(themeName) {
+    if (confirm('Activate theme "' + themeName + '"? This will change the site appearance.')) {
+        fetch('/admin-panel/appearance/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=change_theme&theme_name=' + encodeURIComponent(themeName)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Refresh to show new theme
+            } else {
+                alert('Failed to change theme: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error changing theme: ' + error.message);
+        });
+    }
+}
+
+function resetColors() {
+    if (confirm('Reset all colors to theme defaults?')) {
+        alert('Reset colors functionality will be implemented.');
+    }
+}
+
+function saveColors() {
+    const formData = new FormData();
+    formData.append('action', 'save_colors');
+    formData.append('primary_color', document.querySelector('input[name="primary_color"]').value);
+    formData.append('secondary_color', document.querySelector('input[name="secondary_color"]').value);
+    formData.append('success_color', document.querySelector('input[name="success_color"]').value);
+    formData.append('warning_color', document.querySelector('input[name="warning_color"]').value);
+    formData.append('danger_color', document.querySelector('input[name="danger_color"]').value);
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+    fetch('/admin-panel/appearance/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Color scheme saved successfully!');
+        } else {
+            alert('Failed to save colors: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error saving colors: ' + error.message);
+    });
+}
+
+function previewColors() {
+    alert('Color preview functionality will show a live preview of changes.');
+}
+
+function formatCSS() {
+    alert('CSS formatting functionality will beautify the CSS code.');
+}
+
+function validateCSS() {
+    alert('CSS validation functionality will check for syntax errors.');
+}
+
+function previewCSS() {
+    alert('CSS preview functionality will show how changes affect the site.');
+}
+
+function clearCustomCSS() {
+    if (confirm('Clear all custom CSS? This action cannot be undone.')) {
+        document.querySelector('textarea[name="custom_css"]').value = '';
+    }
+}
+
+// Color picker sync
+document.querySelectorAll('input[type="color"]').forEach(colorInput => {
+    colorInput.addEventListener('change', function() {
+        const textInput = this.nextElementSibling;
+        textInput.value = this.value;
+        updatePreview();
+    });
+});
+
+document.querySelectorAll('input[type="text"]').forEach(textInput => {
+    if (textInput.previousElementSibling && textInput.previousElementSibling.type === 'color') {
+        textInput.addEventListener('change', function() {
+            const colorInput = this.previousElementSibling;
+            colorInput.value = this.value;
+            updatePreview();
+        });
+    }
+});
+
+function updatePreview() {
+    // Update the live preview with new colors
+    const primaryColor = document.querySelector('input[name="primary_color"]').value;
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+        progressBar.style.backgroundColor = primaryColor;
+    }
+}
+</script>
+{% endblock %}

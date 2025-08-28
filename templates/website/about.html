@@ -1,0 +1,139 @@
+{% extends 'website/base.html' %}
+
+{% block title %}About Us - Our Vision & Mission - EduSight{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6 hero-content" data-aos="fade-right">
+                <h1 class="hero-title">
+                    About
+                    <span style="background: linear-gradient(45deg, #22d3ee, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">EduSight</span>
+                </h1>
+                <p class="hero-subtitle">
+                    We are pioneers in educational technology, combining AI analytics with scientific 
+                    assessments to unlock every student's potential and guide their learning journey.
+                </p>
+                
+                <!-- Vision Statement -->
+                <div class="vision-statement mt-4">
+                    <h4 class="text-white mb-3">
+                        <i class="fas fa-eye me-2"></i>Our Vision
+                    </h4>
+                    <p class="text-white-75 mb-3">
+                        To revolutionize education through AI-powered analytics and scientific assessments, 
+                        helping every child discover and achieve their true potential.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="card-custom p-4 bg-white bg-opacity-10 backdrop-blur">
+                    <h4 class="text-white mb-3">
+                        <i class="fas fa-bullseye me-2"></i>Our Mission
+                    </h4>
+                    <p class="text-white mb-3">
+                        To provide scientifically-backed educational insights that empower students, 
+                        parents, and educators to make informed decisions about learning and career development.
+                    </p>
+                    
+                    <h5 class="text-white mb-3 mt-4">Our Expertise</h5>
+                    <ul class="list-unstyled text-white">
+                        <li class="mb-2"><i class="fas fa-prism text-info me-2"></i>EPR Assessment System</li>
+                        <li class="mb-2"><i class="fas fa-fingerprint text-warning me-2"></i>DMIT Scientific Analysis</li>
+                        <li class="mb-2"><i class="fas fa-brain text-success me-2"></i>AI-Powered Analytics</li>
+                        <li class="mb-2"><i class="fas fa-heart text-danger me-2"></i>Educational Psychology</li>
+                        <li class="mb-2"><i class="fas fa-route text-primary me-2"></i>Career Guidance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Vision, Mission, Values Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">Our Foundation</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Built on strong values and clear purpose to transform educational assessment and analytics.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 mb-4" data-aos="fade-up">
+                <div class="card-custom h-100 p-4 text-center" id="vision">
+                    <div class="card-icon mx-auto" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                        <i class="fas fa-eye" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Vision</h4>
+                    <p class="text-muted">
+                        To be the leading platform for educational analytics and talent discovery, 
+                        transforming how we understand and nurture learning potential through scientific assessment.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto" style="background: linear-gradient(135deg, #10b981, #059669);">
+                        <i class="fas fa-bullseye" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Mission</h4>
+                    <p class="text-muted">
+                        To democratize access to scientific educational assessments and AI-powered 
+                        insights that guide optimal learning paths and career development for every student.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                        <i class="fas fa-heart" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Values</h4>
+                    <p class="text-muted">
+                        Scientific accuracy, ethical practices, student-first approach, 
+                        data privacy, and unwavering commitment to educational excellence in everything we do.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">Our Expert Team</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Meet the professionals dedicated to transforming educational analytics.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for member in team_members %}
+            <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto mb-3">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h5 class="mb-2">{{ member.name }}</h5>
+                    <p class="text-primary mb-2">{{ member.role }}</p>
+                    <p class="text-muted mb-2"><strong>{{ member.experience }}</strong></p>
+                    <p class="text-muted">{{ member.specialization }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

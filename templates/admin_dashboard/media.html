@@ -1,0 +1,344 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Manage media files, images, and uploads for your website.</p>
+{% endblock %}
+
+{% block content %}
+<!-- Media Statistics -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-primary">{{ total_files }}</div>
+                    <div class="stats-label">Total Files</div>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-file fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-success">{{ total_size|filesizeformat }}</div>
+                    <div class="stats-label">Total Size</div>
+                </div>
+                <div class="text-success">
+                    <i class="fas fa-hdd fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-warning">85%</div>
+                    <div class="stats-label">Storage Used</div>
+                </div>
+                <div class="text-warning">
+                    <i class="fas fa-chart-pie fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload and Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-upload me-2"></i>
+                    File Upload & Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="upload-area border-2 border-dashed rounded p-4 text-center" style="border-color: #e2e8f0;">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h6>Drag & Drop files here or click to browse</h6>
+                            <p class="text-muted mb-3">Supported formats: JPG, PNG, GIF, PDF, DOC, MP4 (Max: 10MB)</p>
+                            <input type="file" id="fileInput" multiple class="d-none" accept="image/*,video/*,.pdf,.doc,.docx">
+                            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-folder-open me-2"></i>
+                                Browse Files
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-success">
+                                <i class="fas fa-compress-alt me-2"></i>
+                                Optimize Images
+                            </button>
+                            <button class="btn btn-outline-warning">
+                                <i class="fas fa-broom me-2"></i>
+                                Clean Unused Files
+                            </button>
+                            <button class="btn btn-outline-info">
+                                <i class="fas fa-download me-2"></i>
+                                Backup Media
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Media Files List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-folder me-2"></i>
+                    Media Library
+                </h5>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="viewMode" id="gridView" checked>
+                    <label class="btn btn-outline-secondary btn-sm" for="gridView">
+                        <i class="fas fa-th"></i> Grid
+                    </label>
+                    <input type="radio" class="btn-check" name="viewMode" id="listView">
+                    <label class="btn btn-outline-secondary btn-sm" for="listView">
+                        <i class="fas fa-list"></i> List
+                    </label>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Filter and Search -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Search files...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option value="">All File Types</option>
+                            <option value="image">Images</option>
+                            <option value="video">Videos</option>
+                            <option value="document">Documents</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option value="">Sort by Date</option>
+                            <option value="name">Sort by Name</option>
+                            <option value="size">Sort by Size</option>
+                            <option value="type">Sort by Type</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grid View -->
+                <div id="gridViewContent">
+                    {% if media_files %}
+                        <div class="row">
+                            {% for file in media_files %}
+                            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="position-relative">
+                                        {% if file.name|slice:"-4:" in ".jpg,.png,.gif,.jpeg" %}
+                                            <img src="{{ file.url }}" class="card-img-top" alt="{{ file.name }}" style="height: 120px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 120px; background: #f8fafc;">
+                                                {% if file.name|slice:"-4:" == ".pdf" %}
+                                                    <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                                                {% elif file.name|slice:"-4:" in ".doc,.docx" %}
+                                                    <i class="fas fa-file-word fa-3x text-primary"></i>
+                                                {% elif file.name|slice:"-4:" in ".mp4,.avi,.mov" %}
+                                                    <i class="fas fa-file-video fa-3x text-info"></i>
+                                                {% else %}
+                                                    <i class="fas fa-file fa-3x text-secondary"></i>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="position-absolute top-0 end-0 p-1">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-secondary" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="{{ file.url }}" target="_blank"><i class="fas fa-eye me-2"></i>View</a></li>
+                                                    <li><a class="dropdown-item" href="{{ file.url }}" download><i class="fas fa-download me-2"></i>Download</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="copyUrl('{{ file.url }}')"><i class="fas fa-copy me-2"></i>Copy URL</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteFile('{{ file.name }}')"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-truncate mb-1" title="{{ file.name }}">{{ file.name }}</h6>
+                                        <small class="text-muted">
+                                            {{ file.size|filesizeformat }}
+                                            <br>
+                                            {{ file.modified|date:"M d, Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                            <h6 class="text-muted">No media files found</h6>
+                            <p class="text-muted">Upload your first file to get started.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- List View (Hidden by default) -->
+                <div id="listViewContent" style="display: none;">
+                    {% if media_files %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Preview</th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Size</th>
+                                        <th>Modified</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for file in media_files %}
+                                    <tr>
+                                        <td>
+                                            {% if file.name|slice:"-4:" in ".jpg,.png,.gif,.jpeg" %}
+                                                <img src="{{ file.url }}" alt="{{ file.name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                            {% else %}
+                                                <div class="d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: #f8fafc; border-radius: 4px;">
+                                                    <i class="fas fa-file text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <strong>{{ file.name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ file.path }}</small>
+                                        </td>
+                                        <td>
+                                            {% if file.name|slice:"-4:" in ".jpg,.png,.gif,.jpeg" %}
+                                                <span class="badge bg-success">Image</span>
+                                            {% elif file.name|slice:"-4:" == ".pdf" %}
+                                                <span class="badge bg-danger">PDF</span>
+                                            {% elif file.name|slice:"-4:" in ".doc,.docx" %}
+                                                <span class="badge bg-primary">Document</span>
+                                            {% elif file.name|slice:"-4:" in ".mp4,.avi,.mov" %}
+                                                <span class="badge bg-info">Video</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Other</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ file.size|filesizeformat }}</td>
+                                        <td>
+                                            {{ file.modified|date:"M d, Y H:i" }}
+                                            <br>
+                                            <small class="text-muted">{{ file.modified|timesince }} ago</small>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary action-btn" title="View" onclick="window.open('{{ file.url }}', '_blank')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success action-btn" title="Copy URL" onclick="copyUrl('{{ file.url }}')">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger action-btn" title="Delete" onclick="deleteFile('{{ file.name }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// View mode toggle
+document.getElementById('gridView').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('gridViewContent').style.display = 'block';
+        document.getElementById('listViewContent').style.display = 'none';
+    }
+});
+
+document.getElementById('listView').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('gridViewContent').style.display = 'none';
+        document.getElementById('listViewContent').style.display = 'block';
+    }
+});
+
+// File operations
+function copyUrl(url) {
+    navigator.clipboard.writeText(url).then(function() {
+        alert('URL copied to clipboard: ' + url);
+    }, function() {
+        alert('Failed to copy URL. Please copy manually: ' + url);
+    });
+}
+
+function deleteFile(filename) {
+    if (confirm('Are you sure you want to delete "' + filename + '"? This action cannot be undone.')) {
+        alert('Delete file functionality will be implemented.');
+    }
+}
+
+// File upload handling
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const files = e.target.files;
+    if (files.length > 0) {
+        alert('Selected ' + files.length + ' file(s). Upload functionality will be implemented.');
+        // Here you would implement the actual file upload logic
+    }
+});
+
+// Drag and drop functionality
+const uploadArea = document.querySelector('.upload-area');
+
+uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    uploadArea.style.borderColor = '#2563eb';
+    uploadArea.style.backgroundColor = '#f0f9ff';
+});
+
+uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    uploadArea.style.borderColor = '#e2e8f0';
+    uploadArea.style.backgroundColor = 'transparent';
+});
+
+uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    uploadArea.style.borderColor = '#e2e8f0';
+    uploadArea.style.backgroundColor = 'transparent';
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        alert('Dropped ' + files.length + ' file(s). Upload functionality will be implemented.');
+        // Here you would implement the actual file upload logic
+    }
+});
+</script>
+{% endblock %}

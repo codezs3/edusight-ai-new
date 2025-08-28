@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EduSight - EPR Assessment Platform & Educational Analytics{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block description %}EduSight EPR - Comprehensive student assessment platform evaluating Academic Performance, Psychological Well-being & Physical Health. AI-powered analytics for optimal learning outcomes.{% endblock %}">
+    <meta name="keywords" content="EPR Assessment, EduSight Prism Rating, Educational Analytics, Student Assessment, AI Learning, K-12 Education, Career Guidance, Academic Performance, Psychological Well-being, Physical Health">
+    <meta name="author" content="EduSight">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}EduSight EPR - Comprehensive Student Assessment Platform{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Transform your child's learning with EduSight Prism Rating - comprehensive assessment covering Academic, Psychological, and Physical development{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #1d4ed8;
+            --turquoise: #06b6d4;
+            --light-turquoise: #22d3ee;
+            --dark-blue: #1e3a8a;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            --gradient-secondary: linear-gradient(135deg, #1d4ed8 0%, #22d3ee 100%);
+            --gradient-hero: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #06b6d4 100%);
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --light-bg: #f8fafc;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        
+        /* Navigation Styles */
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0;
+            transition: all 0.3s ease;
+            min-height: 70px;
+        }
+        
+        .navbar-custom.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+            padding: 0.5rem 0;
+        }
+        
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 1rem !important;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background: var(--gradient-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 80%;
+            left: 10%;
+        }
+        
+        /* Mega Menu Styles */
+        .dropdown-mega {
+            position: static;
+        }
+        
+        .mega-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: none;
+            border-radius: 0 0 15px 15px;
+            box-shadow: var(--shadow-xl);
+            padding: 2rem;
+            margin-top: 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1050;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .dropdown-mega:hover .mega-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .mega-menu-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 992px) {
+            .mega-menu-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .mega-menu-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        
+        .mega-menu-column h6 {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .mega-menu-item {
+            display: block;
+            padding: 0.75rem 0;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .mega-menu-item:hover {
+            color: var(--primary-blue);
+            padding-left: 0.5rem;
+        }
+        
+        .mega-menu-item i {
+            width: 20px;
+            margin-right: 0.5rem;
+            color: var(--turquoise);
+        }
+        
+        /* Buttons */
+        .btn-primary-custom {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+        
+        .btn-outline-custom {
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            background: transparent;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-outline-custom:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: var(--gradient-hero);
+            color: white;
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') bottom center/cover no-repeat;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+        
+        /* Section Styles */
+        .section-padding {
+            padding: 5rem 0;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 3rem;
+        }
+        
+        /* Card Styles */
+        .card-custom {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .card-custom:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Footer */
+        .footer-custom {
+            background: var(--text-dark);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--light-turquoise);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .mega-menu {
+                position: relative;
+                width: 100%;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                padding: 1rem;
+            }
+            
+            .mega-menu-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        
+        /* Custom Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* DMIT Specific Styles */
+        .dmit-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+        
+        .dmit-badge {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .price-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 3px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+        
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            padding: 3px;
+            background: var(--gradient-primary);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            z-index: -1;
+        }
+        /* Assessment Header Animations */
+        .assessment-header {
+            position: relative;
+        }
+        
+        .typing-animation {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typewriter 2s steps(40, end);
+        }
+        
+        .assessment-label {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--light-turquoise);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+        }
+        
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .word-animate {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        .word-animate[data-delay="0"] { animation-delay: 0s; }
+        .word-animate[data-delay="0.3"] { animation-delay: 0.3s; }
+        .word-animate[data-delay="0.6"] { animation-delay: 0.6s; }
+        
+        .gradient-text {
+            background: linear-gradient(45deg, #22d3ee, #ffffff, #22d3ee);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: var(--delay, 0.9s);
+        }
+        
+        .fade-in-up[data-delay="0.9"] { animation-delay: 0.9s; }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .highlight-text {
+            color: var(--light-turquoise);
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .highlight-text::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #22d3ee, #06b6d4);
+            transform: scaleX(0);
+            animation: underlineGrow 0.8s ease forwards;
+            animation-delay: 1.5s;
+        }
+        
+        @keyframes underlineGrow {
+            to { transform: scaleX(1); }
+        }
+        
+        /* Assessment Features Animation */
+        .assessment-features-animation {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.6s ease forwards;
+        }
+        
+        .feature-item[data-delay="1.2"] { animation-delay: 1.2s; }
+        .feature-item[data-delay="1.4"] { animation-delay: 1.4s; }
+        .feature-item[data-delay="1.6"] { animation-delay: 1.6s; }
+        
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .pulse-icon {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Assessment Demo Animations */
+        .assessment-demo-container {
+            position: relative;
+        }
+        
+        .bounce-icon {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .assessment-progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #22d3ee, #06b6d4);
+            width: 0%;
+            animation: progressFill 3s ease-in-out infinite;
+        }
+        
+        @keyframes progressFill {
+            0% { width: 0%; }
+            50% { width: 85%; }
+            100% { width: 100%; }
+        }
+        
+        .metric-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#22d3ee 0% 0%, rgba(255,255,255,0.2) 0% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            position: relative;
+            animation: circleGrow 2s ease-in-out forwards;
+            animation-delay: 1s;
+        }
+        
+        .metric-inner {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .score-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .score-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        @keyframes circleGrow {
+            to {
+                background: conic-gradient(#22d3ee 0% 88%, rgba(255,255,255,0.2) 88% 100%);
+            }
+        }
+        
+        /* Domain Scores Animation */
+        .domain-scores {
+            margin-top: 2rem;
+        }
+        
+        .domain-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideInFade 0.8s ease forwards;
+        }
+        
+        .academic-domain { animation-delay: 1.5s; }
+        .psychological-domain { animation-delay: 1.8s; }
+        .physical-domain { animation-delay: 2.1s; }
+        
+        @keyframes slideInFade {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .domain-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .academic-domain .domain-icon {
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+            color: white;
+        }
+        
+        .psychological-domain .domain-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .physical-domain .domain-icon {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .domain-info {
+            flex: 1;
+        }
+        
+        .domain-name {
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .domain-score {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--light-turquoise);
+        }
+        
+        .domain-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .domain-fill {
+            height: 100%;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 1.5s ease-in-out;
+        }
+        
+        .academic-fill {
+            background: linear-gradient(45deg, #f59e0b, #eab308);
+            animation: fillBar 2s ease-in-out forwards;
+            animation-delay: 2s;
+        }
+        
+        .psychological-fill {
+            background: linear-gradient(45deg, #10b981, #059669);
+            animation: fillBar 2s ease-in-out forwards;
+            animation-delay: 2.3s;
+        }
+        
+        .physical-fill {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            animation: fillBar 2s ease-in-out forwards;
+            animation-delay: 2.6s;
+        }
+        
+        @keyframes fillBar {
+            to { width: 85%; }
+        }
+        
+        .assessment-insights {
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 3s;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .assessment-features-animation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .domain-scores {
+                margin-top: 1rem;
+            }
+            
+            .metric-circle {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .metric-inner {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .score-text {
+                font-size: 1.2rem;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .assessment-features-animation {
+                justify-content: center;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'website_home' %}">
+                <i class="fas fa-brain me-2"></i>EduSight
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                                            <li class="nav-item">
+                            <a class="nav-link" href="{% url 'website_home' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'website_about' %}">About Us</a>
+                        </li>
+                    
+                    <!-- Frameworks Mega Menu -->
+                    <li class="nav-item dropdown dropdown-mega">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Frameworks
+                        </a>
+                        <div class="dropdown-menu mega-menu">
+                            <div class="mega-menu-content">
+                                <div class="mega-menu-column">
+                                    <h6><i class="fas fa-graduation-cap me-2"></i>Academic Frameworks</h6>
+                                    <a href="{% url 'framework_cbse' %}" class="mega-menu-item">
+                                        <i class="fas fa-school"></i>CBSE - Central Board
+                                    </a>
+                                    <a href="{% url 'framework_icse' %}" class="mega-menu-item">
+                                        <i class="fas fa-book-open"></i>ICSE - Indian Certificate
+                                    </a>
+                                    <a href="{% url 'framework_igcse' %}" class="mega-menu-item">
+                                        <i class="fas fa-globe-americas"></i>IGCSE - International
+                                    </a>
+                                    <a href="{% url 'framework_ib' %}" class="mega-menu-item">
+                                        <i class="fas fa-university"></i>IB - Baccalaureate
+                                    </a>
+                                    <a href="{% url 'framework_cbse' %}" class="mega-menu-item">
+                                        <i class="fas fa-chart-line"></i>Assessment Standards
+                                    </a>
+                                </div>
+                                <div class="mega-menu-column">
+                                    <h6><i class="fas fa-brain me-2"></i>Psychological Frameworks</h6>
+                                    <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
+                                        <i class="fas fa-head-side-virus"></i>Cognitive Assessment
+                                    </a>
+                                    <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
+                                        <i class="fas fa-heart"></i>Emotional Intelligence
+                                    </a>
+                                    <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
+                                        <i class="fas fa-people-arrows"></i>Social Skills Assessment
+                                    </a>
+                                    <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
+                                        <i class="fas fa-lightbulb"></i>Learning Style Analysis
+                                    </a>
+                                    <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
+                                        <i class="fas fa-smile"></i>Personality Assessment
+                                    </a>
+                                </div>
+                                <div class="mega-menu-column">
+                                    <h6><i class="fas fa-dumbbell me-2"></i>Physical Education</h6>
+                                    <a href="{% url 'framework_physical' %}" class="mega-menu-item">
+                                        <i class="fas fa-running"></i>Fitness Assessment
+                                    </a>
+                                    <a href="{% url 'framework_physical' %}" class="mega-menu-item">
+                                        <i class="fas fa-child"></i>Motor Skills Development
+                                    </a>
+                                    <a href="{% url 'framework_physical' %}" class="mega-menu-item">
+                                        <i class="fas fa-heartbeat"></i>Health Monitoring
+                                    </a>
+                                    <a href="{% url 'framework_physical' %}" class="mega-menu-item">
+                                        <i class="fas fa-trophy"></i>Sports Analytics
+                                    </a>
+                                    <a href="{% url 'framework_physical' %}" class="mega-menu-item">
+                                        <i class="fas fa-balance-scale"></i>BMI & Growth Tracking
+                                    </a>
+                                </div>
+                                <div class="mega-menu-column">
+                                    <h6><i class="fas fa-tools me-2"></i>Assessment Tools</h6>
+                                    <a href="{% url 'pricing_plans' %}" class="mega-menu-item">
+                                        <i class="fas fa-chart-bar"></i>EPR Assessment Plans
+                                    </a>
+                                    <a href="{% url 'dmit_info' %}" class="mega-menu-item">
+                                        <i class="fas fa-fingerprint"></i>DMIT Analysis
+                                    </a>
+                                    <a href="{% url 'book_assessment' %}" class="mega-menu-item">
+                                        <i class="fas fa-calendar-check"></i>Book Assessment
+                                    </a>
+                                    <a href="{% url 'dashboard' %}" class="mega-menu-item">
+                                        <i class="fas fa-tachometer-alt"></i>Demo Dashboard
+                                    </a>
+                                    <a href="{% url 'website_contact' %}" class="mega-menu-item">
+                                        <i class="fas fa-headset"></i>Get Consultation
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'pricing_plans' %}">EPR Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'website_contact' %}">Contact Us</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex gap-2">
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary-custom">Demo Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-brain me-2"></i>EduSight
+                    </h5>
+                    <p class="text-muted">
+                        Empowering students with AI-powered educational analytics and scientific DMIT testing 
+                        to unlock their true potential and guide their academic journey.
+                    </p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="text-muted"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Services</h6>
+                    <div class="footer-links">
+                        <a href="{% url 'pricing_plans' %}" class="d-block mb-2">EPR Assessment</a>
+                        <a href="#" class="d-block mb-2">Academic Analytics</a>
+                        <a href="#" class="d-block mb-2">Career Guidance</a>
+                        <a href="#" class="d-block mb-2">AI-Powered Insights</a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Frameworks</h6>
+                    <div class="footer-links">
+                        <a href="{% url 'framework_cbse' %}" class="d-block mb-2">CBSE</a>
+                        <a href="{% url 'framework_icse' %}" class="d-block mb-2">ICSE</a>
+                        <a href="{% url 'framework_igcse' %}" class="d-block mb-2">IGCSE</a>
+                        <a href="{% url 'framework_ib' %}" class="d-block mb-2">IB</a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Company</h6>
+                    <div class="footer-links">
+                        <a href="{% url 'website_about' %}" class="d-block mb-2">About Us</a>
+                        <a href="{% url 'website_about' %}#vision" class="d-block mb-2">Our Vision</a>
+                        <a href="{% url 'website_contact' %}" class="d-block mb-2">Contact</a>
+                        <a href="#" class="d-block mb-2">Privacy Policy</a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Contact Info</h6>
+                    <div class="footer-links">
+                        <p class="mb-2"><i class="fas fa-phone me-2"></i>+91 9876543210</p>
+                        <p class="mb-2"><i class="fas fa-envelope me-2"></i>info@edusight.com</p>
+                        <p class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>Mumbai, India</p>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">&copy; 2025 EduSight. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="dmit-badge">EPR Assessment from ₹499 + GST - Edusight Prism Rating</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNav');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,781 @@
+{% extends 'website/base.html' %}
+
+{% block title %}Comprehensive Student Assessment Platform - EduSight EPR{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6 hero-content" data-aos="fade-right">
+                <div class="assessment-header">
+                    <div class="typing-animation mb-3">
+                        <span class="assessment-label">EduSight Prism Rating Platform</span>
+                    </div>
+                    <h1 class="hero-title">
+                        <span class="word-animate" data-delay="0">EduSight</span>
+                        <span class="word-animate" data-delay="0.3">Prism</span>
+                        <span class="gradient-text word-animate" data-delay="0.6">Rating</span>
+                    </h1>
+                    <div class="subtitle-container">
+                        <p class="hero-subtitle fade-in-up" data-delay="0.9">
+                            Comprehensive multidimensional student assessment framework evaluating 
+                            <span class="highlight-text">Academic Performance</span>, 
+                            <span class="highlight-text">Psychological Well-being</span>, and 
+                            <span class="highlight-text">Physical Health</span>
+                        </p>
+                    </div>
+                    
+                    <!-- EPR Features Animation -->
+                    <div class="assessment-features-animation mt-3 mb-4">
+                        <div class="feature-item" data-delay="1.2">
+                            <i class="fas fa-prism pulse-icon"></i>
+                            <span>EPR Scoring System</span>
+                        </div>
+                        <div class="feature-item" data-delay="1.4">
+                            <i class="fas fa-chart-line pulse-icon"></i>
+                            <span>AI-Powered Analytics</span>
+                        </div>
+                        <div class="feature-item" data-delay="1.6">
+                            <i class="fas fa-user-graduate pulse-icon"></i>
+                            <span>Growth Insights</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trust Signals -->
+                <div class="d-flex align-items-center gap-4 text-white mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-users me-2 text-success"></i>
+                        <small><strong>500+</strong> Families Trust Us</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star me-2 text-warning"></i>
+                        <small><strong>4.9/5</strong> Parent Rating</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-certificate me-2 text-info"></i>
+                        <small>Scientifically Validated</small>
+                    </div>
+                </div>
+                
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="#assessment-quiz" class="btn btn-primary-custom btn-lg">
+                        <i class="fas fa-prism me-2"></i>Start EPR Assessment
+                    </a>
+                    <a href="{% url 'pricing_plans' %}" class="btn btn-outline-custom btn-lg">
+                        <i class="fas fa-chart-line me-2"></i>View EPR Plans
+                    </a>
+                </div>
+                
+                <!-- Value Props -->
+                <div class="d-flex align-items-center gap-4 text-white">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-clock me-2 text-warning"></i>
+                        <small>Results in 24 Hours</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-shield-alt me-2 text-success"></i>
+                        <small>100% Confidential</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-undo me-2 text-info"></i>
+                        <small>30-Day Guarantee</small>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="position-relative">
+                    <!-- Interactive Assessment Demo -->
+                    <div class="assessment-demo-container">
+                        <div class="card-custom p-4 bg-white bg-opacity-10 backdrop-blur">
+                            <div class="demo-header text-center mb-4">
+                                <h4 class="text-white mb-2">
+                                    <i class="fas fa-clipboard-check me-2 bounce-icon"></i>Live Assessment Demo
+                                </h4>
+                                <div class="assessment-progress-bar">
+                                    <div class="progress-fill"></div>
+                                </div>
+                                <small class="text-white-50">Assessment in Progress...</small>
+                            </div>
+                            
+                            <!-- Animated Assessment Metrics -->
+                            <div class="assessment-metrics">
+                                <div class="metric-circle-container text-center mb-3">
+                                    <div class="metric-circle" id="overallScore">
+                                        <div class="metric-inner">
+                                            <span class="score-text">0%</span>
+                                            <small class="score-label">Overall Score</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Domain Scores with Animation -->
+                                <div class="domain-scores">
+                                    <div class="domain-item academic-domain">
+                                        <div class="domain-icon">
+                                            <i class="fas fa-graduation-cap"></i>
+                                        </div>
+                                        <div class="domain-info">
+                                            <div class="domain-name">Academic</div>
+                                            <div class="domain-score" data-target="89">0%</div>
+                                            <div class="domain-bar">
+                                                <div class="domain-fill academic-fill"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="domain-item psychological-domain">
+                                        <div class="domain-icon">
+                                            <i class="fas fa-brain"></i>
+                                        </div>
+                                        <div class="domain-info">
+                                            <div class="domain-name">Psychological</div>
+                                            <div class="domain-score" data-target="94">0%</div>
+                                            <div class="domain-bar">
+                                                <div class="domain-fill psychological-fill"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="domain-item physical-domain">
+                                        <div class="domain-icon">
+                                            <i class="fas fa-heartbeat"></i>
+                                        </div>
+                                        <div class="domain-info">
+                                            <div class="domain-name">Physical</div>
+                                            <div class="domain-score" data-target="82">0%</div>
+                                            <div class="domain-bar">
+                                                <div class="domain-fill physical-fill"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="demo-footer text-center mt-3">
+                                <div class="assessment-insights">
+                                    <i class="fas fa-lightbulb text-warning me-2"></i>
+                                    <span class="text-white-75">Generating personalized insights...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonial Band -->
+<section class="py-4" style="background: rgba(255,255,255,0.95);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center">
+                    <div class="me-4">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face&auto=format" 
+                             alt="Parent" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                    </div>
+                    <div>
+                        <blockquote class="mb-1" style="font-style: italic; color: #374151;">
+                            "EduSight's assessment revealed my son's hidden strengths in visual learning. His grades improved by 40% after following their recommendations!"
+                        </blockquote>
+                        <cite class="text-muted">— Priya Sharma, Mother of 8th grader</cite>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="d-flex align-items-center justify-content-lg-end">
+                    <div class="me-3">
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <small class="text-muted">4.9/5 from 247 parents</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">The EPR Assessment Framework</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Edusight Prism Rating - A comprehensive, multidimensional assessment framework that evaluates 
+                    student development across three critical domains with advanced analytics and AI insights.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto" style="background: linear-gradient(135deg, #f59e0b, #eab308);">
+                        <i class="fas fa-graduation-cap" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Academic Performance</h4>
+                    <p class="text-muted">
+                        Tracks cognitive growth, subject mastery, learning pace, and engagement metrics 
+                        using structured data and predictive analytics.
+                    </p>
+                    <div class="mt-auto">
+                        <span class="dmit-badge" style="background: linear-gradient(135deg, #f59e0b, #eab308);">Cognitive Growth</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto" style="background: linear-gradient(135deg, #10b981, #059669);">
+                        <i class="fas fa-heart" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Psychological Well-being</h4>
+                    <p class="text-muted">
+                        Measures emotional resilience, stress levels, social connectedness, and behavioral 
+                        indicators through validated psychometric inputs and sentiment analysis.
+                    </p>
+                    <div class="mt-auto">
+                        <span class="dmit-badge" style="background: linear-gradient(135deg, #10b981, #059669);">Emotional Health</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                        <i class="fas fa-dumbbell" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Physical Health</h4>
+                    <p class="text-muted">
+                        Assesses physical activity, sleep patterns, nutrition habits, and overall vitality 
+                        via self-reports, school inputs, and optional wearable integrations.
+                    </p>
+                    <div class="mt-auto">
+                        <span class="dmit-badge" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">Physical Vitality</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h4 class="mb-3">Home Collection</h4>
+                    <p class="text-muted">
+                        Convenient home visit service for DMIT fingerprint collection. 
+                        Safe, hygienic, and comfortable testing environment.
+                    </p>
+                    <div class="mt-auto">
+                        <small class="text-warning"><i class="fas fa-shield-alt me-1"></i>Safe & Secure</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="600">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4 class="mb-3">Detailed Reports</h4>
+                    <p class="text-muted">
+                        Comprehensive analysis reports with career guidance, learning style 
+                        recommendations, and personalized development plans.
+                    </p>
+                    <div class="mt-auto">
+                        <small class="text-info"><i class="fas fa-file-alt me-1"></i>Detailed Analysis</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="700">
+                <div class="card-custom h-100 p-4 text-center">
+                    <div class="card-icon mx-auto">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4 class="mb-3">Expert Consultation</h4>
+                    <p class="text-muted">
+                        One-on-one consultation with certified counselors to discuss results 
+                        and create actionable development strategies.
+                    </p>
+                    <div class="mt-auto">
+                        <small class="text-purple"><i class="fas fa-user-tie me-1"></i>Certified Experts</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Assessment Pricing Section -->
+<section class="section-padding">
+    <div class="container">
+        <!-- Assessment Quiz Section -->
+        <div id="assessment-quiz" class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h2 class="section-title mb-4">Find Your Perfect Assessment Plan</h2>
+                <div class="card border-0 shadow-lg p-4">
+                    <h5 class="mb-4">Quick Assessment Finder</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check text-start">
+                                <input class="form-check-input" type="radio" name="assessmentType" id="academic" value="academic">
+                                <label class="form-check-label" for="academic">
+                                    <strong>Academic Focus</strong><br>
+                                    <small class="text-muted">Subject performance & learning style</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check text-start">
+                                <input class="form-check-input" type="radio" name="assessmentType" id="holistic" value="holistic" checked>
+                                <label class="form-check-label" for="holistic">
+                                    <strong>Complete Assessment</strong><br>
+                                    <small class="text-muted">Academic + Emotional + Physical</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check text-start">
+                                <input class="form-check-input" type="radio" name="assessmentType" id="career" value="career">
+                                <label class="form-check-label" for="career">
+                                    <strong>Career Guidance</strong><br>
+                                    <small class="text-muted">Future planning & skill mapping</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg mt-3" onclick="showRecommendation()">
+                        <i class="fas fa-magic me-2"></i>Get My Recommendation
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">Simple, Transparent Pricing</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Choose the assessment that fits your needs. All plans include detailed reports and recommendations.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Basic Plan -->
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="price-card text-center h-100">
+                    <h4 class="mb-3">Basic</h4>
+                    <div class="dmit-price mb-3">₹499 <small class="text-muted">+ GST</small></div>
+                    <p class="text-muted mb-4">Essential assessments for students</p>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Academic performance analysis</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Basic learning style assessment</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Subject-wise strengths report</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Basic recommendations</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Digital report</li>
+                    </ul>
+                    
+                    <a href="{% url 'pricing_plans' %}" class="btn btn-outline-primary w-100 mb-3">
+                        <i class="fas fa-cart-plus me-2"></i>Choose Basic
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Gold Plan -->
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="price-card text-center h-100" style="border: 2px solid #f59e0b;">
+                    <div class="dmit-badge mb-3" style="background: linear-gradient(135deg, #f59e0b, #eab308);">Most Popular</div>
+                    <h4 class="mb-3">Gold</h4>
+                    <div class="dmit-price mb-3">₹899 <small class="text-muted">+ GST</small></div>
+                    <p class="text-muted mb-4">Comprehensive assessment package</p>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Everything in Basic</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Psychological wellbeing analysis</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Career guidance insights</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>AI-powered recommendations</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Progress tracking</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Email support</li>
+                    </ul>
+                    
+                    <a href="{% url 'pricing_plans' %}" class="btn btn-primary-custom w-100 mb-3">
+                        <i class="fas fa-star me-2"></i>Choose Gold
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Platinum Plan -->
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="price-card text-center h-100" style="border: 2px solid #8b5cf6;">
+                    <div class="dmit-badge mb-3" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">Premium</div>
+                    <h4 class="mb-3">Platinum</h4>
+                    <div class="dmit-price mb-3">₹1,499 <small class="text-muted">+ GST</small></div>
+                    <p class="text-muted mb-4">Complete educational analytics</p>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Everything in Gold</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Advanced ML analytics</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Personalized study plans</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Expert consultation call</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority support</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Monthly progress reports</li>
+                    </ul>
+                    
+                    <a href="{% url 'pricing_plans' %}" class="btn btn-primary-custom w-100 mb-3" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
+                        <i class="fas fa-crown me-2"></i>Choose Platinum
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Corporate Plan -->
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="price-card text-center h-100" style="border: 2px solid #059669;">
+                    <div class="dmit-badge mb-3" style="background: linear-gradient(135deg, #059669, #10b981);">Enterprise</div>
+                    <h4 class="mb-3">Corporate</h4>
+                    <div class="dmit-price mb-3">₹25,000 <small class="text-muted">/ year</small></div>
+                    <p class="text-muted mb-4">For schools & institutions</p>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Platinum access for 50 students</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Bulk analytics dashboard</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Teacher training sessions</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Custom reporting</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Dedicated support</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Annual reviews</li>
+                    </ul>
+                    
+                    <a href="{% url 'website_contact' %}" class="btn btn-success w-100 mb-3">
+                        <i class="fas fa-building me-2"></i>Contact Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">How DMIT Works</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Simple 4-step process to unlock your child's potential through scientific analysis.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-3 col-md-6 text-center mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="position-relative">
+                    <div class="card-icon mx-auto mb-3" style="background: linear-gradient(135deg, #10b981, #22d3ee);">
+                        <span style="font-size: 2rem; font-weight: bold;">1</span>
+                    </div>
+                    <h5 class="mb-3">Book Appointment</h5>
+                    <p class="text-muted">Schedule a convenient time for our expert to visit your home for fingerprint collection.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 text-center mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="position-relative">
+                    <div class="card-icon mx-auto mb-3" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6);">
+                        <span style="font-size: 2rem; font-weight: bold;">2</span>
+                    </div>
+                    <h5 class="mb-3">Fingerprint Collection</h5>
+                    <p class="text-muted">Safe and hygienic collection of all 10 fingerprints using advanced scanning technology.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 text-center mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="position-relative">
+                    <div class="card-icon mx-auto mb-3" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+                        <span style="font-size: 2rem; font-weight: bold;">3</span>
+                    </div>
+                    <h5 class="mb-3">Scientific Analysis</h5>
+                    <p class="text-muted">Advanced dermatoglyphics analysis using proven scientific methods and AI algorithms.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 text-center mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="position-relative">
+                    <div class="card-icon mx-auto mb-3" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">
+                        <span style="font-size: 2rem; font-weight: bold;">4</span>
+                    </div>
+                    <h5 class="mb-3">Detailed Report</h5>
+                    <p class="text-muted">Receive comprehensive report with career guidance and expert consultation session.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">What Parents Say</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Real experiences from families who discovered their children's potential through DMIT.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-custom p-4 h-100">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L13 3V7H9S7 1 5 1H3V7L9 13V21H11V15L15 21H17V13L21 9Z'/%3E%3C/svg%3E" alt="Parent" class="rounded-circle me-3">
+                        <div>
+                            <h6 class="mb-0">Mrs. Priya Sharma</h6>
+                            <small class="text-muted">Mother of Arjun (Class 8)</small>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">
+                        "DMIT helped us understand Arjun's natural inclination towards mathematics and science. 
+                        The detailed report guided us in choosing the right coaching and career path."
+                    </p>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card-custom p-4 h-100">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L13 3V7H9S7 1 5 1H3V7L9 13V21H11V15L15 21H17V13L21 9Z'/%3E%3C/svg%3E" alt="Parent" class="rounded-circle me-3">
+                        <div>
+                            <h6 class="mb-0">Mr. Rajesh Patel</h6>
+                            <small class="text-muted">Father of Kavya (Class 10)</small>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">
+                        "The home collection service was very convenient. The analysis revealed Kavya's creative abilities 
+                        which we never knew existed. Now she's pursuing digital arts!"
+                    </p>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="card-custom p-4 h-100">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L13 3V7H9S7 1 5 1H3V7L9 13V21H11V15L15 21H17V13L21 9Z'/%3E%3C/svg%3E" alt="Parent" class="rounded-circle me-3">
+                        <div>
+                            <h6 class="mb-0">Mrs. Anita Singh</h6>
+                            <small class="text-muted">Mother of Rohan (Class 6)</small>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">
+                        "Scientific and accurate analysis! The consultation session was very helpful in understanding 
+                        Rohan's learning style. Highly recommend EduSight."
+                    </p>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- EPR Assessment CTA Section -->
+<section class="section-padding" style="background: var(--gradient-hero);">
+    <div class="container">
+        <div class="row justify-content-center text-center text-white">
+            <div class="col-lg-8" data-aos="fade-up">
+                <h2 class="mb-4" style="font-size: 2.5rem; font-weight: 700;">
+                    Ready to Transform Your Child's Learning Journey?
+                </h2>
+                <p class="mb-4" style="font-size: 1.2rem; opacity: 0.9;">
+                    Join thousands of families who have discovered their children's potential through EduSight Prism Rating assessment.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{% url 'pricing_plans' %}" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-prism me-2"></i>Start EPR Assessment
+                    </a>
+                    <a href="{% url 'website_contact' %}" class="btn btn-outline-light btn-lg px-5">
+                        <i class="fas fa-phone me-2"></i>Get Free Consultation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- DMIT Additional Service Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h3 class="mb-4">
+                    <i class="fas fa-fingerprint me-3 text-primary"></i>
+                    DMIT Testing Available
+                </h3>
+                <p class="text-muted mb-4">
+                    In addition to our comprehensive EPR assessments, we also offer Dermatoglyphics Multiple Intelligence Test (DMIT) 
+                    for parents seeking fingerprint-based analysis of their child's innate intelligence patterns.
+                </p>
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span class="text-muted">Scientific Analysis</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span class="text-muted">20-46 Page Report</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span class="text-muted">Home Collection</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span class="text-muted">From ₹2,999</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'dmit_info' %}" class="btn btn-outline-primary me-3">
+                    <i class="fas fa-info-circle me-2"></i>Learn About DMIT
+                </a>
+                <a href="{% url 'book_appointment' %}" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus me-2"></i>Book DMIT Test
+                </a>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="text-center">
+                    <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=500&h=400&fit=crop&auto=format" 
+                         alt="DMIT Fingerprint Analysis" class="img-fluid rounded-lg shadow-lg" 
+                         style="max-width: 400px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Assessment Demo JavaScript -->
+<script>
+// Animated counter for assessment scores
+function animateCounter(element, target, duration = 2000) {
+    const start = 0;
+    const startTime = performance.now();
+    
+    function updateCounter(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(start + (target - start) * easeOutCubic);
+        
+        element.textContent = current + '%';
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+        }
+    }
+    
+    requestAnimationFrame(updateCounter);
+}
+
+// Initialize animations when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate overall score
+    setTimeout(() => {
+        const overallScoreElement = document.querySelector('#overallScore .score-text');
+        if (overallScoreElement) {
+            animateCounter(overallScoreElement, 88, 2000);
+        }
+    }, 1500);
+    
+    // Animate domain scores
+    const domainScores = document.querySelectorAll('.domain-score');
+    domainScores.forEach((scoreElement, index) => {
+        const target = parseInt(scoreElement.getAttribute('data-target'));
+        setTimeout(() => {
+            animateCounter(scoreElement, target, 1500);
+        }, 2000 + (index * 300));
+    });
+    
+    // Set fill widths for progress bars based on scores
+    setTimeout(() => {
+        document.querySelector('.academic-fill').style.setProperty('--fill-width', '89%');
+        document.querySelector('.psychological-fill').style.setProperty('--fill-width', '94%');
+        document.querySelector('.physical-fill').style.setProperty('--fill-width', '82%');
+    }, 1000);
+});
+
+function showRecommendation() {
+    const selectedType = document.querySelector('input[name="assessmentType"]:checked').value;
+    let recommendation = '';
+    let planLink = '';
+    
+    switch(selectedType) {
+        case 'academic':
+            recommendation = 'Based on your focus on academics, we recommend our <strong>Student Starter Plan (₹499)</strong> - perfect for academic performance tracking and learning style assessment.';
+            planLink = '{% url "pricing_plans" %}#basic';
+            break;
+        case 'holistic':
+            recommendation = 'For complete student development, we recommend our <strong>Family Complete Plan (₹899)</strong> - includes academic, emotional, and physical health assessment with AI insights.';
+            planLink = '{% url "pricing_plans" %}#gold';
+            break;
+        case 'career':
+            recommendation = 'For career planning and future guidance, our <strong>Growth Pro Plan (₹1,499)</strong> is ideal - includes everything plus career mapping and expert consultation.';
+            planLink = '{% url "pricing_plans" %}#platinum';
+            break;
+    }
+    
+    // Show recommendation
+    const recommendationDiv = document.createElement('div');
+    recommendationDiv.className = 'alert alert-success mt-3';
+    recommendationDiv.innerHTML = `
+        <h6><i class="fas fa-lightbulb me-2"></i>Perfect Match Found!</h6>
+        <p class="mb-3">${recommendation}</p>
+        <a href="${planLink}" class="btn btn-success">
+            <i class="fas fa-arrow-right me-2"></i>Get Started Now
+        </a>
+    `;
+    
+    // Remove existing recommendation if any
+    const existing = document.querySelector('.alert-success');
+    if (existing) existing.remove();
+    
+    // Add new recommendation
+    document.querySelector('#assessment-quiz .card').appendChild(recommendationDiv);
+    
+    // Smooth scroll to recommendation
+    recommendationDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+
+{% endblock %}

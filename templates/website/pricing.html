@@ -1,0 +1,429 @@
+{% extends 'website/base.html' %}
+
+{% block title %}Assessment Plans & Pricing - EduSight{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6 hero-content" data-aos="fade-right">
+                <h1 class="hero-title">
+                    EPR Assessment
+                    <span style="background: linear-gradient(45deg, #22d3ee, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Plans</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Edusight Prism Rating - Choose your comprehensive assessment plan. 
+                    From basic academic analysis to complete multidimensional evaluation.
+                </p>
+                <div class="d-flex align-items-center gap-4 text-white mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-rupee-sign me-2 text-warning"></i>
+                        <span><strong>Starting ₹499</strong> + GST</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chart-line me-2 text-success"></i>
+                        <span>AI Analytics</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-support me-2 text-info"></i>
+                        <span>Expert Support</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="card-custom p-4 bg-white bg-opacity-10 backdrop-blur">
+                    <h4 class="text-white mb-3">
+                        <i class="fas fa-star me-2"></i>Plan Comparison
+                    </h4>
+                    <div class="row text-white">
+                        <div class="col-6 mb-3">
+                            <div class="text-center p-2 rounded bg-white bg-opacity-20">
+                                <h6 class="mb-1">Basic</h6>
+                                <small>₹499 + GST</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center p-2 rounded bg-white bg-opacity-20">
+                                <h6 class="mb-1">Gold ⭐</h6>
+                                <small>₹899 + GST</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-2 rounded bg-white bg-opacity-20">
+                                <h6 class="mb-1">Platinum 👑</h6>
+                                <small>₹1,499 + GST</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-2 rounded bg-white bg-opacity-20">
+                                <h6 class="mb-1">Corporate</h6>
+                                <small>₹25,000/year</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Detailed Pricing Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">Choose Your EPR Assessment Plan</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Edusight Prism Rating - Comprehensive multidimensional assessments across Academic Performance, Psychological Well-being & Physical Health.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Basic Plan -->
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="price-card text-center h-100">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-chart-bar" style="font-size: 3rem; color: #6b7280;"></i>
+                    </div>
+                    <h3 class="mb-3">Basic Plan</h3>
+                    <div class="dmit-price mb-3">₹499 <small class="text-muted">+ GST</small></div>
+                    <div class="dmit-badge mb-4" style="background: linear-gradient(135deg, #6b7280, #9ca3af);">Essential</div>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Academic Performance Analysis</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Basic learning style assessment</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Subject-wise strengths report</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Performance recommendations</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Digital PDF report</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Email delivery</li>
+                        <li class="mb-3"><i class="fas fa-times text-muted me-2"></i>AI-powered insights</li>
+                        <li class="mb-3"><i class="fas fa-times text-muted me-2"></i>Career guidance</li>
+                        <li class="mb-3"><i class="fas fa-times text-muted me-2"></i>Expert consultation</li>
+                    </ul>
+                    
+                    <a href="{% url 'book_assessment' %}?plan=basic" class="btn btn-outline-primary btn-lg w-100 mb-3">
+                        <i class="fas fa-cart-plus me-2"></i>Choose Basic Plan
+                    </a>
+                    
+                    <small class="text-muted">Perfect for initial assessment</small>
+                </div>
+            </div>
+            
+            <!-- Gold Plan -->
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="price-card text-center h-100" style="border: 3px solid #f59e0b; transform: scale(1.05);">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-star" style="font-size: 3rem; color: #f59e0b;"></i>
+                    </div>
+                    <div class="dmit-badge mb-3" style="background: linear-gradient(135deg, #f59e0b, #eab308);">Most Popular</div>
+                    <h3 class="mb-3">Gold Plan</h3>
+                    <div class="dmit-price mb-3">₹899 <small class="text-muted">+ GST</small></div>
+                    <div class="text-success mb-4"><strong>Save 40% vs Basic features</strong></div>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Everything in Basic Plan</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Psychological wellbeing analysis</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Career guidance insights</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>AI-powered recommendations</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Progress tracking dashboard</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Email support</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Mobile-friendly reports</li>
+                        <li class="mb-3"><i class="fas fa-times text-muted me-2"></i>Expert consultation call</li>
+                        <li class="mb-3"><i class="fas fa-times text-muted me-2"></i>Priority support</li>
+                    </ul>
+                    
+                    <a href="{% url 'book_assessment' %}?plan=gold" class="btn btn-primary-custom btn-lg w-100 mb-3" style="background: linear-gradient(135deg, #f59e0b, #eab308);">
+                        <i class="fas fa-star me-2"></i>Choose Gold Plan
+                    </a>
+                    
+                    <small class="text-muted">Recommended for most students</small>
+                </div>
+            </div>
+            
+            <!-- Platinum Plan -->
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="price-card text-center h-100" style="border: 3px solid #8b5cf6;">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-crown" style="font-size: 3rem; color: #8b5cf6;"></i>
+                    </div>
+                    <div class="dmit-badge mb-3" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">Premium</div>
+                    <h3 class="mb-3">Platinum Plan</h3>
+                    <div class="dmit-price mb-3">₹1,499 <small class="text-muted">+ GST</small></div>
+                    <div class="text-success mb-4"><strong>Complete Analytics Suite</strong></div>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Everything in Gold Plan</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Advanced ML analytics</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Personalized study plans</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Expert consultation call</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Priority email & phone support</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Monthly progress reports</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Interactive dashboard</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Custom recommendations</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Certificate of completion</li>
+                    </ul>
+                    
+                    <a href="{% url 'book_assessment' %}?plan=platinum" class="btn btn-primary-custom btn-lg w-100 mb-3" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
+                        <i class="fas fa-crown me-2"></i>Choose Platinum Plan
+                    </a>
+                    
+                    <small class="text-muted">Ultimate assessment experience</small>
+                </div>
+            </div>
+            
+            <!-- Corporate Plan -->
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="price-card text-center h-100" style="border: 3px solid #059669;">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-building" style="font-size: 3rem; color: #059669;"></i>
+                    </div>
+                    <div class="dmit-badge mb-3" style="background: linear-gradient(135deg, #059669, #10b981);">Enterprise</div>
+                    <h3 class="mb-3">Corporate Plan</h3>
+                    <div class="dmit-price mb-3">₹25,000 <small class="text-muted">/ year</small></div>
+                    <div class="text-success mb-4"><strong>50 Students Included</strong></div>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Platinum access for 50 students</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Bulk analytics dashboard</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Teacher training sessions</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Custom institutional reporting</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Dedicated account manager</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>Annual strategic reviews</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>API access for integration</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>White-label options</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i>24/7 priority support</li>
+                    </ul>
+                    
+                    <a href="{% url 'website_contact' %}?plan=corporate" class="btn btn-success btn-lg w-100 mb-3">
+                        <i class="fas fa-handshake me-2"></i>Contact Sales Team
+                    </a>
+                    
+                    <small class="text-muted">Perfect for schools & institutions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Comparison Table -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">Feature Comparison</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Detailed comparison of what's included in each assessment plan.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card-custom p-0 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <thead style="background: var(--gradient-primary); color: white;">
+                                <tr>
+                                    <th class="p-3">Features</th>
+                                    <th class="p-3 text-center">Basic<br><small>₹499 + GST</small></th>
+                                    <th class="p-3 text-center">Gold<br><small>₹899 + GST</small></th>
+                                    <th class="p-3 text-center">Platinum<br><small>₹1,499 + GST</small></th>
+                                    <th class="p-3 text-center">Corporate<br><small>₹25,000/year</small></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="p-3"><strong>Academic Performance Analysis</strong></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr style="background: #f8fafc;">
+                                    <td class="p-3">Learning Style Assessment</td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">Subject-wise Analysis</td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr style="background: #f8fafc;">
+                                    <td class="p-3"><strong>Psychological Wellbeing Analysis</strong></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3"><strong>Career Guidance</strong></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr style="background: #f8fafc;">
+                                    <td class="p-3">AI-Powered Recommendations</td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3"><strong>Expert Consultation Call</strong></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr style="background: #f8fafc;">
+                                    <td class="p-3">Advanced ML Analytics</td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">Personalized Study Plans</td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr style="background: #f8fafc;">
+                                    <td class="p-3"><strong>Bulk Dashboard (50 Students)</strong></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">Teacher Training Sessions</td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr style="background: #f8fafc;">
+                                    <td class="p-3">Dedicated Account Manager</td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-times text-muted"></i></td>
+                                    <td class="p-3 text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">Frequently Asked Questions</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Common questions about our assessment plans and pricing.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="pricingFAQ">
+                    <div class="accordion-item mb-3 border-0 rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                What's included in the GST for assessment plans?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                GST is applicable as per Indian tax regulations. For Basic (₹499), Gold (₹899), and Platinum (₹1,499) plans, 
+                                GST will be added to the base price. Corporate plans (₹25,000/year) also include applicable GST.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3 border-0 rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Can I upgrade my plan later?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Yes! You can upgrade from Basic to Gold or Platinum at any time. The price difference will be adjusted, 
+                                and you'll get access to all premium features immediately.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3 border-0 rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                How does the Corporate plan work for 50 students?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                The Corporate plan provides Platinum-level access for up to 50 students annually. You'll get a centralized 
+                                dashboard, bulk analytics, teacher training, and dedicated support for ₹25,000/year.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3 border-0 rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                What payment methods do you accept?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                We accept all major payment methods including UPI, net banking, credit/debit cards, and for corporate 
+                                clients, we also accept bank transfers and provide invoicing facilities.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section-padding" style="background: var(--gradient-hero);">
+    <div class="container">
+        <div class="row justify-content-center text-center text-white">
+            <div class="col-lg-8" data-aos="fade-up">
+                <h2 class="mb-4" style="font-size: 2.5rem; font-weight: 700;">
+                    Ready to Get Started?
+                </h2>
+                <p class="mb-4" style="font-size: 1.2rem; opacity: 0.9;">
+                    Choose your assessment plan and unlock your child's potential with AI-powered educational analytics.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{% url 'book_assessment' %}?plan=gold" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-star me-2"></i>Start with Gold Plan
+                    </a>
+                    <a href="{% url 'website_contact' %}" class="btn btn-outline-light btn-lg px-5">
+                        <i class="fas fa-phone me-2"></i>Need Help Choosing?
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

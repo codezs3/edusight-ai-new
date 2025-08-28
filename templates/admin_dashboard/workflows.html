@@ -1,0 +1,607 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .workflow-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .workflow-status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-paused {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .airflow-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .dag-item {
+        border-left: 4px solid #007bff;
+        padding: 15px;
+        margin-bottom: 15px;
+        background: white;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .workflow-template {
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .workflow-template:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">{{ page_title }}</h1>
+                <div>
+                    <a href="{{ airflow_url }}" target="_blank" class="btn btn-info">
+                        <i class="fas fa-external-link-alt me-2"></i>Open Airflow UI
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Airflow Status Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="airflow-section">
+                <h4><i class="fas fa-cogs me-2"></i>Apache Airflow Management</h4>
+                
+                {% if not airflow_available %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Apache Airflow integration is not available. Please install Airflow dependencies.
+                </div>
+                {% else %}
+                
+                <!-- Airflow Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-primary">{{ total_dags }}</h5>
+                                <p class="card-text">Total DAGs</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-success">{{ active_dags }}</h5>
+                                <p class="card-text">Active DAGs</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-warning">{{ total_dags|add:"-"|add:active_dags }}</h5>
+                                <p class="card-text">Paused DAGs</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-info">{{ workflow_templates|length }}</h5>
+                                <p class="card-text">Templates</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Airflow Control Panel -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-control me-2"></i>Airflow Control Panel</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>System Setup</h6>
+                                <button class="btn btn-outline-primary me-2 mb-2" onclick="initializeAirflow()">
+                                    <i class="fas fa-database me-1"></i>Initialize Database
+                                </button>
+                                <button class="btn btn-outline-success me-2 mb-2" onclick="createAirflowUser()">
+                                    <i class="fas fa-user-plus me-1"></i>Create Admin User
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Services</h6>
+                                <button class="btn btn-outline-info me-2 mb-2" onclick="startScheduler()">
+                                    <i class="fas fa-clock me-1"></i>Start Scheduler
+                                </button>
+                                <button class="btn btn-outline-warning me-2 mb-2" onclick="startWebserver()">
+                                    <i class="fas fa-server me-1"></i>Start Webserver
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Current DAGs Section -->
+    {% if airflow_available %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-project-diagram me-2"></i>Active Workflows (DAGs)</h5>
+                    <button class="btn btn-sm btn-success" onclick="refreshDAGs()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if dags %}
+                    <div class="row">
+                        {% for dag in dags %}
+                        <div class="col-md-6 mb-3">
+                            <div class="dag-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ dag.dag_id }}</h6>
+                                        <p class="mb-2 text-muted">{{ dag.description|default:"No description" }}</p>
+                                        <small class="text-muted">
+                                            Schedule: {{ dag.schedule_interval|default:"Manual" }}
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="workflow-status {% if dag.is_paused %}status-paused{% else %}status-active{% endif %}">
+                                            {% if dag.is_paused %}Paused{% else %}Active{% endif %}
+                                        </span>
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-primary" onclick="triggerDAG('{{ dag.dag_id }}')">
+                                                <i class="fas fa-play me-1"></i>Trigger
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-project-diagram fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No DAGs found. Create a workflow template to get started.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Workflow Templates Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-template me-2"></i>Workflow Templates</h5>
+                    <button class="btn btn-sm btn-primary" onclick="showCreateWorkflow()">
+                        <i class="fas fa-plus me-1"></i>Create Custom Workflow
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for template in workflow_templates %}
+                        <div class="col-md-4 mb-3">
+                            <div class="workflow-card workflow-template" onclick="deployTemplate('{{ template.id }}')">
+                                <h6 class="card-title">
+                                    <i class="fas fa-{% if template.category == 'assessment' %}chart-bar{% elif template.category == 'crm' %}users{% else %}cogs{% endif %} me-2"></i>
+                                    {{ template.name }}
+                                </h6>
+                                <p class="card-text">{{ template.description }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ template.category|title }}</small>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-rocket me-1"></i>Deploy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Workflow Modal -->
+<div class="modal fade" id="createWorkflowModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Custom Workflow</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="workflowForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="workflowName" class="form-label">Workflow Name</label>
+                        <input type="text" class="form-control" id="workflowName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="workflowDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="workflowDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="scheduleInterval" class="form-label">Schedule Interval</label>
+                        <select class="form-control" id="scheduleInterval">
+                            <option value="@daily">Daily</option>
+                            <option value="@hourly">Hourly</option>
+                            <option value="@weekly">Weekly</option>
+                            <option value="@monthly">Monthly</option>
+                            <option value="@once">Run Once</option>
+                            <option value="">Manual</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Workflow Tasks</label>
+                        <div id="workflowTasks">
+                            <div class="task-item border rounded p-3 mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Task Type</label>
+                                        <select class="form-control task-type">
+                                            <option value="epr_calculation">EPR Calculation</option>
+                                            <option value="notification">Send Notification</option>
+                                            <option value="lead_processing">Process Leads</option>
+                                            <option value="backup">Create Backup</option>
+                                            <option value="dummy">Placeholder Task</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Task Name</label>
+                                        <input type="text" class="form-control task-name" placeholder="Enter task name">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTask()">
+                            <i class="fas fa-plus me-1"></i>Add Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createWorkflow()">Create Workflow</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Creation Modal -->
+<div class="modal fade" id="createUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Airflow Admin User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" value="admin" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" value="admin@edusight.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" value="admin123" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="firstname" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstname" value="Admin">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="lastname" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastname" value="User">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitCreateUser()">Create User</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function initializeAirflow() {
+    if (confirm('Initialize Airflow database? This will set up the required tables.')) {
+        fetch('/admin-panel/workflows/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=initialize_airflow'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Airflow database initialized successfully!');
+                location.reload();
+            } else {
+                alert('Failed to initialize Airflow: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error initializing Airflow: ' + error.message);
+        });
+    }
+}
+
+function createAirflowUser() {
+    const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
+    modal.show();
+}
+
+function submitCreateUser() {
+    const formData = new FormData();
+    formData.append('action', 'create_user');
+    formData.append('username', document.getElementById('username').value);
+    formData.append('email', document.getElementById('email').value);
+    formData.append('password', document.getElementById('password').value);
+    formData.append('firstname', document.getElementById('firstname').value);
+    formData.append('lastname', document.getElementById('lastname').value);
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+    fetch('/admin-panel/workflows/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Airflow user created successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
+        } else {
+            alert('Failed to create user: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error creating user: ' + error.message);
+    });
+}
+
+function startScheduler() {
+    if (confirm('Start Airflow scheduler? This will run workflow schedules.')) {
+        fetch('/admin-panel/workflows/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=start_scheduler'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Airflow scheduler started successfully!');
+            } else {
+                alert('Failed to start scheduler: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error starting scheduler: ' + error.message);
+        });
+    }
+}
+
+function startWebserver() {
+    if (confirm('Start Airflow webserver? This will open the Airflow UI on port 8080.')) {
+        fetch('/admin-panel/workflows/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=start_webserver'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Airflow webserver started! You can access it at http://localhost:8080');
+            } else {
+                alert('Failed to start webserver: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error starting webserver: ' + error.message);
+        });
+    }
+}
+
+function triggerDAG(dagId) {
+    if (confirm(`Trigger workflow "${dagId}"?`)) {
+        const formData = new FormData();
+        formData.append('action', 'trigger_dag');
+        formData.append('dag_id', dagId);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        fetch('/admin-panel/workflows/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Workflow "${dagId}" triggered successfully!`);
+            } else {
+                alert('Failed to trigger workflow: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error triggering workflow: ' + error.message);
+        });
+    }
+}
+
+function refreshDAGs() {
+    location.reload();
+}
+
+function deployTemplate(templateId) {
+    if (confirm(`Deploy the "${templateId}" workflow template?`)) {
+        alert('Template deployment feature coming soon! This will create a new DAG based on the template.');
+    }
+}
+
+function showCreateWorkflow() {
+    const modal = new bootstrap.Modal(document.getElementById('createWorkflowModal'));
+    modal.show();
+}
+
+function addTask() {
+    const tasksContainer = document.getElementById('workflowTasks');
+    const taskCount = tasksContainer.children.length + 1;
+    
+    const taskHtml = `
+        <div class="task-item border rounded p-3 mb-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Task Type</label>
+                    <select class="form-control task-type">
+                        <option value="epr_calculation">EPR Calculation</option>
+                        <option value="notification">Send Notification</option>
+                        <option value="lead_processing">Process Leads</option>
+                        <option value="backup">Create Backup</option>
+                        <option value="dummy">Placeholder Task</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Task Name</label>
+                    <input type="text" class="form-control task-name" placeholder="Enter task name">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTask(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    tasksContainer.insertAdjacentHTML('beforeend', taskHtml);
+}
+
+function removeTask(button) {
+    button.closest('.task-item').remove();
+}
+
+function createWorkflow() {
+    const name = document.getElementById('workflowName').value;
+    const description = document.getElementById('workflowDescription').value;
+    const schedule = document.getElementById('scheduleInterval').value;
+    
+    if (!name) {
+        alert('Please enter a workflow name');
+        return;
+    }
+    
+    // Collect tasks
+    const tasks = [];
+    document.querySelectorAll('.task-item').forEach((taskItem, index) => {
+        const taskType = taskItem.querySelector('.task-type').value;
+        const taskName = taskItem.querySelector('.task-name').value || `task_${index + 1}`;
+        
+        tasks.push({
+            task_id: taskName.toLowerCase().replace(/\s+/g, '_'),
+            task_type: taskType,
+            task_name: taskName
+        });
+    });
+    
+    const workflowConfig = {
+        dag_id: name.toLowerCase().replace(/\s+/g, '_'),
+        name: name,
+        description: description,
+        schedule_interval: schedule || '@daily',
+        tasks: tasks
+    };
+    
+    const formData = new FormData();
+    formData.append('action', 'create_custom_workflow');
+    formData.append('workflow_config', JSON.stringify(workflowConfig));
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    
+    fetch('/admin-panel/workflows/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Custom workflow created successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('createWorkflowModal')).hide();
+            location.reload();
+        } else {
+            alert('Failed to create workflow: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error creating workflow: ' + error.message);
+    });
+}
+</script>
+{% endblock %}

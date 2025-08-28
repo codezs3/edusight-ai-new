@@ -1,0 +1,405 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Configure system settings and preferences.</p>
+{% endblock %}
+
+{% block content %}
+<!-- Settings Navigation -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#general-settings" type="button" role="tab">
+                            <i class="fas fa-cog me-2"></i>
+                            General
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#security-settings" type="button" role="tab">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Security
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#email-settings" type="button" role="tab">
+                            <i class="fas fa-envelope me-2"></i>
+                            Email
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#advanced-settings" type="button" role="tab">
+                            <i class="fas fa-tools me-2"></i>
+                            Advanced
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <!-- General Settings Tab -->
+                    <div class="tab-pane fade show active" id="general-settings" role="tabpanel">
+                        <form method="post" class="row">
+                            {% csrf_token %}
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Site Information</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Site Name</label>
+                                    <input type="text" class="form-control" name="site_name" value="{{ site_settings.site_name }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Site URL</label>
+                                    <input type="url" class="form-control" name="site_url" value="{{ site_settings.site_url }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Admin Email</label>
+                                    <input type="email" class="form-control" name="admin_email" value="{{ site_settings.admin_email }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Timezone</label>
+                                    <select class="form-select" name="timezone">
+                                        <option value="Asia/Kolkata" {% if site_settings.timezone == "Asia/Kolkata" %}selected{% endif %}>Asia/Kolkata (IST)</option>
+                                        <option value="UTC" {% if site_settings.timezone == "UTC" %}selected{% endif %}>UTC</option>
+                                        <option value="America/New_York" {% if site_settings.timezone == "America/New_York" %}selected{% endif %}>America/New_York (EST)</option>
+                                        <option value="Europe/London" {% if site_settings.timezone == "Europe/London" %}selected{% endif %}>Europe/London (GMT)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Features & Options</h6>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="maintenance_mode" {% if site_settings.maintenance_mode %}checked{% endif %}>
+                                        <label class="form-check-label">
+                                            Maintenance Mode
+                                        </label>
+                                        <div class="form-text">Put the site in maintenance mode</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="registration_enabled" {% if site_settings.registration_enabled %}checked{% endif %}>
+                                        <label class="form-check-label">
+                                            User Registration
+                                        </label>
+                                        <div class="form-text">Allow new user registrations</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="email_notifications" {% if site_settings.email_notifications %}checked{% endif %}>
+                                        <label class="form-check-label">
+                                            Email Notifications
+                                        </label>
+                                        <div class="form-text">Send email notifications for admin events</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Default Language</label>
+                                    <select class="form-select" name="language">
+                                        <option value="en" {% if site_settings.language == "English" %}selected{% endif %}>English</option>
+                                        <option value="hi">Hindi</option>
+                                        <option value="es">Spanish</option>
+                                        <option value="fr">French</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    Save General Settings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Security Settings Tab -->
+                    <div class="tab-pane fade" id="security-settings" role="tabpanel">
+                        <form class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Authentication</h6>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="two_factor_auth" {% if security_settings.two_factor_auth %}checked{% endif %}>
+                                        <label class="form-check-label">
+                                            Two-Factor Authentication
+                                        </label>
+                                        <div class="form-text">Require 2FA for admin accounts</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password Expiry (days)</label>
+                                    <input type="number" class="form-control" name="password_expiry_days" value="{{ security_settings.password_expiry_days }}" min="0" max="365">
+                                    <div class="form-text">Set to 0 to disable password expiry</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Session Timeout (minutes)</label>
+                                    <input type="number" class="form-control" name="session_timeout" value="{{ security_settings.session_timeout }}" min="5" max="1440">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Access Control</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Max Login Attempts</label>
+                                    <input type="number" class="form-control" name="max_login_attempts" value="{{ security_settings.max_login_attempts }}" min="1" max="10">
+                                    <div class="form-text">Account locked after this many failed attempts</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Allowed IP Ranges</label>
+                                    <textarea class="form-control" name="allowed_ips" rows="3" placeholder="127.0.0.1&#10;192.168.1.0/24&#10;10.0.0.0/8"></textarea>
+                                    <div class="form-text">One IP or CIDR range per line (leave empty for no restrictions)</div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center p-3 border rounded">
+                                        <div>
+                                            <strong>SSL Certificate</strong>
+                                            <br>
+                                            <small class="text-muted">HTTPS encryption status</small>
+                                        </div>
+                                        <span class="badge bg-warning">Development</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    Save Security Settings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Email Settings Tab -->
+                    <div class="tab-pane fade" id="email-settings" role="tabpanel">
+                        <form class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">SMTP Configuration</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">SMTP Host</label>
+                                    <input type="text" class="form-control" name="smtp_host" placeholder="smtp.gmail.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">SMTP Port</label>
+                                    <input type="number" class="form-control" name="smtp_port" value="587">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">SMTP Username</label>
+                                    <input type="email" class="form-control" name="smtp_username" placeholder="your-email@gmail.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">SMTP Password</label>
+                                    <input type="password" class="form-control" name="smtp_password">
+                                    <div class="form-text">Use app-specific password for Gmail</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Email Options</h6>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="use_tls" checked>
+                                        <label class="form-check-label">Use TLS Encryption</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">From Email</label>
+                                    <input type="email" class="form-control" name="from_email" placeholder="noreply@edusight.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">From Name</label>
+                                    <input type="text" class="form-control" name="from_name" value="EduSight">
+                                </div>
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-outline-primary w-100" onclick="testEmailSettings()">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        Send Test Email
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Note:</strong> Email settings are stored securely and used for notifications, password resets, and contact form submissions.
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    Save Email Settings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Advanced Settings Tab -->
+                    <div class="tab-pane fade" id="advanced-settings" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Performance</h6>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="enable_caching" checked>
+                                        <label class="form-check-label">
+                                            Enable Caching
+                                        </label>
+                                        <div class="form-text">Improve site performance with caching</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="compress_files" checked>
+                                        <label class="form-check-label">
+                                            Compress Static Files
+                                        </label>
+                                        <div class="form-text">Gzip compression for CSS/JS files</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Cache Timeout (hours)</label>
+                                    <input type="number" class="form-control" name="cache_timeout" value="24" min="1" max="168">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Development</h6>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="debug_mode">
+                                        <label class="form-check-label">
+                                            Debug Mode
+                                        </label>
+                                        <div class="form-text text-warning">⚠️ Only enable in development</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="error_logging" checked>
+                                        <label class="form-check-label">
+                                            Error Logging
+                                        </label>
+                                        <div class="form-text">Log errors for debugging</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Log Level</label>
+                                    <select class="form-select" name="log_level">
+                                        <option value="ERROR">ERROR</option>
+                                        <option value="WARNING">WARNING</option>
+                                        <option value="INFO" selected>INFO</option>
+                                        <option value="DEBUG">DEBUG</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Warning:</strong> Advanced settings can affect site performance and security. Change only if you know what you're doing.
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-tools me-2"></i>
+                                    Save Advanced Settings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Information -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    System Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>Django Version:</strong></td>
+                        <td>5.2.5</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Python Version:</strong></td>
+                        <td>3.x</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database:</strong></td>
+                        <td>SQLite3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Server:</strong></td>
+                        <td>Development Server</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Last Backup:</strong></td>
+                        <td>No backups yet</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tasks me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="clearCache()">
+                        <i class="fas fa-broom me-2"></i>
+                        Clear Cache
+                    </button>
+                    <button class="btn btn-outline-success" onclick="optimizeDatabase()">
+                        <i class="fas fa-database me-2"></i>
+                        Optimize Database
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="checkUpdates()">
+                        <i class="fas fa-sync me-2"></i>
+                        Check for Updates
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="resetToDefaults()">
+                        <i class="fas fa-undo me-2"></i>
+                        Reset to Defaults
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function testEmailSettings() {
+    alert('Test email functionality will send a test message to the admin email.');
+}
+
+function clearCache() {
+    if (confirm('Clear all cached data? This may temporarily slow down the site.')) {
+        alert('Clear cache functionality will be implemented.');
+    }
+}
+
+function optimizeDatabase() {
+    if (confirm('Optimize database? This may take a few minutes.')) {
+        alert('Database optimization functionality will be implemented.');
+    }
+}
+
+function checkUpdates() {
+    alert('Check for updates functionality will scan for available updates.');
+}
+
+function resetToDefaults() {
+    if (confirm('Reset all settings to defaults? This action cannot be undone.')) {
+        alert('Reset to defaults functionality will be implemented.');
+    }
+}
+</script>
+{% endblock %}

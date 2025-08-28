@@ -1,0 +1,202 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Create and manage system backups to protect your data.</p>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function createBackup() {
+    const btn = document.getElementById('createBackupBtn');
+    const originalText = btn.innerHTML;
+    
+    // Show loading state
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Backup...';
+    btn.disabled = true;
+    
+    fetch('/admin-panel/backup/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh to show new backup
+        } else {
+            alert('Backup failed: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Backup failed: ' + error.message);
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Backup Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-database me-2"></i>
+                    Backup Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Create New Backup</h6>
+                        <p class="text-muted mb-3">Create a full backup of your system including database and files.</p>
+                        {% csrf_token %}
+                        <button id="createBackupBtn" class="btn btn-primary" onclick="createBackup()">
+                            <i class="fas fa-plus me-2"></i>
+                            Create Backup Now
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Backup Information</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Database backup included</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Media files included</li>
+                            <li><i class="fas fa-check text-success me-2"></i>System configuration included</li>
+                            <li><i class="fas fa-info-circle text-info me-2"></i>Automatic compression</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Existing Backups -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-archive me-2"></i>
+                    Existing Backups
+                </h5>
+                <span class="badge bg-secondary">{{ backups|length }} backup{{ backups|length|pluralize }}</span>
+            </div>
+            <div class="card-body">
+                {% if backups %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Backup Name</th>
+                                    <th>Size</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for backup in backups %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-file-archive text-primary me-2"></i>
+                                        {{ backup.name }}
+                                    </td>
+                                    <td>
+                                        {% if backup.size < 1048576 %}
+                                            {{ backup.size|floatformat:0|filesizeformat }}
+                                        {% else %}
+                                            {{ backup.size|filesizeformat }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ backup.created|date:"M d, Y H:i" }}
+                                        <br>
+                                        <small class="text-muted">{{ backup.created|timesince }} ago</small>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary action-btn" title="Download">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success action-btn" title="Restore" onclick="confirmRestore('{{ backup.name }}')">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger action-btn" title="Delete" onclick="confirmDelete('{{ backup.name }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-archive fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No backups found</h6>
+                        <p class="text-muted">Create your first backup to protect your data.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Backup Schedule (Future Feature) -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Automatic Backup Schedule
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Coming Soon:</strong> Automatic backup scheduling will be available in the next update. Currently, you can create backups manually.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Recommended Backup Schedule</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-clock text-primary me-2"></i>Daily: Database backup</li>
+                            <li><i class="fas fa-calendar-week text-success me-2"></i>Weekly: Full system backup</li>
+                            <li><i class="fas fa-calendar text-warning me-2"></i>Monthly: Archive backup</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Best Practices</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-shield-alt text-success me-2"></i>Keep multiple backup copies</li>
+                            <li><i class="fas fa-cloud text-info me-2"></i>Store backups off-site</li>
+                            <li><i class="fas fa-test text-warning me-2"></i>Test restore procedures regularly</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmRestore(backupName) {
+    if (confirm('Are you sure you want to restore from backup "' + backupName + '"? This will overwrite current data.')) {
+        alert('Restore functionality will be implemented in the next update.');
+    }
+}
+
+function confirmDelete(backupName) {
+    if (confirm('Are you sure you want to delete backup "' + backupName + '"? This action cannot be undone.')) {
+        alert('Delete functionality will be implemented in the next update.');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,414 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Manage form submissions, leads, and customer interactions.</p>
+{% endblock %}
+
+{% block content %}
+<!-- Forms Statistics -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-primary">{{ total_submissions }}</div>
+                    <div class="stats-label">Form Submissions</div>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-envelope fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-success">{{ total_leads }}</div>
+                    <div class="stats-label">Total Leads</div>
+                </div>
+                <div class="text-success">
+                    <i class="fas fa-users fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-warning">{{ total_appointments }}</div>
+                    <div class="stats-label">Appointments</div>
+                </div>
+                <div class="text-warning">
+                    <i class="fas fa-calendar fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-primary w-100">
+                            <i class="fas fa-download me-2"></i>
+                            Export All Data
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-success w-100">
+                            <i class="fas fa-envelope me-2"></i>
+                            Send Follow-up
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-warning w-100">
+                            <i class="fas fa-filter me-2"></i>
+                            Filter Results
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-info w-100">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            View Reports
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs for different form types -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-submissions" type="button" role="tab">
+                            <i class="fas fa-envelope me-2"></i>
+                            Form Submissions ({{ form_submissions|length }})
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#leads" type="button" role="tab">
+                            <i class="fas fa-users me-2"></i>
+                            Leads ({{ leads|length }})
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab">
+                            <i class="fas fa-calendar me-2"></i>
+                            Appointments ({{ appointments|length }})
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body p-0">
+                <div class="tab-content">
+                    <!-- Form Submissions Tab -->
+                    <div class="tab-pane fade show active" id="form-submissions" role="tabpanel">
+                        {% if form_submissions %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Submission ID</th>
+                                            <th>Form Type</th>
+                                            <th>Data</th>
+                                            <th>IP Address</th>
+                                            <th>Submitted</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for submission in form_submissions %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-secondary">#{{ submission.submission_id }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ submission.form_type|title }}</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="viewFormData('{{ submission.id }}')">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    View Data
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <code>{{ submission.ip_address }}</code>
+                                            </td>
+                                            <td>
+                                                {{ submission.created_at|date:"M d, Y H:i" }}
+                                                <br>
+                                                <small class="text-muted">{{ submission.created_at|timesince }} ago</small>
+                                            </td>
+                                            <td>
+                                                {% if submission.processed %}
+                                                    <span class="badge status-active">Processed</span>
+                                                {% else %}
+                                                    <span class="badge status-pending">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-success action-btn" title="Process" onclick="processSubmission({{ submission.id }})">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger action-btn" title="Delete" onclick="deleteSubmission({{ submission.id }})">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-envelope fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">No form submissions yet</h6>
+                                <p class="text-muted">Form submissions will appear here when users submit contact forms.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Leads Tab -->
+                    <div class="tab-pane fade" id="leads" role="tabpanel">
+                        {% if leads %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Lead</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Source</th>
+                                            <th>Created</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for lead in leads %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle me-3">
+                                                        {{ lead.name|first|upper }}
+                                                    </div>
+                                                    <div>
+                                                        <strong>{{ lead.name }}</strong>
+                                                        {% if lead.company %}
+                                                            <br><small class="text-muted">{{ lead.company }}</small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ lead.email }}</td>
+                                            <td>{{ lead.phone|default:"—" }}</td>
+                                            <td>
+                                                {% if lead.source %}
+                                                    <span class="badge bg-info">{{ lead.source.name }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">Direct</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ lead.created_at|date:"M d, Y" }}
+                                                <br>
+                                                <small class="text-muted">{{ lead.created_at|timesince }} ago</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-{{ lead.status|lower }}">{{ lead.status }}</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary action-btn" title="View Details" onclick="viewLead({{ lead.id }})">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success action-btn" title="Contact" onclick="contactLead({{ lead.id }})">
+                                                    <i class="fas fa-phone"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning action-btn" title="Follow-up" onclick="followUpLead({{ lead.id }})">
+                                                    <i class="fas fa-calendar-plus"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">No leads yet</h6>
+                                <p class="text-muted">Generated leads will appear here for tracking and follow-up.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Appointments Tab -->
+                    <div class="tab-pane fade" id="appointments" role="tabpanel">
+                        {% if appointments %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Service</th>
+                                            <th>Date & Time</th>
+                                            <th>Contact</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for appointment in appointments %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle me-3">
+                                                        {{ appointment.name|first|upper }}
+                                                    </div>
+                                                    <strong>{{ appointment.name }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">{{ appointment.service|default:"General" }}</span>
+                                            </td>
+                                            <td>
+                                                {% if appointment.preferred_date %}
+                                                    {{ appointment.preferred_date|date:"M d, Y" }}
+                                                    {% if appointment.preferred_time %}
+                                                        <br><small class="text-muted">{{ appointment.preferred_time }}</small>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted">TBD</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ appointment.email }}
+                                                {% if appointment.phone %}
+                                                    <br><small>{{ appointment.phone }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge status-pending">{{ appointment.status|default:"Pending" }}</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-success action-btn" title="Confirm" onclick="confirmAppointment({{ appointment.id }})">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary action-btn" title="Reschedule" onclick="rescheduleAppointment({{ appointment.id }})">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger action-btn" title="Cancel" onclick="cancelAppointment({{ appointment.id }})">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-calendar fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">No appointments booked</h6>
+                                <p class="text-muted">Customer appointments will appear here for scheduling.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: none;
+    color: var(--text-secondary);
+}
+
+.nav-tabs .nav-link.active {
+    border-bottom-color: var(--primary-color);
+    color: var(--primary-color);
+    background: none;
+}
+</style>
+
+<script>
+function viewFormData(submissionId) {
+    alert('View form data for submission ID: ' + submissionId + '\nThis will show the complete form submission data.');
+}
+
+function processSubmission(submissionId) {
+    if (confirm('Mark this submission as processed?')) {
+        alert('Process submission functionality will be implemented.');
+    }
+}
+
+function deleteSubmission(submissionId) {
+    if (confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
+        alert('Delete submission functionality will be implemented.');
+    }
+}
+
+function viewLead(leadId) {
+    alert('View lead details for ID: ' + leadId + '\nThis will show the complete lead profile.');
+}
+
+function contactLead(leadId) {
+    alert('Contact lead functionality will open email/phone interface.');
+}
+
+function followUpLead(leadId) {
+    alert('Schedule follow-up for lead ID: ' + leadId);
+}
+
+function confirmAppointment(appointmentId) {
+    if (confirm('Confirm this appointment?')) {
+        alert('Confirm appointment functionality will be implemented.');
+    }
+}
+
+function rescheduleAppointment(appointmentId) {
+    alert('Reschedule appointment functionality will open date/time picker.');
+}
+
+function cancelAppointment(appointmentId) {
+    if (confirm('Are you sure you want to cancel this appointment?')) {
+        alert('Cancel appointment functionality will be implemented.');
+    }
+}
+</script>
+{% endblock %}

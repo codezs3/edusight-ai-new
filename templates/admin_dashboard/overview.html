@@ -1,0 +1,182 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Welcome to your admin dashboard. Manage your EduSight platform from here.</p>
+{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-primary">{{ total_users }}</div>
+                    <div class="stats-label">Total Users</div>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-users fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-success">{{ total_leads }}</div>
+                    <div class="stats-label">Total Leads</div>
+                </div>
+                <div class="text-success">
+                    <i class="fas fa-chart-line fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-warning">{{ total_appointments }}</div>
+                    <div class="stats-label">Appointments</div>
+                </div>
+                <div class="text-warning">
+                    <i class="fas fa-calendar fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-info">{{ recent_activity|length }}</div>
+                    <div class="stats-label">Recent Activity</div>
+                </div>
+                <div class="text-info">
+                    <i class="fas fa-activity fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="/admin-panel/pages/" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Manage Pages
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/admin-panel/users/" class="btn btn-outline-success w-100">
+                            <i class="fas fa-users me-2"></i>
+                            Manage Users
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/admin-panel/backup/" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-database me-2"></i>
+                            Create Backup
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/admin-panel/analytics/" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            View Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Recent Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_activity %}
+                    <div class="list-group list-group-flush">
+                        {% for activity in recent_activity %}
+                        <div class="list-group-item d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="{{ activity.icon }} {{ activity.color }}"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-medium">{{ activity.message }}</div>
+                                <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No recent activity to show.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    System Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Website Status</span>
+                        <span class="badge status-active">Online</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Database</span>
+                        <span class="badge status-active">Connected</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Backup Status</span>
+                        <span class="badge status-active">Up to date</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Security</span>
+                        <span class="badge status-active">Protected</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <a href="/admin-panel/settings/" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-cog me-1"></i>
+                        System Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

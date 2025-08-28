@@ -1,0 +1,494 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block page_subtitle %}
+<p class="page-subtitle">Manage plugins and extensions to enhance your website functionality.</p>
+{% endblock %}
+
+{% block content %}
+<!-- Plugin Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-primary">{{ total_plugins }}</div>
+                    <div class="stats-label">Total Plugins</div>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-plug fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-success">{{ active_plugins }}</div>
+                    <div class="stats-label">Active Plugins</div>
+                </div>
+                <div class="text-success">
+                    <i class="fas fa-check-circle fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-warning">2</div>
+                    <div class="stats-label">Updates Available</div>
+                </div>
+                <div class="text-warning">
+                    <i class="fas fa-sync fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number text-info">15</div>
+                    <div class="stats-label">Available</div>
+                </div>
+                <div class="text-info">
+                    <i class="fas fa-store fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Plugin Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tools me-2"></i>
+                    Plugin Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#installPluginModal">
+                            <i class="fas fa-plus me-2"></i>
+                            Install Plugin
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-success w-100" onclick="updateAllPlugins()">
+                            <i class="fas fa-sync me-2"></i>
+                            Update All
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-warning w-100" onclick="checkCompatibility()">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Check Compatibility
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-info w-100" onclick="browsePluginStore()">
+                            <i class="fas fa-store me-2"></i>
+                            Browse Store
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Installed Plugins -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Installed Plugins
+                </h5>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="pluginFilter" id="filterAll" checked>
+                    <label class="btn btn-outline-secondary btn-sm" for="filterAll">All</label>
+                    <input type="radio" class="btn-check" name="pluginFilter" id="filterActive">
+                    <label class="btn btn-outline-secondary btn-sm" for="filterActive">Active</label>
+                    <input type="radio" class="btn-check" name="pluginFilter" id="filterInactive">
+                    <label class="btn btn-outline-secondary btn-sm" for="filterInactive">Inactive</label>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Plugin</th>
+                                <th>Version</th>
+                                <th>Status</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plugin in plugins %}
+                            <tr data-plugin-status="{% if plugin.active %}active{% else %}inactive{% endif %}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="plugin-icon me-3">
+                                            {% if plugin.name == "ML Analytics" %}
+                                                <i class="fas fa-brain text-primary"></i>
+                                            {% elif plugin.name == "CRM Integration" %}
+                                                <i class="fas fa-users text-success"></i>
+                                            {% elif plugin.name == "Backup Manager" %}
+                                                <i class="fas fa-database text-warning"></i>
+                                            {% elif plugin.name == "SEO Optimizer" %}
+                                                <i class="fas fa-search text-info"></i>
+                                            {% else %}
+                                                <i class="fas fa-plug text-secondary"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <strong>{{ plugin.name }}</strong>
+                                            {% if not plugin.active %}
+                                                <span class="badge bg-secondary ms-2">Inactive</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <code>v{{ plugin.version }}</code>
+                                    {% if plugin.name in "ML Analytics,CRM Integration" %}
+                                        <br><small class="text-success">Latest</small>
+                                    {% elif plugin.name == "Backup Manager" %}
+                                        <br><small class="text-warning">Update available</small>
+                                    {% elif plugin.name == "SEO Optimizer" %}
+                                        <br><small class="text-warning">Update available</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if plugin.active %}
+                                        <span class="badge status-active">Active</span>
+                                    {% else %}
+                                        <span class="badge status-inactive">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ plugin.description }}</small>
+                                </td>
+                                <td>
+                                    {% if plugin.active %}
+                                        <button class="btn btn-sm btn-outline-warning action-btn" title="Deactivate" onclick="deactivatePlugin('{{ plugin.name }}')">
+                                            <i class="fas fa-pause"></i>
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-outline-success action-btn" title="Activate" onclick="activatePlugin('{{ plugin.name }}')">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-primary action-btn" title="Settings" onclick="configurePlugin('{{ plugin.name }}')">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    {% if plugin.name in "Backup Manager,SEO Optimizer" %}
+                                        <button class="btn btn-sm btn-outline-info action-btn" title="Update" onclick="updatePlugin('{{ plugin.name }}')">
+                                            <i class="fas fa-sync"></i>
+                                        </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-danger action-btn" title="Uninstall" onclick="uninstallPlugin('{{ plugin.name }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Available Plugins -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-store me-2"></i>
+                    Available Plugins
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-chart-line text-success fa-2x me-3"></i>
+                                    <div>
+                                        <h6 class="card-title mb-0">Advanced Analytics</h6>
+                                        <small class="text-muted">v2.1.0</small>
+                                    </div>
+                                </div>
+                                <p class="card-text text-muted">Enhanced analytics with custom dashboards and reporting features.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">Free</span>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="installPlugin('Advanced Analytics')">
+                                        <i class="fas fa-download me-1"></i>
+                                        Install
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-envelope text-primary fa-2x me-3"></i>
+                                    <div>
+                                        <h6 class="card-title mb-0">Email Marketing</h6>
+                                        <small class="text-muted">v1.5.0</small>
+                                    </div>
+                                </div>
+                                <p class="card-text text-muted">Automated email campaigns and newsletter management system.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-warning">Premium</span>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="installPlugin('Email Marketing')">
+                                        <i class="fas fa-download me-1"></i>
+                                        Install
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-mobile-alt text-info fa-2x me-3"></i>
+                                    <div>
+                                        <h6 class="card-title mb-0">Mobile App</h6>
+                                        <small class="text-muted">v1.0.0</small>
+                                    </div>
+                                </div>
+                                <p class="card-text text-muted">Progressive Web App functionality for mobile users.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-info">Beta</span>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="installPlugin('Mobile App')">
+                                        <i class="fas fa-download me-1"></i>
+                                        Install
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-comments text-warning fa-2x me-3"></i>
+                                    <div>
+                                        <h6 class="card-title mb-0">Live Chat</h6>
+                                        <small class="text-muted">v3.2.0</small>
+                                    </div>
+                                </div>
+                                <p class="card-text text-muted">Real-time customer support chat widget.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">Free</span>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="installPlugin('Live Chat')">
+                                        <i class="fas fa-download me-1"></i>
+                                        Install
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-credit-card text-success fa-2x me-3"></i>
+                                    <div>
+                                        <h6 class="card-title mb-0">Payment Gateway</h6>
+                                        <small class="text-muted">v2.4.0</small>
+                                    </div>
+                                </div>
+                                <p class="card-text text-muted">Secure payment processing with multiple gateways.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-warning">Premium</span>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="installPlugin('Payment Gateway')">
+                                        <i class="fas fa-download me-1"></i>
+                                        Install
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-language text-danger fa-2x me-3"></i>
+                                    <div>
+                                        <h6 class="card-title mb-0">Multi-Language</h6>
+                                        <small class="text-muted">v1.8.0</small>
+                                    </div>
+                                </div>
+                                <p class="card-text text-muted">Internationalization support for multiple languages.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">Free</span>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="installPlugin('Multi-Language')">
+                                        <i class="fas fa-download me-1"></i>
+                                        Install
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <button class="btn btn-outline-info" onclick="loadMorePlugins()">
+                        <i class="fas fa-plus me-2"></i>
+                        Load More Plugins
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Install Plugin Modal -->
+<div class="modal fade" id="installPluginModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Install Plugin from File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Plugin File</label>
+                        <input type="file" class="form-control" accept=".zip,.tar.gz" required>
+                        <div class="form-text">Upload a .zip or .tar.gz plugin file</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="autoActivate" checked>
+                            <label class="form-check-label" for="autoActivate">
+                                Activate plugin after installation
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="uploadPlugin()">
+                    <i class="fas fa-upload me-2"></i>
+                    Install Plugin
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.plugin-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 1.2rem;
+}
+</style>
+
+<script>
+// Plugin filter functionality
+document.querySelectorAll('input[name="pluginFilter"]').forEach(filter => {
+    filter.addEventListener('change', function() {
+        const filterValue = this.id.replace('filter', '').toLowerCase();
+        const rows = document.querySelectorAll('tbody tr[data-plugin-status]');
+        
+        rows.forEach(row => {
+            const status = row.getAttribute('data-plugin-status');
+            if (filterValue === 'all' || status === filterValue) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+
+// Plugin management functions
+function activatePlugin(pluginName) {
+    if (confirm('Activate plugin "' + pluginName + '"?')) {
+        alert('Activate plugin functionality will be implemented.');
+    }
+}
+
+function deactivatePlugin(pluginName) {
+    if (confirm('Deactivate plugin "' + pluginName + '"? This may affect site functionality.')) {
+        alert('Deactivate plugin functionality will be implemented.');
+    }
+}
+
+function configurePlugin(pluginName) {
+    alert('Plugin configuration for "' + pluginName + '" will open the settings panel.');
+}
+
+function updatePlugin(pluginName) {
+    if (confirm('Update plugin "' + pluginName + '" to the latest version?')) {
+        alert('Update plugin functionality will be implemented.');
+    }
+}
+
+function uninstallPlugin(pluginName) {
+    if (confirm('Uninstall plugin "' + pluginName + '"? This action cannot be undone and may affect site functionality.')) {
+        alert('Uninstall plugin functionality will be implemented.');
+    }
+}
+
+function installPlugin(pluginName) {
+    if (confirm('Install plugin "' + pluginName + '"?')) {
+        alert('Install plugin functionality will be implemented.');
+    }
+}
+
+function updateAllPlugins() {
+    if (confirm('Update all plugins with available updates?')) {
+        alert('Update all plugins functionality will be implemented.');
+    }
+}
+
+function checkCompatibility() {
+    alert('Compatibility check will verify all plugins work with the current system version.');
+}
+
+function browsePluginStore() {
+    alert('Plugin store will open in a new window with available plugins and extensions.');
+}
+
+function loadMorePlugins() {
+    alert('Load more plugins functionality will fetch additional plugins from the store.');
+}
+
+function uploadPlugin() {
+    alert('Upload plugin functionality will install the selected plugin file.');
+}
+</script>
+{% endblock %}
