@@ -19,7 +19,7 @@ EduSight is an advanced educational assessment platform that provides comprehens
 ### 📊 Advanced Analytics Engine
 - **Benchmarking**: Compare with national, state, and local averages
 - **Trend Analysis**: Performance patterns and improvement tracking
-- **Predictive Modeling**: ML-powered future performance predictions
+- **Predictive Modeling**: Algorithm-powered future performance predictions
 - **Interactive Visualizations**: Charts, graphs, and radar plots
 
 ### 📁 Intelligent File Processing
@@ -197,9 +197,9 @@ airflow scheduler
 - **SQLite/PostgreSQL**: Database
 - **Celery**: Asynchronous task processing
 
-### Machine Learning & AI
-- **Scikit-learn**: ML algorithms
-- **TensorFlow/Keras**: Deep learning
+### Analytics & Processing
+- **Scikit-learn**: Advanced algorithms
+- **TensorFlow/Keras**: Deep analytics
 - **Pandas**: Data processing
 - **NumPy**: Numerical computing
 - **OpenCV**: Image processing

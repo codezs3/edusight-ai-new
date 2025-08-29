@@ -45,7 +45,7 @@ def website_about(request):
                 'name': 'Prof. Amit Sharma',
                 'role': 'Head of Academic Analytics',
                 'experience': '12+ years',
-                'specialization': 'AI & Machine Learning'
+                'specialization': 'Data Analytics & Algorithms'
             },
             {
                 'name': 'Ms. Priya Patel',
@@ -202,7 +202,7 @@ def pricing_plans(request):
                     'Everything in Basic',
                     'Psychological wellbeing analysis',
                     'Career guidance insights',
-                    'AI-powered recommendations',
+                    'Advanced recommendations',
                     'Progress tracking',
                     'Email support'
                 ]
@@ -213,7 +213,7 @@ def pricing_plans(request):
                 'premium': True,
                 'features': [
                     'Everything in Gold',
-                    'Advanced ML analytics',
+                    'Advanced predictive analytics',
                     'Personalized study plans',
                     'Expert consultation call',
                     'Priority support',
