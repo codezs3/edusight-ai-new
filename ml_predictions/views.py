@@ -46,10 +46,8 @@ def ml_dashboard(request):
     avg_confidence_score = MLPrediction.objects.aggregate(Avg('confidence_score'))['confidence_score__avg'] or 0
     
     # Get model performance
-    model_performance = MLModel.objects.annotate(
-        prediction_count=Count('mlprediction'),
-        avg_confidence_score=Avg('mlprediction__confidence_score')
-    )
+    # Get model performance (simplified since there's no direct FK relationship)
+    model_performance = MLModel.objects.all()
     
     # Get prediction types distribution
     prediction_types = MLPrediction.objects.values('prediction_type').annotate(
@@ -572,10 +570,8 @@ def model_management(request):
         messages.error(request, 'Access denied.')
         return redirect('dashboard')
     
-    models = MLModel.objects.annotate(
-        prediction_count=Count('mlprediction'),
-        avg_confidence_score=Avg('mlprediction__confidence_score')
-    ).order_by('-created_at')
+    # Get models (simplified since there's no direct FK relationship)
+    models = MLModel.objects.all().order_by('-created_at')
     
     context = {
         'models': models,
@@ -984,20 +980,24 @@ def predict_api(request):
 @login_required
 def models_api(request):
     """API endpoint for ML models."""
-    models = MLModel.objects.annotate(
-        prediction_count=Count('mlprediction'),
-        avg_confidence_score=Avg('mlprediction__confidence_score')
-    )
+    # Get models (simplified since there's no direct FK relationship)
+    models = MLModel.objects.all()
     
     data = []
     for model in models:
+        # Calculate prediction count for this model version
+        prediction_count = MLPrediction.objects.filter(model_version=model.version).count()
+        avg_confidence = MLPrediction.objects.filter(model_version=model.version).aggregate(
+            avg_score=Avg('confidence_score')
+        )['avg_score'] or 0
+        
         data.append({
             'id': model.id,
             'name': model.name,
             'model_type': model.model_type,
             'version': model.version,
-            'prediction_count': model.prediction_count,
-            'avg_confidence_score': model.avg_confidence_score or 0,
+            'prediction_count': prediction_count,
+            'avg_confidence_score': avg_confidence,
             'created_at': model.created_at.isoformat(),
         })
     

@@ -916,7 +916,7 @@ def get_recent_activity():
     for lead in recent_leads:
         activities.append({
             'type': 'lead',
-            'message': f'New lead: {lead.name}',
+            'message': f'New lead: {lead.full_name}',
             'timestamp': lead.created_at,
             'icon': 'fas fa-user-plus',
             'color': 'text-success'
