@@ -43,12 +43,12 @@ def ml_dashboard(request):
     
     # Get prediction statistics
     total_predictions = MLPrediction.objects.count()
-    avg_accuracy = MLPrediction.objects.aggregate(Avg('accuracy'))['accuracy__avg'] or 0
+    avg_confidence_score = MLPrediction.objects.aggregate(Avg('confidence_score'))['confidence_score__avg'] or 0
     
     # Get model performance
     model_performance = MLModel.objects.annotate(
         prediction_count=Count('mlprediction'),
-        avg_accuracy=Avg('mlprediction__accuracy')
+        avg_confidence_score=Avg('mlprediction__confidence_score')
     )
     
     # Get prediction types distribution
@@ -60,7 +60,7 @@ def ml_dashboard(request):
         'models': models,
         'recent_predictions': recent_predictions,
         'total_predictions': total_predictions,
-        'avg_accuracy': avg_accuracy,
+        'avg_confidence_score': avg_confidence_score,
         'model_performance': model_performance,
         'prediction_types': list(prediction_types),
     }
@@ -162,7 +162,7 @@ def generate_prediction(request, student_id):
             model=model,
             prediction_type=prediction_type,
             prediction_data=json.dumps(prediction_data),
-            accuracy=random.uniform(0.75, 0.95),  # Simulated accuracy
+            confidence_score=random.uniform(0.75, 0.95),  # Simulated confidence_score
             created_at=timezone.now()
         )
         
@@ -574,7 +574,7 @@ def model_management(request):
     
     models = MLModel.objects.annotate(
         prediction_count=Count('mlprediction'),
-        avg_accuracy=Avg('mlprediction__accuracy')
+        avg_confidence_score=Avg('mlprediction__confidence_score')
     ).order_by('-created_at')
     
     context = {
@@ -590,16 +590,16 @@ def ml_api(request):
     """API endpoint for ML data."""
     total_predictions = MLPrediction.objects.count()
     total_models = MLModel.objects.count()
-    avg_accuracy = MLPrediction.objects.aggregate(Avg('accuracy'))['accuracy__avg'] or 0
+    avg_confidence_score = MLPrediction.objects.aggregate(Avg('confidence_score'))['confidence_score__avg'] or 0
     
     recent_predictions = MLPrediction.objects.values(
-        'prediction_type', 'created_at', 'accuracy'
+        'prediction_type', 'created_at', 'confidence_score'
     ).order_by('-created_at')[:10]
     
     return JsonResponse({
         'total_predictions': total_predictions,
         'total_models': total_models,
-        'avg_accuracy': avg_accuracy,
+        'avg_confidence_score': avg_confidence_score,
         'recent_predictions': list(recent_predictions),
     })
 
@@ -626,9 +626,385 @@ def prediction_api(request, student_id):
         data.append({
             'id': prediction.id,
             'type': prediction.prediction_type,
-            'accuracy': prediction.accuracy,
+            'confidence_score': prediction.confidence_score,
             'created_at': prediction.created_at.isoformat(),
             'data': prediction_data,
         })
     
     return JsonResponse({'predictions': data})
+
+
+# Additional views for the URLs
+@login_required
+def ml_models_list(request):
+    """List all ML models."""
+    return model_management(request)
+
+
+@login_required
+def student_predictions(request, student_id):
+    """Student-specific predictions page."""
+    student = get_object_or_404(Student, pk=student_id)
+    
+    # Check permissions
+    if not (request.user.is_staff or 
+            (hasattr(request.user, 'student_profile') and student == request.user.student_profile)):
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+    
+    predictions = MLPrediction.objects.filter(student=student).order_by('-created_at')
+    
+    context = {
+        'student': student,
+        'predictions': predictions,
+    }
+    
+    return render(request, 'ml_predictions/student_predictions.html', context)
+
+
+@login_required
+def career_recommendations(request, student_id):
+    """Career recommendations for a student."""
+    student = get_object_or_404(Student, pk=student_id)
+    
+    # Get latest career recommendation
+    career_prediction = MLPrediction.objects.filter(
+        student=student,
+        prediction_type='career_recommendation'
+    ).order_by('-created_at').first()
+    
+    if not career_prediction:
+        # Generate new career recommendation
+        prediction_data = generate_career_recommendation(student)
+        
+        model, _ = MLModel.objects.get_or_create(
+            name="career_recommendation_model",
+            defaults={
+                'model_type': 'career_recommendation',
+                'version': '1.0',
+                'description': 'ML model for career recommendations'
+            }
+        )
+        
+        career_prediction = MLPrediction.objects.create(
+            student=student,
+            model=model,
+            prediction_type='career_recommendation',
+            prediction_data=json.dumps(prediction_data),
+            confidence_score=random.uniform(0.75, 0.95)
+        )
+    
+    try:
+        prediction_data = json.loads(career_prediction.prediction_data)
+    except json.JSONDecodeError:
+        prediction_data = {}
+    
+    context = {
+        'student': student,
+        'prediction': career_prediction,
+        'prediction_data': prediction_data,
+    }
+    
+    return render(request, 'ml_predictions/career_recommendations.html', context)
+
+
+@login_required
+def academic_predictions(request, student_id):
+    """Academic predictions for a student."""
+    student = get_object_or_404(Student, pk=student_id)
+    
+    # Get latest performance forecast
+    academic_prediction = MLPrediction.objects.filter(
+        student=student,
+        prediction_type='performance_forecast'
+    ).order_by('-created_at').first()
+    
+    if not academic_prediction:
+        # Generate new academic prediction
+        prediction_data = generate_performance_forecast(student)
+        
+        model, _ = MLModel.objects.get_or_create(
+            name="performance_forecast_model",
+            defaults={
+                'model_type': 'performance_forecast',
+                'version': '1.0',
+                'description': 'ML model for academic performance forecasting'
+            }
+        )
+        
+        academic_prediction = MLPrediction.objects.create(
+            student=student,
+            model=model,
+            prediction_type='performance_forecast',
+            prediction_data=json.dumps(prediction_data),
+            confidence_score=random.uniform(0.75, 0.95)
+        )
+    
+    try:
+        prediction_data = json.loads(academic_prediction.prediction_data)
+    except json.JSONDecodeError:
+        prediction_data = {}
+    
+    context = {
+        'student': student,
+        'prediction': academic_prediction,
+        'prediction_data': prediction_data,
+    }
+    
+    return render(request, 'ml_predictions/academic_predictions.html', context)
+
+
+@login_required
+def wellbeing_predictions(request, student_id):
+    """Wellbeing predictions for a student."""
+    student = get_object_or_404(Student, pk=student_id)
+    
+    # Get latest risk assessment
+    wellbeing_prediction = MLPrediction.objects.filter(
+        student=student,
+        prediction_type='risk_assessment'
+    ).order_by('-created_at').first()
+    
+    if not wellbeing_prediction:
+        # Generate new wellbeing prediction
+        prediction_data = generate_risk_assessment(student)
+        
+        model, _ = MLModel.objects.get_or_create(
+            name="risk_assessment_model",
+            defaults={
+                'model_type': 'risk_assessment',
+                'version': '1.0',
+                'description': 'ML model for student wellbeing risk assessment'
+            }
+        )
+        
+        wellbeing_prediction = MLPrediction.objects.create(
+            student=student,
+            model=model,
+            prediction_type='risk_assessment',
+            prediction_data=json.dumps(prediction_data),
+            confidence_score=random.uniform(0.75, 0.95)
+        )
+    
+    try:
+        prediction_data = json.loads(wellbeing_prediction.prediction_data)
+    except json.JSONDecodeError:
+        prediction_data = {}
+    
+    context = {
+        'student': student,
+        'prediction': wellbeing_prediction,
+        'prediction_data': prediction_data,
+    }
+    
+    return render(request, 'ml_predictions/wellbeing_predictions.html', context)
+
+
+@login_required
+def batch_predictions(request):
+    """Batch predictions management."""
+    if not request.user.is_staff:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+    
+    # Get all students
+    students = Student.objects.all()
+    
+    # Get recent batch prediction runs
+    recent_predictions = MLPrediction.objects.values('created_at__date').annotate(
+        count=Count('id')
+    ).order_by('-created_at__date')[:10]
+    
+    context = {
+        'students': students,
+        'recent_predictions': recent_predictions,
+    }
+    
+    return render(request, 'ml_predictions/batch_predictions.html', context)
+
+
+@login_required
+def run_batch_predictions(request):
+    """Run batch predictions for all students."""
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    if request.method == 'POST':
+        prediction_type = request.POST.get('prediction_type')
+        student_ids = request.POST.getlist('student_ids')
+        
+        if not student_ids:
+            return JsonResponse({'error': 'No students selected'}, status=400)
+        
+        created_count = 0
+        for student_id in student_ids:
+            try:
+                student = Student.objects.get(id=student_id)
+                
+                # Generate prediction
+                if prediction_type == 'performance_forecast':
+                    prediction_data = generate_performance_forecast(student)
+                elif prediction_type == 'career_recommendation':
+                    prediction_data = generate_career_recommendation(student)
+                elif prediction_type == 'risk_assessment':
+                    prediction_data = generate_risk_assessment(student)
+                elif prediction_type == 'learning_style':
+                    prediction_data = generate_learning_style_analysis(student)
+                else:
+                    continue
+                
+                # Create prediction record
+                model, _ = MLModel.objects.get_or_create(
+                    name=f"{prediction_type}_model",
+                    defaults={
+                        'model_type': prediction_type,
+                        'version': '1.0',
+                        'description': f'ML model for {prediction_type}'
+                    }
+                )
+                
+                MLPrediction.objects.create(
+                    student=student,
+                    model=model,
+                    prediction_type=prediction_type,
+                    prediction_data=json.dumps(prediction_data),
+                    confidence_score=random.uniform(0.75, 0.95)
+                )
+                
+                created_count += 1
+                
+            except Student.DoesNotExist:
+                continue
+        
+        return JsonResponse({
+            'success': True,
+            'created_count': created_count,
+            'message': f'Generated {created_count} predictions successfully'
+        })
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@login_required
+def train_models(request):
+    """Train ML models."""
+    if not request.user.is_staff:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        model_type = request.POST.get('model_type')
+        
+        # Simulate model training
+        messages.success(request, f'Model training for {model_type} started successfully!')
+        return redirect('ml_predictions:models_list')
+    
+    model_types = [
+        {'id': 'performance_forecast', 'name': 'Academic Performance Forecast'},
+        {'id': 'career_recommendation', 'name': 'Career Recommendation'},
+        {'id': 'risk_assessment', 'name': 'Risk Assessment'},
+        {'id': 'learning_style', 'name': 'Learning Style Analysis'},
+    ]
+    
+    context = {
+        'model_types': model_types,
+    }
+    
+    return render(request, 'ml_predictions/train_models.html', context)
+
+
+@login_required
+def model_details(request, model_id):
+    """View ML model details."""
+    model = get_object_or_404(MLModel, pk=model_id)
+    
+    # Get model statistics
+    prediction_count = MLPrediction.objects.filter(model=model).count()
+    avg_confidence_score = MLPrediction.objects.filter(model=model).aggregate(
+        Avg('confidence_score')
+    )['confidence_score__avg'] or 0
+    
+    # Get recent predictions
+    recent_predictions = MLPrediction.objects.filter(
+        model=model
+    ).select_related('student__user').order_by('-created_at')[:10]
+    
+    context = {
+        'model': model,
+        'prediction_count': prediction_count,
+        'avg_confidence_score': avg_confidence_score,
+        'recent_predictions': recent_predictions,
+    }
+    
+    return render(request, 'ml_predictions/model_details.html', context)
+
+
+# API endpoints
+@login_required
+def predict_api(request):
+    """API endpoint for generating predictions."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        student_id = data.get('student_id')
+        prediction_type = data.get('prediction_type')
+        
+        if not student_id or not prediction_type:
+            return JsonResponse({'error': 'Missing required parameters'}, status=400)
+        
+        student = Student.objects.get(id=student_id)
+        
+        # Generate prediction
+        if prediction_type == 'performance_forecast':
+            prediction_data = generate_performance_forecast(student)
+        elif prediction_type == 'career_recommendation':
+            prediction_data = generate_career_recommendation(student)
+        elif prediction_type == 'risk_assessment':
+            prediction_data = generate_risk_assessment(student)
+        elif prediction_type == 'learning_style':
+            prediction_data = generate_learning_style_analysis(student)
+        else:
+            return JsonResponse({'error': 'Invalid prediction type'}, status=400)
+        
+        return JsonResponse({
+            'success': True,
+            'prediction_data': prediction_data
+        })
+        
+    except Student.DoesNotExist:
+        return JsonResponse({'error': 'Student not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def models_api(request):
+    """API endpoint for ML models."""
+    models = MLModel.objects.annotate(
+        prediction_count=Count('mlprediction'),
+        avg_confidence_score=Avg('mlprediction__confidence_score')
+    )
+    
+    data = []
+    for model in models:
+        data.append({
+            'id': model.id,
+            'name': model.name,
+            'model_type': model.model_type,
+            'version': model.version,
+            'prediction_count': model.prediction_count,
+            'avg_confidence_score': model.avg_confidence_score or 0,
+            'created_at': model.created_at.isoformat(),
+        })
+    
+    return JsonResponse({'models': data})
+
+
+@login_required
+def student_predictions_api(request, student_id):
+    """API endpoint for student predictions."""
+    return prediction_api(request, student_id)

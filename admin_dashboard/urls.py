@@ -16,4 +16,10 @@ urlpatterns = [
     path('settings/', views.settings_management, name='settings'),
     path('backup/', views.backup_system, name='backup'),
     path('workflows/', views.workflow_management, name='workflows'),
+    
+    # New CRUD management pages
+    path('students/', views.students_management, name='students'),
+    path('assessments/', views.assessments_management, name='assessments'),
+    path('ml-models/', views.ml_models_management, name='ml_models'),
+    path('system-stats/', views.system_statistics, name='system_stats'),
 ]

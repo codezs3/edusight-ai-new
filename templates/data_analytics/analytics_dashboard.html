@@ -1,0 +1,353 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - Edusight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        border-top: 4px solid var(--primary-color);
+        height: 100%;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .metric-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        height: 400px;
+    }
+    
+    .trend-item {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.3s ease;
+    }
+    
+    .trend-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .trend-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Analytics Header -->
+    <div class="analytics-header text-center">
+        <div class="container">
+            <h1><i class="fas fa-chart-line me-3"></i>Analytics Dashboard</h1>
+            <p class="lead">Comprehensive data insights and performance metrics</p>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="metric-card">
+                <div class="d-flex align-items-center">
+                    <div class="metric-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0">{{ total_students }}</h3>
+                        <small class="text-muted">Total Students</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="metric-card">
+                <div class="d-flex align-items-center">
+                    <div class="metric-icon">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0">{{ total_schools }}</h3>
+                        <small class="text-muted">Total Schools</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="metric-card">
+                <div class="d-flex align-items-center">
+                    <div class="metric-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0">{{ total_assessments }}</h3>
+                        <small class="text-muted">Assessments</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="metric-card">
+                <div class="d-flex align-items-center">
+                    <div class="metric-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0">{{ total_results }}</h3>
+                        <small class="text-muted">Results</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Averages -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4 col-lg-6">
+            <div class="metric-card text-center">
+                <div class="metric-icon mx-auto mb-3">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h4>{{ avg_academic|floatformat:1 }}%</h4>
+                <small class="text-muted">Average Academic Score</small>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-lg-6">
+            <div class="metric-card text-center">
+                <div class="metric-icon mx-auto mb-3">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h4>{{ avg_psychological|floatformat:1 }}%</h4>
+                <small class="text-muted">Average Wellbeing Score</small>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-lg-6">
+            <div class="metric-card text-center">
+                <div class="metric-icon mx-auto mb-3">
+                    <i class="fas fa-running"></i>
+                </div>
+                <h4>{{ avg_physical|floatformat:1 }}%</h4>
+                <small class="text-muted">Average Fitness Score</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Trends -->
+    <div class="row g-4">
+        <!-- Performance Trends Chart -->
+        <div class="col-lg-8">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-line me-2"></i>Performance Trends</h5>
+                <canvas id="trendsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Trends -->
+        <div class="col-lg-4">
+            <div class="chart-container" style="height: auto;">
+                <h5><i class="fas fa-list me-2"></i>Recent Trends</h5>
+                
+                {% if recent_trends %}
+                    {% for trend in recent_trends %}
+                    <div class="trend-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">{{ trend.end_date|date:"M d" }}</small>
+                                <div class="fw-bold">{{ trend.avg_score|floatformat:1 }}%</div>
+                            </div>
+                            <span class="badge bg-primary">{{ trend.count }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No trend data available</h6>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Assessment Distribution and Grade Performance -->
+    <div class="row g-4 mt-4">
+        <!-- Assessment Distribution -->
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-pie me-2"></i>Assessment Distribution</h5>
+                <canvas id="assessmentChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Grade Performance -->
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-bar me-2"></i>Grade Performance</h5>
+                <canvas id="gradeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- School Performance -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="chart-container" style="height: auto;">
+                <h5><i class="fas fa-school me-2"></i>School Performance</h5>
+                
+                {% if school_performance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>School</th>
+                                    <th>Academic Average</th>
+                                    <th>Wellbeing Average</th>
+                                    <th>Fitness Average</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for performance in school_performance %}
+                                <tr>
+                                    <td>{{ performance.school.name }}</td>
+                                    <td><span class="badge bg-primary">{{ performance.academic_average|floatformat:1 }}%</span></td>
+                                    <td><span class="badge bg-success">{{ performance.wellbeing_average|floatformat:1 }}%</span></td>
+                                    <td><span class="badge bg-info">{{ performance.fitness_average|floatformat:1 }}%</span></td>
+                                    <td>{{ performance.date|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-school fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No school performance data available</h6>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Performance Trends Chart
+    const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+    const trendsChart = new Chart(trendsCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for trend in recent_trends %}'{{ trend.end_date|date:"M d" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Average Score',
+                data: [{% for trend in recent_trends %}{{ trend.avg_score|floatformat:1 }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                borderColor: 'rgb(99, 102, 241)',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // Assessment Distribution Chart
+    const assessmentCtx = document.getElementById('assessmentChart').getContext('2d');
+    const assessmentChart = new Chart(assessmentCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for item in assessment_distribution %}'{{ item.assessment_type }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for item in assessment_distribution %}{{ item.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgb(99, 102, 241)',
+                    'rgb(6, 182, 212)',
+                    'rgb(16, 185, 129)',
+                    'rgb(245, 158, 11)',
+                    'rgb(239, 68, 68)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Grade Performance Chart
+    const gradeCtx = document.getElementById('gradeChart').getContext('2d');
+    const gradeChart = new Chart(gradeCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for grade in grade_performance %}'Grade {{ grade.student__grade }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Academic Average',
+                data: [{% for grade in grade_performance %}{{ grade.avg_academic|floatformat:1 }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: 'rgba(99, 102, 241, 0.8)'
+            }, {
+                label: 'Wellbeing Average',
+                data: [{% for grade in grade_performance %}{{ grade.avg_psychological|floatformat:1 }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: 'rgba(16, 185, 129, 0.8)'
+            }, {
+                label: 'Fitness Average',
+                data: [{% for grade in grade_performance %}{{ grade.avg_physical|floatformat:1 }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: 'rgba(6, 182, 212, 0.8)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

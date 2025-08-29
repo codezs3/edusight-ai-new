@@ -1,0 +1,172 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Assessments - Edusight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .assessments-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+    }
+    
+    .assessment-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        border-left: 4px solid var(--primary-color);
+        height: 100%;
+    }
+    
+    .assessment-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .assessment-type {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .type-academic { background: #e3f2fd; color: #1976d2; }
+    .type-psychological { background: #f3e5f5; color: #7b1fa2; }
+    .type-physical { background: #e8f5e8; color: #388e3c; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Assessments Header -->
+    <div class="assessments-header text-center">
+        <div class="container">
+            <h1><i class="fas fa-clipboard-list me-3"></i>Assessments</h1>
+            <p class="lead">Create, manage, and analyze student assessments</p>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>All Assessments</h3>
+                    <p class="text-muted">Manage and review student assessments</p>
+                </div>
+                <a href="{% url 'assessments:assessment_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create New Assessment
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assessments Grid -->
+    <div class="row g-4">
+        {% if assessments %}
+            {% for assessment in assessments %}
+            <div class="col-xl-4 col-lg-6 col-md-6">
+                <div class="assessment-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title">{{ assessment.title }}</h5>
+                        <span class="assessment-type type-{{ assessment.assessment_type }}">
+                            {{ assessment.get_assessment_type_display }}
+                        </span>
+                    </div>
+                    
+                    <p class="text-muted mb-3">{{ assessment.description|truncatechars:100 }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-star me-1"></i>
+                            Max Score: {{ assessment.max_score }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ assessment.duration }} min
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Created: {{ assessment.created_at|date:"M d, Y" }}
+                        </small>
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'assessments:assessment_detail' assessment.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'assessments:assessment_update' assessment.pk %}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'assessments:assessment_delete' assessment.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-list fa-5x text-muted mb-4"></i>
+                    <h4 class="text-muted">No assessments found</h4>
+                    <p class="text-muted mb-4">Create your first assessment to get started</p>
+                    <a href="{% url 'assessments:assessment_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create Assessment
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Assessment pagination">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any assessment-specific JavaScript here
+    console.log('Assessments page loaded');
+});
+</script>
+{% endblock %}

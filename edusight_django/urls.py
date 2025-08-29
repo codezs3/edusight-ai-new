@@ -55,11 +55,12 @@ urlpatterns = [
     path('api/assessments/stats/', assessment_stats_api, name='assessment_stats_api'),
     path('api/ml/predictions/', ml_predictions_api, name='ml_predictions_api'),
     
-    # App URLs (to be added when views are created)
-    # path('students/', include('students.urls')),
-    # path('assessments/', include('assessments.urls')),
-    # path('analytics/', include('data_analytics.urls')),
-    # path('ml/', include('ml_predictions.urls')),
+    # App URLs 
+    path('students/', include('students.urls')),
+    path('assessments/', include('assessments.urls')),
+    path('analytics/', include('data_analytics.urls')),
+    path('ml/', include('ml_predictions.urls')),
+    path('crm/', include('crm.urls')),
     
     # Authentication (Django built-in)
     path('accounts/', include('django.contrib.auth.urls')),

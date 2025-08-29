@@ -55,7 +55,7 @@ class AssessmentListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['assessment_types'] = Assessment.ASSESSMENT_TYPES
+        context['assessment_types'] = Assessment.ASSESSMENT_TYPE_CHOICES
         context['curriculums'] = Assessment.CURRICULUM_CHOICES
         context['grades'] = Assessment.objects.values_list('grade', flat=True).distinct()
         context['total_assessments'] = Assessment.objects.count()
@@ -94,7 +94,7 @@ class AssessmentCreateView(LoginRequiredMixin, CreateView):
     template_name = 'assessments/assessment_form.html'
     fields = ['title', 'description', 'assessment_type', 'curriculum', 'grade', 
               'subject', 'duration_minutes', 'total_questions', 'passing_percentage']
-    success_url = reverse_lazy('assessment_list')
+    success_url = reverse_lazy('assessments:assessment_list')
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -108,11 +108,22 @@ class AssessmentUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'assessments/assessment_form.html'
     fields = ['title', 'description', 'assessment_type', 'curriculum', 'grade', 
               'subject', 'duration_minutes', 'total_questions', 'passing_percentage']
-    success_url = reverse_lazy('assessment_list')
+    success_url = reverse_lazy('assessments:assessment_list')
 
     def form_valid(self, form):
         messages.success(self.request, 'Assessment updated successfully!')
         return super().form_valid(form)
+
+
+class AssessmentDeleteView(LoginRequiredMixin, DeleteView):
+    """Delete an assessment."""
+    model = Assessment
+    template_name = 'assessments/assessment_confirm_delete.html'
+    success_url = reverse_lazy('assessments:assessment_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Assessment deleted successfully!')
+        return super().delete(request, *args, **kwargs)
 
 
 @login_required

@@ -3,10 +3,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView
 from django.http import JsonResponse
-from django.db.models import Q, Count, Avg, Max, Min, Sum
+from django.contrib import messages
+from django.db.models import Q, Count, Avg, Max, Min, Sum, Prefetch
 from django.utils import timezone
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+from django.db import transaction
+from django.conf import settings
 from datetime import datetime, timedelta
 import json
+import logging
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 from .models import StudentAnalytics, SchoolAnalytics, PerformanceTrend, AnalyticsReport, DashboardMetrics
 from students.models import Student, School
@@ -14,58 +23,91 @@ from assessments.models import Assessment, AssessmentResult
 
 
 @login_required
+@cache_page(300)  # Cache for 5 minutes
 def analytics_dashboard(request):
-    """Main analytics dashboard."""
+    """
+    Optimized main analytics dashboard with caching and efficient queries.
+    """
     if not request.user.is_staff:
         messages.error(request, 'Access denied.')
         return redirect('dashboard')
     
-    # Overall statistics
-    total_students = Student.objects.count()
-    total_schools = School.objects.count()
-    total_assessments = Assessment.objects.count()
-    total_results = AssessmentResult.objects.count()
+    # Check cache first for expensive computations
+    cache_key = f'analytics_dashboard_{request.user.id}'
+    cached_data = cache.get(cache_key)
     
-    # Performance averages
-    avg_academic = StudentAnalytics.objects.aggregate(Avg('academic_score'))['academic_score__avg'] or 0
-    avg_psychological = StudentAnalytics.objects.aggregate(Avg('psychological_score'))['psychological_score__avg'] or 0
-    avg_physical = StudentAnalytics.objects.aggregate(Avg('physical_score'))['physical_score__avg'] or 0
+    if cached_data:
+        logger.info(f"Analytics dashboard cache hit for user {request.user.id}")
+        return render(request, 'data_analytics/analytics_dashboard.html', cached_data)
     
-    # Recent trends
-    recent_trends = PerformanceTrend.objects.values('date').annotate(
-        avg_score=Avg('score'),
-        count=Count('id')
-    ).order_by('-date')[:30]
-    
-    # School performance
-    school_performance = SchoolAnalytics.objects.select_related('school').order_by('-date')[:10]
-    
-    # Assessment type distribution
-    assessment_distribution = Assessment.objects.values('assessment_type').annotate(
-        count=Count('id')
-    )
-    
-    # Grade-wise performance
-    grade_performance = StudentAnalytics.objects.values('student__grade').annotate(
-        avg_academic=Avg('academic_score'),
-        avg_psychological=Avg('psychological_score'),
-        avg_physical=Avg('physical_score'),
-        student_count=Count('id')
-    ).order_by('student__grade')
-    
-    context = {
-        'total_students': total_students,
-        'total_schools': total_schools,
-        'total_assessments': total_assessments,
-        'total_results': total_results,
-        'avg_academic': avg_academic,
-        'avg_psychological': avg_psychological,
-        'avg_physical': avg_physical,
-        'recent_trends': list(recent_trends),
-        'school_performance': school_performance,
-        'assessment_distribution': list(assessment_distribution),
-        'grade_performance': list(grade_performance),
-    }
+    try:
+        with transaction.atomic():
+            # Use efficient single-query aggregations where possible
+            stats_query = {
+                'total_students': Student.objects.count(),
+                'total_schools': School.objects.count(), 
+                'total_assessments': Assessment.objects.count(),
+                'total_results': AssessmentResult.objects.count()
+            }
+            
+            # Optimized performance averages with single query
+            performance_averages = StudentAnalytics.objects.aggregate(
+                avg_academic=Avg('academic_score'),
+                avg_psychological=Avg('wellbeing_score'),
+                avg_physical=Avg('fitness_score'),
+                total_records=Count('id')
+            )
+            
+            # Efficient recent trends with limited data
+            recent_trends = PerformanceTrend.objects.values('end_date').annotate(
+                avg_score=Avg('final_value'),
+                count=Count('id')
+            ).order_by('-end_date')[:20]  # Reduced to 20 for better performance
+            
+            # Optimized school performance with select_related
+            school_performance = SchoolAnalytics.objects.select_related('school').order_by('-date')[:10]
+            
+            # Single query for assessment distribution
+            assessment_distribution = list(Assessment.objects.values('assessment_type').annotate(
+                count=Count('id')
+            ))
+            
+            # Efficient grade-wise performance
+            grade_performance = list(StudentAnalytics.objects.values('student__grade').annotate(
+                avg_academic=Avg('academic_score'),
+                avg_psychological=Avg('wellbeing_score'),
+                avg_physical=Avg('fitness_score'),
+                student_count=Count('id')
+            ).order_by('student__grade'))
+            
+            context = {
+                **stats_query,
+                'avg_academic': performance_averages.get('avg_academic') or 0,
+                'avg_psychological': performance_averages.get('avg_psychological') or 0,
+                'avg_physical': performance_averages.get('avg_physical') or 0,
+                'total_analytics_records': performance_averages.get('total_records') or 0,
+                'recent_trends': list(recent_trends),
+                'school_performance': school_performance,
+                'assessment_distribution': assessment_distribution,
+                'grade_performance': grade_performance,
+            }
+            
+            # Cache the context for 5 minutes
+            cache.set(cache_key, context, 300)
+            logger.info(f"Analytics dashboard data cached for user {request.user.id}")
+            
+    except Exception as e:
+        logger.error(f"Error in analytics dashboard: {str(e)}")
+        messages.error(request, 'Error loading analytics data.')
+        context = {
+            'total_students': 0,
+            'total_schools': 0,
+            'total_assessments': 0,
+            'total_results': 0,
+            'avg_academic': 0,
+            'avg_psychological': 0,
+            'avg_physical': 0,
+        }
     
     return render(request, 'data_analytics/analytics_dashboard.html', context)
 
@@ -85,7 +127,7 @@ def student_analytics_detail(request, pk):
     analytics = StudentAnalytics.objects.filter(student=student).first()
     
     # Get performance trends
-    trends = PerformanceTrend.objects.filter(student=student).order_by('date')
+    trends = PerformanceTrend.objects.filter(student=student).order_by('end_date')
     
     # Get assessment results by type
     academic_results = AssessmentResult.objects.filter(
@@ -152,8 +194,8 @@ def school_analytics(request, pk=None):
             student__school=school
         ).aggregate(
             avg_academic=Avg('academic_score'),
-            avg_psychological=Avg('psychological_score'),
-            avg_physical=Avg('physical_score')
+            avg_psychological=Avg('wellbeing_score'),
+            avg_physical=Avg('fitness_score')
         )
         
         # Get assessment completion rate
@@ -190,16 +232,16 @@ def performance_comparison(request):
     # Grade comparison
     grade_comparison = StudentAnalytics.objects.values('student__grade').annotate(
         avg_academic=Avg('academic_score'),
-        avg_psychological=Avg('psychological_score'),
-        avg_physical=Avg('physical_score'),
+        avg_psychological=Avg('wellbeing_score'),
+        avg_physical=Avg('fitness_score'),
         student_count=Count('id')
     ).order_by('student__grade')
     
     # School comparison
     school_comparison = StudentAnalytics.objects.values('student__school__name').annotate(
         avg_academic=Avg('academic_score'),
-        avg_psychological=Avg('psychological_score'),
-        avg_physical=Avg('physical_score'),
+        avg_psychological=Avg('wellbeing_score'),
+        avg_physical=Avg('fitness_score'),
         student_count=Count('id')
     ).order_by('student__school__name')
     
@@ -347,8 +389,8 @@ def generate_student_performance_report(date_from, date_to, filters):
     return {
         'total_students': queryset.count(),
         'avg_academic': queryset.aggregate(Avg('academic_score'))['academic_score__avg'] or 0,
-        'avg_psychological': queryset.aggregate(Avg('psychological_score'))['psychological_score__avg'] or 0,
-        'avg_physical': queryset.aggregate(Avg('physical_score'))['physical_score__avg'] or 0,
+        'avg_psychological': queryset.aggregate(Avg('wellbeing_score'))['wellbeing_score__avg'] or 0,
+        'avg_physical': queryset.aggregate(Avg('fitness_score'))['fitness_score__avg'] or 0,
         'top_performers': list(queryset.order_by('-academic_score')[:10].values(
             'student__user__first_name', 'student__user__last_name', 'academic_score'
         )),
@@ -445,8 +487,8 @@ def analytics_api(request):
     
     # Performance averages
     avg_academic = StudentAnalytics.objects.aggregate(Avg('academic_score'))['academic_score__avg'] or 0
-    avg_psychological = StudentAnalytics.objects.aggregate(Avg('psychological_score'))['psychological_score__avg'] or 0
-    avg_physical = StudentAnalytics.objects.aggregate(Avg('physical_score'))['physical_score__avg'] or 0
+    avg_psychological = StudentAnalytics.objects.aggregate(Avg('wellbeing_score'))['wellbeing_score__avg'] or 0
+    avg_physical = StudentAnalytics.objects.aggregate(Avg('fitness_score'))['fitness_score__avg'] or 0
     
     # Recent trends (last 7 days)
     week_ago = timezone.now() - timedelta(days=7)
@@ -473,20 +515,189 @@ def performance_api(request):
     # Grade-wise performance
     grade_performance = StudentAnalytics.objects.values('student__grade').annotate(
         avg_academic=Avg('academic_score'),
-        avg_psychological=Avg('psychological_score'),
-        avg_physical=Avg('physical_score'),
+        avg_psychological=Avg('wellbeing_score'),
+        avg_physical=Avg('fitness_score'),
         student_count=Count('id')
     ).order_by('student__grade')
     
     # School performance
     school_performance = StudentAnalytics.objects.values('student__school__name').annotate(
         avg_academic=Avg('academic_score'),
-        avg_psychological=Avg('psychological_score'),
-        avg_physical=Avg('physical_score'),
+        avg_psychological=Avg('wellbeing_score'),
+        avg_physical=Avg('fitness_score'),
         student_count=Count('id')
     ).order_by('student__school__name')
     
     return JsonResponse({
         'grade_performance': list(grade_performance),
         'school_performance': list(school_performance),
+    })
+
+
+# Additional view functions for the URLs
+@login_required
+def student_analytics_dashboard(request):
+    """Student analytics dashboard."""
+    return analytics_dashboard(request)
+
+
+@login_required  
+def school_analytics_dashboard(request):
+    """School analytics dashboard."""
+    return school_analytics(request)
+
+
+@login_required
+def student_detailed_analytics(request, student_id):
+    """Detailed analytics for a specific student."""
+    return student_analytics_detail(request, student_id)
+
+
+@login_required
+def student_performance_trends(request, student_id):
+    """Performance trends for a specific student."""
+    student = get_object_or_404(Student, pk=student_id)
+    
+    # Get performance trends over time
+    trends = PerformanceTrend.objects.filter(student=student).order_by('end_date')
+    
+    # Group by assessment type
+    academic_trends = trends.filter(assessment_type='academic').values('date', 'score')
+    psychological_trends = trends.filter(assessment_type='psychological').values('date', 'score')
+    physical_trends = trends.filter(assessment_type='physical').values('date', 'score')
+    
+    context = {
+        'student': student,
+        'academic_trends': list(academic_trends),
+        'psychological_trends': list(psychological_trends),
+        'physical_trends': list(physical_trends),
+    }
+    
+    return render(request, 'data_analytics/student_performance_trends.html', context)
+
+
+@login_required
+def student_reports(request, student_id):
+    """Reports for a specific student."""
+    student = get_object_or_404(Student, pk=student_id)
+    
+    # Get all reports for this student
+    reports = AnalyticsReport.objects.filter(
+        parameters__icontains=f'"student_id": {student_id}'
+    ).order_by('-created_at')
+    
+    context = {
+        'student': student,
+        'reports': reports,
+    }
+    
+    return render(request, 'data_analytics/student_reports.html', context)
+
+
+@login_required
+def comparative_analytics(request):
+    """Comparative analytics view."""
+    return performance_comparison(request)
+
+
+@login_required
+def benchmark_analytics(request):
+    """Benchmark analytics view."""
+    if not request.user.is_staff:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+    
+    # National/Regional benchmarks (mock data)
+    benchmarks = {
+        'academic': {'national_avg': 75.5, 'regional_avg': 72.3, 'school_avg': 0},
+        'psychological': {'national_avg': 68.2, 'regional_avg': 65.8, 'school_avg': 0},
+        'physical': {'national_avg': 71.0, 'regional_avg': 69.5, 'school_avg': 0},
+    }
+    
+    # Calculate school averages
+    school_avg = StudentAnalytics.objects.aggregate(
+        academic=Avg('academic_score'),
+        psychological=Avg('wellbeing_score'),
+        physical=Avg('fitness_score')
+    )
+    
+    benchmarks['academic']['school_avg'] = school_avg['academic'] or 0
+    benchmarks['psychological']['school_avg'] = school_avg['psychological'] or 0  
+    benchmarks['physical']['school_avg'] = school_avg['physical'] or 0
+    
+    context = {
+        'benchmarks': benchmarks,
+    }
+    
+    return render(request, 'data_analytics/benchmark_analytics.html', context)
+
+
+@login_required
+def analytics_reports(request):
+    """Analytics reports view."""
+    return reports_list(request)
+
+
+@login_required
+def generate_analytics_report(request):
+    """Generate analytics report."""
+    return generate_report(request)
+
+
+# API endpoints
+@login_required
+def analytics_dashboard_api(request):
+    """API for analytics dashboard."""
+    return analytics_api(request)
+
+
+@login_required
+def student_analytics_api(request, student_id):
+    """API for student analytics."""
+    student = get_object_or_404(Student, pk=student_id)
+    
+    # Get student analytics
+    analytics = StudentAnalytics.objects.filter(student=student).first()
+    
+    # Get recent assessment results
+    recent_results = AssessmentResult.objects.filter(
+        student=student
+    ).order_by('-completed_at')[:10]
+    
+    data = {
+        'student_id': student.id,
+        'student_name': f"{student.user.first_name} {student.user.last_name}",
+        'analytics': {
+            'academic_score': analytics.academic_score if analytics else 0,
+            'wellbeing_score': analytics.wellbeing_score if analytics else 0,
+            'fitness_score': analytics.fitness_score if analytics else 0,
+        } if analytics else {},
+        'recent_results': [
+            {
+                'assessment': result.assessment.title,
+                'score': result.percentage,
+                'date': result.completed_at.isoformat(),
+            }
+            for result in recent_results
+        ]
+    }
+    
+    return JsonResponse(data)
+
+
+@login_required
+def analytics_trends_api(request):
+    """API for analytics trends."""
+    days = int(request.GET.get('days', 30))
+    start_date = timezone.now() - timedelta(days=days)
+    
+    # Performance trends over time
+    trends = PerformanceTrend.objects.filter(
+        date__gte=start_date
+    ).values('date', 'assessment_type').annotate(
+        avg_score=Avg('score')
+    ).order_by('date')
+    
+    return JsonResponse({
+        'trends': list(trends)
     })

@@ -95,8 +95,21 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 20,
+            'check_same_thread': False,
+        },
+        'CONN_MAX_AGE': 300,  # Connection pooling
     }
 }
+
+# Database optimization
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Performance optimizations
+CONN_MAX_AGE = 300
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 
 # Database routers for multiple databases (commented out for SQLite)
 # DATABASE_ROUTERS = ['edusight_django.routers.AnalyticsRouter', 'edusight_django.routers.MLCacheRouter']
@@ -120,6 +133,36 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# Caching
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edusight-cache',
+        'TIMEOUT': 300,  # 5 minutes default
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,
+            'CULL_FREQUENCY': 3,
+        }
+    },
+    'sessions': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edusight-sessions',
+        'TIMEOUT': 3600,  # 1 hour for sessions
+    }
+}
+
+# Cache middleware settings
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 300
+CACHE_MIDDLEWARE_KEY_PREFIX = 'edusight'
+
+# Session optimization
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_CACHE_ALIAS = 'sessions'
+SESSION_COOKIE_AGE = 3600  # 1 hour
+SESSION_SAVE_EVERY_REQUEST = False
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

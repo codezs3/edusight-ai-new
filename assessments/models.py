@@ -79,7 +79,8 @@ class AssessmentResult(models.Model):
     
     def save(self, *args, **kwargs):
         if self.score and self.assessment.max_score:
-            self.percentage = (self.score / self.assessment.max_score) * 100
+            from decimal import Decimal
+            self.percentage = (self.score / Decimal(str(self.assessment.max_score))) * 100
         super().save(*args, **kwargs)
     
     def get_performance_level(self):

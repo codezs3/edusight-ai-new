@@ -3,15 +3,16 @@ File processing services for handling CSV, Excel, PDF, DOC, and image uploads
 Extracts data and converts to structured format for EPR analysis
 """
 
-import pandas as pd
-import pytesseract
-from PIL import Image
-import PyPDF2
-import docx
+# Temporarily commented out to fix server startup issues
+# import pandas as pd
+# import pytesseract
+# from PIL import Image
+# import PyPDF2
+# import docx
 import json
 import re
-import cv2
-import numpy as np
+# import cv2
+# import numpy as np
 from typing import Dict, List, Any, Tuple, Optional
 from django.core.files.base import ContentFile
 from django.utils import timezone
@@ -64,7 +65,8 @@ class FileProcessor:
             
             for encoding in encodings:
                 try:
-                    df = pd.read_csv(self.file_path, encoding=encoding)
+                    # df = pd.read_csv(self.file_path, encoding=encoding)
+                    return self.error_response("CSV processing temporarily disabled - pandas not available")
                     break
                 except UnicodeDecodeError:
                     continue
@@ -91,11 +93,12 @@ class FileProcessor:
         """Process Excel files"""
         try:
             # Read all sheets
-            excel_file = pd.ExcelFile(self.file_path)
+            # excel_file = pd.ExcelFile(self.file_path)
+            return self.error_response("Excel processing temporarily disabled - pandas not available")
             all_data = {}
             
             for sheet_name in excel_file.sheet_names:
-                df = pd.read_excel(self.file_path, sheet_name=sheet_name)
+                # df = pd.read_excel(self.file_path, sheet_name=sheet_name)
                 
                 # Detect data type for each sheet
                 data_type = self.detect_data_type(df.columns.tolist())
@@ -129,7 +132,8 @@ class FileProcessor:
             text_content = ""
             
             with open(self.file_path, 'rb') as file:
-                pdf_reader = PyPDF2.PdfReader(file)
+                # pdf_reader = PyPDF2.PdfReader(file)
+                return self.error_response("PDF processing temporarily disabled - PyPDF2 not available")
                 
                 for page in pdf_reader.pages:
                     text_content += page.extract_text() + "\n"
@@ -156,7 +160,8 @@ class FileProcessor:
         """Process Word documents"""
         try:
             if self.file_type == 'docx':
-                doc = docx.Document(self.file_path)
+                # doc = docx.Document(self.file_path)
+                return self.error_response("DOC processing temporarily disabled - docx not available")
                 text_content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
                 
                 # Extract tables if any
@@ -195,7 +200,8 @@ class FileProcessor:
             processed_image = self.preprocess_image()
             
             # Extract text using OCR
-            text_content = pytesseract.image_to_string(processed_image)
+            # text_content = pytesseract.image_to_string(processed_image)
+            return self.error_response("Image OCR temporarily disabled - pytesseract not available")
             
             # Extract structured data from text
             structured_data = self.extract_structured_data_from_text(text_content)
@@ -250,7 +256,7 @@ class FileProcessor:
         else:
             return 'unknown'
     
-    def process_academic_csv(self, df: pd.DataFrame) -> Dict[str, Any]:
+    def process_academic_csv(self, df: Any) -> Dict[str, Any]:
         """Process academic data from CSV"""
         try:
             academic_records = []
@@ -276,7 +282,7 @@ class FileProcessor:
                 for field, column in mapped_columns.items():
                     if column and column in df.columns:
                         value = row[column]
-                        if pd.notna(value):
+                        if value is not None and str(value).strip():
                             record[field] = self.clean_numeric_value(value) if field in ['marks_obtained', 'total_marks', 'percentage', 'attendance'] else str(value)
                 
                 # Calculate percentage if not provided
@@ -302,7 +308,7 @@ class FileProcessor:
         except Exception as e:
             return self.error_response(f"Academic CSV processing failed: {str(e)}")
     
-    def process_psychological_csv(self, df: pd.DataFrame) -> Dict[str, Any]:
+    def process_psychological_csv(self, df: Any) -> Dict[str, Any]:
         """Process psychological data from CSV"""
         try:
             psychological_records = []
@@ -327,7 +333,7 @@ class FileProcessor:
                 for field, column in mapped_columns.items():
                     if column and column in df.columns:
                         value = row[column]
-                        if pd.notna(value):
+                        if value is not None and str(value).strip():
                             if field in ['stress_level', 'anxiety_level', 'mood_score', 'confidence_level', 'social_skills']:
                                 record[field] = self.clean_numeric_value(value)
                             else:
@@ -349,7 +355,7 @@ class FileProcessor:
         except Exception as e:
             return self.error_response(f"Psychological CSV processing failed: {str(e)}")
     
-    def process_physical_csv(self, df: pd.DataFrame) -> Dict[str, Any]:
+    def process_physical_csv(self, df: Any) -> Dict[str, Any]:
         """Process physical health data from CSV"""
         try:
             physical_records = []
@@ -374,7 +380,7 @@ class FileProcessor:
                 for field, column in mapped_columns.items():
                     if column and column in df.columns:
                         value = row[column]
-                        if pd.notna(value):
+                        if value is not None and str(value).strip():
                             if field in ['height_cm', 'weight_kg', 'bmi', 'fitness_score', 'activity_hours', 'sleep_hours']:
                                 record[field] = self.clean_numeric_value(value)
                             else:
@@ -404,7 +410,7 @@ class FileProcessor:
         except Exception as e:
             return self.error_response(f"Physical CSV processing failed: {str(e)}")
     
-    def process_generic_csv(self, df: pd.DataFrame) -> Dict[str, Any]:
+    def process_generic_csv(self, df: Any) -> Dict[str, Any]:
         """Process generic CSV when type cannot be determined"""
         try:
             # Convert to list of dictionaries
@@ -415,7 +421,7 @@ class FileProcessor:
             for record in records:
                 cleaned_record = {}
                 for key, value in record.items():
-                    if pd.notna(value):
+                    if value is not None and str(value).strip():
                         cleaned_record[str(key)] = str(value)
                 if cleaned_record:
                     cleaned_records.append(cleaned_record)
@@ -463,28 +469,30 @@ class FileProcessor:
         except (ValueError, TypeError):
             return None
     
-    def preprocess_image(self) -> Image.Image:
+    def preprocess_image(self) -> Any:
         """Preprocess image for better OCR results"""
         try:
             # Open image
-            image = cv2.imread(self.file_path)
+            # image = cv2.imread(self.file_path)
+            return None  # Image processing temporarily disabled
             
             # Convert to grayscale
-            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             
             # Apply noise reduction
-            denoised = cv2.medianBlur(gray, 3)
+            # denoised = cv2.medianBlur(gray, 3)
             
             # Apply sharpening
-            kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
-            sharpened = cv2.filter2D(denoised, -1, kernel)
+            # kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
+            # sharpened = cv2.filter2D(denoised, -1, kernel)
             
             # Convert back to PIL Image
-            return Image.fromarray(sharpened)
+            # return Image.fromarray(sharpened)
             
         except Exception as e:
             logger.warning(f"Image preprocessing failed, using original: {str(e)}")
-            return Image.open(self.file_path)
+            # return Image.open(self.file_path)
+            return None
     
     def pdf_ocr_extraction(self) -> str:
         """Extract text from PDF using OCR"""
@@ -500,8 +508,9 @@ class FileProcessor:
                 img_data = pix.tobytes("png")
                 
                 # Convert to PIL Image and apply OCR
-                image = Image.open(io.BytesIO(img_data))
-                text_content += pytesseract.image_to_string(image) + "\n"
+                # image = Image.open(io.BytesIO(img_data))
+                # text_content += pytesseract.image_to_string(image) + "\n"
+                text_content += ""  # OCR disabled
             
             doc.close()
             return text_content

@@ -12,7 +12,10 @@ import subprocess
 from datetime import datetime, timedelta
 from django.utils import timezone
 from crm.models import Lead, FormSubmission, Appointment, CallLog
-from students.models import User
+from students.models import User, Student, School
+from assessments.models import Assessment, AssessmentResult
+from ml_predictions.models import MLPrediction, MLModel
+from data_analytics.models import StudentAnalytics
 from pathlib import Path
 
 # Import Airflow integration
@@ -555,6 +558,354 @@ def workflow_management(request):
     }
     
     return render(request, 'admin_dashboard/workflows.html', context)
+
+
+# Additional CRUD Views for Admin Dashboard
+@login_required
+@user_passes_test(is_admin_user)
+def students_management(request):
+    """Manage students with full CRUD operations"""
+    from students.models import Student, School
+    from django.contrib.auth import get_user_model
+    from django.db.models import Count
+    from datetime import datetime
+    
+    User = get_user_model()
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'create':
+            try:
+                # Create user first
+                email = request.POST.get('email')
+                username = email  # Use email as username
+                
+                # Check if user already exists
+                if User.objects.filter(username=username).exists():
+                    messages.error(request, 'A user with this email already exists!')
+                    return redirect('admin_dashboard:students')
+                
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    first_name=request.POST.get('first_name'),
+                    last_name=request.POST.get('last_name'),
+                    password='student123'  # Default password
+                )
+                
+                # Get school
+                school_id = request.POST.get('school')
+                school = School.objects.get(id=school_id) if school_id else None
+                
+                # Create student
+                student = Student.objects.create(
+                    user=user,
+                    school=school,
+                    grade=request.POST.get('grade'),
+                    roll_number=request.POST.get('roll_number'),
+                    enrollment_date=timezone.now().date(),
+                    date_of_birth=request.POST.get('date_of_birth') or None,
+                    phone_number=request.POST.get('phone_number') or '',
+                    address=request.POST.get('address') or ''
+                )
+                
+                messages.success(request, f'Student {user.get_full_name()} created successfully!')
+            except Exception as e:
+                messages.error(request, f'Error creating student: {str(e)}')
+        
+        elif action == 'delete':
+            student_id = request.POST.get('student_id')
+            try:
+                student = Student.objects.get(id=student_id)
+                student_name = student.user.get_full_name()
+                student.user.delete()  # This will cascade delete the student
+                messages.success(request, f'Student {student_name} deleted successfully!')
+            except Student.DoesNotExist:
+                messages.error(request, 'Student not found!')
+            except Exception as e:
+                messages.error(request, f'Error deleting student: {str(e)}')
+        
+        return redirect('admin_dashboard:students')
+    
+    # Get all students with related data
+    students = Student.objects.select_related('user', 'school').order_by('-enrollment_date')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        students = students.filter(
+            Q(user__first_name__icontains=search_query) |
+            Q(user__last_name__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(roll_number__icontains=search_query)
+        )
+    
+    # Filter by school
+    school_filter = request.GET.get('school')
+    if school_filter:
+        students = students.filter(school_id=school_filter)
+        
+    # Filter by grade
+    grade_filter = request.GET.get('grade')
+    if grade_filter:
+        students = students.filter(grade=grade_filter)
+    
+    # Pagination
+    paginator = Paginator(students, 25)
+    page_number = request.GET.get('page')
+    students_page = paginator.get_page(page_number)
+    
+    # Get statistics
+    total_students = Student.objects.count()
+    active_students = Student.objects.filter(user__is_active=True).count()
+    new_enrollments = Student.objects.filter(
+        enrollment_date__gte=timezone.now().date().replace(day=1)
+    ).count()
+    schools_count = School.objects.count()
+    
+    # Get all schools for filter
+    schools = School.objects.all()
+    
+    # Get all grades for filter
+    grades = Student.objects.values_list('grade', flat=True).distinct().order_by('grade')
+    
+    context = {
+        'page_title': 'Students Management',
+        'students': students_page,
+        'search_query': search_query,
+        'total_students': total_students,
+        'active_students': active_students,
+        'new_enrollments': new_enrollments,
+        'schools_count': schools_count,
+        'schools': schools,
+        'grades': grades,
+    }
+    return render(request, 'admin_dashboard/students.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_user)
+def assessments_management(request):
+    """Manage assessments with full CRUD operations"""
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'create_assessment':
+            from assessments.models import Assessment
+            from students.models import School
+            
+            try:
+                school_id = request.POST.get('school_id')
+                school = School.objects.get(id=school_id) if school_id else None
+                
+                assessment = Assessment.objects.create(
+                    title=request.POST.get('title'),
+                    description=request.POST.get('description'),
+                    assessment_type=request.POST.get('assessment_type'),
+                    curriculum=request.POST.get('curriculum'),
+                    grade=request.POST.get('grade'),
+                    subject=request.POST.get('subject'),
+                    duration_minutes=int(request.POST.get('duration_minutes', 60)),
+                    total_questions=int(request.POST.get('total_questions', 10)),
+                    passing_percentage=float(request.POST.get('passing_percentage', 40)),
+                    school=school,
+                    created_by=request.user
+                )
+                
+                messages.success(request, f'Assessment "{assessment.title}" created successfully!')
+            except Exception as e:
+                messages.error(request, f'Error creating assessment: {str(e)}')
+        
+        elif action == 'delete_assessment':
+            from assessments.models import Assessment
+            assessment_id = request.POST.get('assessment_id')
+            try:
+                assessment = Assessment.objects.get(id=assessment_id)
+                assessment.delete()
+                messages.success(request, 'Assessment deleted successfully!')
+            except Assessment.DoesNotExist:
+                messages.error(request, 'Assessment not found!')
+    
+    # Get all assessments
+    from assessments.models import Assessment
+    assessments = Assessment.objects.select_related('created_by', 'school').all()
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        assessments = assessments.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(subject__icontains=search_query)
+        )
+    
+    # Pagination
+    paginator = Paginator(assessments, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_title': 'Assessments Management',
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'total_assessments': Assessment.objects.count(),
+        'assessment_types': Assessment.ASSESSMENT_TYPES,
+        'curriculum_choices': Assessment.CURRICULUM_CHOICES,
+    }
+    return render(request, 'admin_dashboard/assessments.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_user)
+def ml_models_management(request):
+    """Manage ML models with full CRUD operations"""
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'create_model':
+            from ml_predictions.models import MLModel
+            
+            try:
+                model = MLModel.objects.create(
+                    name=request.POST.get('name'),
+                    model_type=request.POST.get('model_type'),
+                    version=request.POST.get('version'),
+                    description=request.POST.get('description'),
+                    accuracy_score=float(request.POST.get('accuracy_score', 0.8)),
+                    training_data_size=int(request.POST.get('training_data_size', 1000)),
+                    feature_count=int(request.POST.get('feature_count', 10)),
+                    is_active=request.POST.get('is_active') == 'on'
+                )
+                
+                messages.success(request, f'ML Model "{model.name}" created successfully!')
+            except Exception as e:
+                messages.error(request, f'Error creating ML model: {str(e)}')
+        
+        elif action == 'delete_model':
+            from ml_predictions.models import MLModel
+            model_id = request.POST.get('model_id')
+            try:
+                model = MLModel.objects.get(id=model_id)
+                model.delete()
+                messages.success(request, 'ML Model deleted successfully!')
+            except MLModel.DoesNotExist:
+                messages.error(request, 'ML Model not found!')
+        
+        elif action == 'toggle_active':
+            from ml_predictions.models import MLModel
+            model_id = request.POST.get('model_id')
+            try:
+                model = MLModel.objects.get(id=model_id)
+                model.is_active = not model.is_active
+                model.save()
+                status = 'activated' if model.is_active else 'deactivated'
+                messages.success(request, f'ML Model {status} successfully!')
+            except MLModel.DoesNotExist:
+                messages.error(request, 'ML Model not found!')
+    
+    # Get all ML models
+    from ml_predictions.models import MLModel, MLPrediction
+    from django.db.models import Count, Avg
+    
+    models = MLModel.objects.annotate(
+        prediction_count=Count('mlprediction'),
+        avg_accuracy=Avg('mlprediction__accuracy')
+    ).all()
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        models = models.filter(
+            Q(name__icontains=search_query) |
+            Q(model_type__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+    
+    # Pagination
+    paginator = Paginator(models, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_title': 'ML Models Management',
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'total_models': MLModel.objects.count(),
+        'active_models': MLModel.objects.filter(is_active=True).count(),
+        'total_predictions': MLPrediction.objects.count(),
+    }
+    return render(request, 'admin_dashboard/ml_models.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_user)
+def system_statistics(request):
+    """System-wide statistics and metrics"""
+    from students.models import Student, School
+    from assessments.models import Assessment, AssessmentResult
+    from ml_predictions.models import MLPrediction, MLModel
+    from crm.models import Lead
+    from django.db.models import Count, Avg
+    
+    # Basic counts
+    stats = {
+        'total_users': User.objects.count(),
+        'total_students': Student.objects.count(),
+        'total_schools': School.objects.count(),
+        'total_assessments': Assessment.objects.count(),
+        'total_results': AssessmentResult.objects.count(),
+        'total_predictions': MLPrediction.objects.count(),
+        'total_models': MLModel.objects.count(),
+        'total_leads': Lead.objects.count(),
+    }
+    
+    # Performance metrics
+    avg_scores = AssessmentResult.objects.aggregate(
+        academic=Avg('percentage', filter=Q(assessment__assessment_type='academic')),
+        psychological=Avg('percentage', filter=Q(assessment__assessment_type='psychological')),
+        physical=Avg('percentage', filter=Q(assessment__assessment_type='physical'))
+    )
+    
+    # Growth metrics (last 30 days vs previous 30 days)
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    sixty_days_ago = timezone.now() - timedelta(days=60)
+    
+    recent_growth = {
+        'new_students': Student.objects.filter(
+            user__date_joined__gte=thirty_days_ago
+        ).count(),
+        'new_assessments': Assessment.objects.filter(
+            created_at__gte=thirty_days_ago
+        ).count(),
+        'new_results': AssessmentResult.objects.filter(
+            completed_at__gte=thirty_days_ago
+        ).count(),
+        'new_leads': Lead.objects.filter(
+            created_at__gte=thirty_days_ago
+        ).count(),
+    }
+    
+    # System health metrics
+    health_metrics = {
+        'active_users': User.objects.filter(is_active=True).count(),
+        'active_models': MLModel.objects.filter(is_active=True).count(),
+        'assessment_completion_rate': (AssessmentResult.objects.count() / 
+                                     (Assessment.objects.count() * Student.objects.count()) * 100) 
+                                     if Assessment.objects.count() > 0 and Student.objects.count() > 0 else 0,
+        'lead_conversion_rate': (Lead.objects.filter(status='converted').count() / 
+                               Lead.objects.count() * 100) if Lead.objects.count() > 0 else 0,
+    }
+    
+    context = {
+        'page_title': 'System Statistics',
+        'stats': stats,
+        'avg_scores': avg_scores,
+        'recent_growth': recent_growth,
+        'health_metrics': health_metrics,
+    }
+    
+    return render(request, 'admin_dashboard/system_stats.html', context)
 
 def get_recent_activity():
     """Get recent system activity"""

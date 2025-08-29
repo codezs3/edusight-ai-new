@@ -1,0 +1,349 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}ML Predictions Dashboard - Edusight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ml-header {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        color: #2d3748;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+    }
+    
+    .prediction-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        border-left: 4px solid var(--primary-color);
+        height: 100%;
+    }
+    
+    .prediction-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .prediction-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .model-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-active { background: #e8f5e8; color: #388e3c; }
+    .status-training { background: #fff3e0; color: #f57c00; }
+    .status-inactive { background: #ffebee; color: #d32f2f; }
+    
+    .confidence-bar {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #0abde3);
+        transition: width 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- ML Header -->
+    <div class="ml-header text-center">
+        <div class="container">
+            <h1><i class="fas fa-brain me-3"></i>ML Predictions Dashboard</h1>
+            <p class="lead">AI-powered insights and predictive analytics for student success</p>
+        </div>
+    </div>
+
+    <!-- ML Statistics -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="prediction-card">
+                <div class="d-flex align-items-center">
+                    <div class="prediction-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0">{{ total_models|default:0 }}</h3>
+                        <small class="text-muted">ML Models</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="prediction-card">
+                <div class="d-flex align-items-center">
+                    <div class="prediction-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0">{{ total_predictions|default:0 }}</h3>
+                        <small class="text-muted">Predictions Made</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="prediction-card">
+                <div class="d-flex align-items-center">
+                    <div class="prediction-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0">{{ avg_accuracy|default:0|floatformat:1 }}%</h3>
+                        <small class="text-muted">Average Accuracy</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="prediction-card">
+                <div class="d-flex align-items-center">
+                    <div class="prediction-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h3 class="mb-0">{{ students_analyzed|default:0 }}</h3>
+                        <small class="text-muted">Students Analyzed</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prediction Types -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-lg-6">
+            <div class="prediction-card text-center">
+                <div class="prediction-icon mx-auto mb-3">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h5>Performance Prediction</h5>
+                <p class="text-muted">Predict student academic performance</p>
+                <a href="{% url 'ml_predictions:performance_forecast' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-chart-line me-1"></i>Generate
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="prediction-card text-center">
+                <div class="prediction-icon mx-auto mb-3">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h5>Career Recommendation</h5>
+                <p class="text-muted">AI-powered career guidance</p>
+                <a href="{% url 'ml_predictions:career_recommendation' %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-lightbulb me-1"></i>Generate
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="prediction-card text-center">
+                <div class="prediction-icon mx-auto mb-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h5>Risk Assessment</h5>
+                <p class="text-muted">Identify at-risk students</p>
+                <a href="{% url 'ml_predictions:risk_assessment' %}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-shield-alt me-1"></i>Generate
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="prediction-card text-center">
+                <div class="prediction-icon mx-auto mb-3">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h5>Learning Style</h5>
+                <p class="text-muted">Analyze learning preferences</p>
+                <a href="{% url 'ml_predictions:learning_style_analysis' %}" class="btn btn-info btn-sm">
+                    <i class="fas fa-search me-1"></i>Analyze
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Predictions -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="prediction-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-history me-2"></i>Recent Predictions</h5>
+                    <a href="{% url 'ml_predictions:prediction_list' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View All
+                    </a>
+                </div>
+                
+                {% if recent_predictions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Prediction Type</th>
+                                    <th>Confidence</th>
+                                    <th>Result</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prediction in recent_predictions %}
+                                <tr>
+                                    <td>{{ prediction.student.user.first_name }} {{ prediction.student.user.last_name }}</td>
+                                    <td><span class="badge bg-primary">{{ prediction.get_prediction_type_display }}</span></td>
+                                    <td>
+                                        <div class="confidence-bar">
+                                            <div class="confidence-fill" style="width: {{ prediction.confidence_score }}%"></div>
+                                        </div>
+                                        <small>{{ prediction.confidence_score }}%</small>
+                                    </td>
+                                    <td>{{ prediction.result|truncatechars:30 }}</td>
+                                    <td>{{ prediction.created_at|timesince }} ago</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-robot fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No predictions generated yet</h6>
+                        <a href="{% url 'ml_predictions:generate_prediction' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Generate First Prediction
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ML Models Status -->
+        <div class="col-lg-4">
+            <div class="prediction-card">
+                <h5><i class="fas fa-cogs me-2"></i>ML Models Status</h5>
+                
+                {% if ml_models %}
+                    {% for model in ml_models %}
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                        <div>
+                            <h6 class="mb-1">{{ model.name }}</h6>
+                            <small class="text-muted">{{ model.model_type }}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="model-status status-{{ model.status|lower }}">{{ model.get_status_display }}</span>
+                            <br><small class="text-muted">{{ model.accuracy|floatformat:1 }}% accuracy</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-cogs fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No ML models configured</h6>
+                        <a href="{% url 'admin_panel:ml_models' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-1"></i>Add Model
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="prediction-card mt-4">
+                <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'ml_predictions:generate_prediction' %}" class="btn btn-primary">
+                        <i class="fas fa-magic me-2"></i>Generate Prediction
+                    </a>
+                    <a href="{% url 'ml_predictions:batch_prediction' %}" class="btn btn-success">
+                        <i class="fas fa-layer-group me-2"></i>Batch Prediction
+                    </a>
+                    <a href="{% url 'admin_panel:ml_models' %}" class="btn btn-info">
+                        <i class="fas fa-cogs me-2"></i>Manage Models
+                    </a>
+                    <a href="{% url 'ml_predictions:prediction_reports' %}" class="btn btn-secondary">
+                        <i class="fas fa-chart-bar me-2"></i>Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Performance Chart -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="prediction-card">
+                <h5><i class="fas fa-chart-line me-2"></i>Model Performance Over Time</h5>
+                <canvas id="performanceChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Model Performance Chart
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    const performanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Model Accuracy',
+                data: [85, 87, 86, 89, 91, 93],
+                borderColor: 'rgb(99, 102, 241)',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 80,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // Add animation to confidence bars
+    document.querySelectorAll('.confidence-fill').forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500);
+    });
+});
+</script>
+{% endblock %}
