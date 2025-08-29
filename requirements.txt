@@ -30,3 +30,6 @@ Pillow==10.4.0
 
 # Development
 python-dotenv==1.0.0
+
+# Production Dependencies
+whitenoise==6.9.0
