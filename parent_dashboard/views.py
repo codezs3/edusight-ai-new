@@ -30,6 +30,11 @@ from .models import (
 from students.models import Student
 
 
+def parent_login_view(request):
+    """Parent login page"""
+    return render(request, 'parent_dashboard/parent_login.html')
+
+
 @login_required
 def parent_dashboard(request):
     """Main parent dashboard view"""

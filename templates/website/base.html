@@ -1017,7 +1017,25 @@
                     </li>
                 </ul>
                 
+                <!-- Auth Links -->
                 <div class="d-flex gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'login' %}">
+                                <i class="fas fa-user me-2"></i>Student/Admin Login
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'parent_dashboard:parent_login' %}">
+                                <i class="fas fa-users me-2"></i>Parent Login
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'book_assessment' %}">
+                                <i class="fas fa-calendar-plus me-2"></i>Book Assessment
+                            </a></li>
+                        </ul>
+                    </div>
                     <a href="{% url 'dashboard' %}" class="btn btn-primary-custom">Demo Dashboard</a>
                 </div>
             </div>

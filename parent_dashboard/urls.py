@@ -4,6 +4,9 @@ from . import views
 app_name = 'parent_dashboard'
 
 urlpatterns = [
+    # Parent login
+    path('login/', views.parent_login_view, name='parent_login'),
+    
     # Main dashboard
     path('', views.parent_dashboard, name='dashboard'),
     
