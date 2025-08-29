@@ -187,7 +187,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'dashboard:dashboard' %}">
+            <a class="navbar-brand" href="{% url 'admin_dashboard:overview' %}">
                 <i class="fas fa-graduation-cap me-2"></i>EduSight
             </a>
             
@@ -198,22 +198,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+                        <a class="nav-link" href="/">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'students:student_list' %}">Students</a>
+                        <a class="nav-link" href="/students/">Students</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'assessments:assessment_list' %}">Assessments</a>
+                        <a class="nav-link" href="/assessments/">Assessments</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'data_analytics:dashboard' %}">Analytics</a>
+                        <a class="nav-link" href="/analytics/">Analytics</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'ml_predictions:dashboard' %}">ML Predictions</a>
+                        <a class="nav-link" href="/ml/">ML Predictions</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'crm:dashboard' %}">CRM</a>
+                        <a class="nav-link" href="/crm/">CRM</a>
                     </li>
                 </ul>
                 
@@ -224,14 +224,14 @@
                                 <i class="fas fa-user-circle me-1"></i>{{ user.username }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'admin_dashboard:overview' %}">Admin Panel</a></li>
+                                <li><a class="dropdown-item" href="/admin-panel/">Admin Panel</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'admin:logout' %}">Logout</a></li>
+                                <li><a class="dropdown-item" href="/admin/logout/">Logout</a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:login' %}">Login</a>
+                            <a class="nav-link" href="/admin/login/">Login</a>
                         </li>
                     {% endif %}
                 </ul>
