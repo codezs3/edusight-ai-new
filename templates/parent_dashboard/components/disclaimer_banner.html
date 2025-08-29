@@ -1,0 +1,102 @@
+<!-- Disclaimer Banner - To be included on assessment and analysis pages -->
+<div class="alert alert-warning border-warning mb-4" role="alert">
+    <div class="d-flex align-items-start">
+        <div class="me-3">
+            <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h6 class="alert-heading fw-bold mb-2">
+                <i class="fas fa-shield-alt me-2"></i>Important: AI-Powered Assessment Tool
+            </h6>
+            <div class="row">
+                <div class="col-md-8">
+                    <p class="mb-2">
+                        <strong>This platform provides supplementary educational insights using artificial intelligence and machine learning.</strong> 
+                        Results are probabilistic estimates based on data patterns and should not be considered definitive assessments.
+                    </p>
+                    <ul class="small mb-2">
+                        <li><strong>Not a replacement</strong> for professional psychological, medical, or educational evaluations</li>
+                        <li><strong>No guarantees</strong> regarding accuracy, future performance, or outcomes</li>
+                        <li><strong>Seek professional advice</strong> for important educational, psychological, or career decisions</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <div class="bg-light p-3 rounded">
+                        <h6 class="small fw-bold text-muted mb-2">
+                            <i class="fas fa-info-circle me-1"></i>Key Limitations:
+                        </h6>
+                        <ul class="small text-muted mb-0">
+                            <li>AI predictions are estimates</li>
+                            <li>Individual variations may not be captured</li>
+                            <li>Results depend on data quality</li>
+                            <li>Cultural factors may influence outcomes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-2">
+                <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#disclaimerModal">
+                    <i class="fas fa-file-contract me-1"></i>Read Full Disclaimer
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="collapse" data-bs-target="#professionalHelp">
+                    <i class="fas fa-user-md me-1"></i>When to Seek Professional Help
+                </button>
+                <button type="button" class="btn btn-sm btn-link text-muted" onclick="dismissBanner(this)">
+                    <i class="fas fa-times me-1"></i>Dismiss
+                </button>
+            </div>
+            
+            <!-- Collapsible Professional Help Section -->
+            <div class="collapse mt-3" id="professionalHelp">
+                <div class="card card-body bg-info bg-opacity-10 border-info">
+                    <h6 class="text-info fw-bold">
+                        <i class="fas fa-user-md me-2"></i>Consult Qualified Professionals For:
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="small mb-0">
+                                <li><strong>Learning disabilities or developmental concerns</strong> → Educational specialists, psychologists</li>
+                                <li><strong>Behavioral or emotional issues</strong> → Child psychologists, counselors</li>
+                                <li><strong>Academic planning and decisions</strong> → School counselors, educators</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="small mb-0">
+                                <li><strong>Career guidance and planning</strong> → Licensed career counselors</li>
+                                <li><strong>Health or medical concerns</strong> → Medical doctors, healthcare providers</li>
+                                <li><strong>Mental health support</strong> → Licensed therapists, psychiatrists</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function dismissBanner(button) {
+    const banner = button.closest('.alert');
+    banner.style.transition = 'opacity 0.3s ease';
+    banner.style.opacity = '0';
+    setTimeout(() => {
+        banner.remove();
+        // Store dismissal in session storage
+        sessionStorage.setItem('disclaimerBannerDismissed', 'true');
+    }, 300);
+}
+
+// Auto-dismiss functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if banner was already dismissed in this session
+    if (sessionStorage.getItem('disclaimerBannerDismissed') === 'true') {
+        const banner = document.querySelector('.alert.alert-warning');
+        if (banner) {
+            banner.remove();
+        }
+    }
+});
+</script>
+
+<!-- Include the disclaimer modal -->
+{% include 'parent_dashboard/components/disclaimer_modal.html' %}

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - EduSight Analytics Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+        
+        .signup-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .logo h2 {
+            color: var(--dark-color);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            color: var(--dark-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+        }
+        
+        .btn-signup {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-signup:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-signup:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+        }
+        
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .terms-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .terms-checkbox {
+            margin: 15px 0;
+        }
+        
+        .terms-checkbox .form-check-input {
+            transform: scale(1.2);
+            margin-right: 10px;
+        }
+        
+        .terms-checkbox .form-check-label {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        
+        .terms-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .terms-link {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .terms-link:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .disclaimer-link {
+            background: var(--warning-color);
+        }
+        
+        .disclaimer-link:hover {
+            background: #d97706;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .user-type-selector {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .user-type-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .user-type-option:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-type-option input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        
+        .user-type-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 30px;
+        }
+        
+        .password-strength {
+            margin-top: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .strength-weak { color: var(--danger-color); }
+        .strength-medium { color: var(--warning-color); }
+        .strength-strong { color: var(--success-color); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="signup-container">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>EduSight</h2>
+                <p>AI-Powered Education Analytics</p>
+            </div>
+            
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Please correct the following errors:</strong>
+                <ul class="mb-0 mt-2">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field|title }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <form method="post" action="{% url 'registration:signup' %}" id="signupForm">
+                {% csrf_token %}
+                
+                <!-- User Type Selection -->
+                <div class="user-type-selector">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-user-tag me-2"></i>I am registering as:</h6>
+                    <div class="user-type-option">
+                        <input type="radio" name="user_type" id="parent" value="parent" checked>
+                        <i class="fas fa-users user-type-icon text-primary"></i>
+                        <div>
+                            <strong>Parent/Guardian</strong>
+                            <div class="text-muted small">Track your child's academic progress and get AI-powered insights</div>
+                        </div>
+                    </div>
+                    <div class="user-type-option">
+                        <input type="radio" name="user_type" id="student" value="student">
+                        <i class="fas fa-graduation-cap user-type-icon text-success"></i>
+                        <div>
+                            <strong>Student</strong>
+                            <div class="text-muted small">Monitor your own academic performance and receive personalized recommendations</div>
+                        </div>
+                    </div>
+                    <div class="user-type-option">
+                        <input type="radio" name="user_type" id="educator" value="educator">
+                        <i class="fas fa-chalkboard-teacher user-type-icon text-info"></i>
+                        <div>
+                            <strong>Educator/Institution</strong>
+                            <div class="text-muted small">Manage multiple students and access advanced analytics tools</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Personal Information -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="first_name" class="form-label">
+                                <i class="fas fa-user"></i> First Name *
+                            </label>
+                            <input type="text" name="first_name" id="first_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="last_name" class="form-label">
+                                <i class="fas fa-user"></i> Last Name *
+                            </label>
+                            <input type="text" name="last_name" id="last_name" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address *
+                    </label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-at"></i> Username *
+                    </label>
+                    <input type="text" name="username" id="username" class="form-control" required>
+                    <small class="text-muted">Must be unique and contain only letters, numbers, and underscores</small>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="password1" class="form-label">
+                                <i class="fas fa-lock"></i> Password *
+                            </label>
+                            <input type="password" name="password1" id="password1" class="form-control" required>
+                            <div id="passwordStrength" class="password-strength"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="password2" class="form-label">
+                                <i class="fas fa-lock"></i> Confirm Password *
+                            </label>
+                            <input type="password" name="password2" id="password2" class="form-control" required>
+                            <div id="passwordMatch" class="password-strength"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Optional Information -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">
+                                <i class="fas fa-phone"></i> Phone Number
+                            </label>
+                            <input type="tel" name="phone" id="phone" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="country" class="form-label">
+                                <i class="fas fa-globe"></i> Country
+                            </label>
+                            <select name="country" id="country" class="form-select">
+                                <option value="">Select Country</option>
+                                <option value="IN">India</option>
+                                <option value="US">United States</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                                <option value="AU">Australia</option>
+                                <option value="SG">Singapore</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Legal Agreements Section -->
+                <div class="terms-section">
+                    <h6 class="fw-bold text-warning mb-3">
+                        <i class="fas fa-gavel me-2"></i>Legal Agreements & Disclaimers
+                    </h6>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Important:</strong> EduSight uses AI/ML technology for educational assessments. 
+                        These are supplementary tools and not replacements for professional evaluations.
+                    </div>
+                    
+                    <div class="terms-links">
+                        <button type="button" class="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">
+                            <i class="fas fa-file-contract me-1"></i>Read Terms of Service
+                        </button>
+                        <button type="button" class="terms-link" data-bs-toggle="modal" data-bs-target="#privacyModal">
+                            <i class="fas fa-shield-alt me-1"></i>Privacy Policy
+                        </button>
+                        <button type="button" class="terms-link disclaimer-link" data-bs-toggle="modal" data-bs-target="#disclaimerModal">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Legal Disclaimer
+                        </button>
+                    </div>
+                    
+                    <!-- Mandatory Checkboxes -->
+                    <div class="terms-checkbox">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" name="agree_terms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                <strong>I have read and agree to the Terms of Service</strong> *
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="terms-checkbox">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreePrivacy" name="agree_privacy" required>
+                            <label class="form-check-label" for="agreePrivacy">
+                                <strong>I have read and agree to the Privacy Policy</strong> *
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="terms-checkbox">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreeDisclaimer" name="agree_disclaimer" required>
+                            <label class="form-check-label" for="agreeDisclaimer">
+                                <strong>I acknowledge and accept the Legal Disclaimer regarding AI/ML limitations</strong> *
+                                <div class="text-muted small mt-1">
+                                    I understand that this platform provides supplementary educational insights only and is not a replacement for professional evaluations.
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="terms-checkbox">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreeProfessional" name="agree_professional" required>
+                            <label class="form-check-label" for="agreeProfessional">
+                                <strong>I understand when to seek professional consultation</strong> *
+                                <div class="text-muted small mt-1">
+                                    I will consult qualified professionals for learning disabilities, behavioral issues, career planning, and health concerns.
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="terms-checkbox">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreeAge" name="agree_age" required>
+                            <label class="form-check-label" for="agreeAge">
+                                <strong>I confirm that I am 18 years or older, or have parental consent</strong> *
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="terms-checkbox">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreeMarketing" name="agree_marketing">
+                            <label class="form-check-label" for="agreeMarketing">
+                                I agree to receive educational insights, updates, and promotional emails (optional)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-signup" id="submitBtn" disabled>
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+            </form>
+            
+            <div class="back-link">
+                <a href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt me-1"></i>Already have an account? Sign In
+                </a>
+                <span class="mx-2">|</span>
+                <a href="{% url 'website_home' %}">
+                    <i class="fas fa-home me-1"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms of Service Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-file-contract me-2"></i>Terms of Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="{% url 'legal:terms' %}" width="100%" height="600" frameborder="0"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="acceptTerms()">I Accept Terms of Service</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Privacy Policy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-shield-alt me-2"></i>Privacy Policy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="lead">Your privacy is important to us. This policy explains how we collect, use, and protect your information.</p>
+                    <h6>Information We Collect</h6>
+                    <ul>
+                        <li>Personal information (name, email, phone)</li>
+                        <li>Educational data uploaded for analysis</li>
+                        <li>Usage data and analytics</li>
+                        <li>Device and browser information</li>
+                    </ul>
+                    <h6>How We Use Your Information</h6>
+                    <ul>
+                        <li>Provide educational assessment services</li>
+                        <li>Generate personalized insights and recommendations</li>
+                        <li>Improve our AI/ML algorithms (anonymized data)</li>
+                        <li>Communicate important updates and features</li>
+                    </ul>
+                    <h6>Data Protection</h6>
+                    <ul>
+                        <li>Industry-standard encryption and security measures</li>
+                        <li>Regular security audits and updates</li>
+                        <li>Compliance with GDPR, COPPA, and FERPA</li>
+                        <li>Limited access on a need-to-know basis</li>
+                    </ul>
+                    <h6>Your Rights</h6>
+                    <ul>
+                        <li>Access your personal data</li>
+                        <li>Request data correction or deletion</li>
+                        <li>Opt-out of marketing communications</li>
+                        <li>Export your data</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="acceptPrivacy()">I Accept Privacy Policy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Legal Disclaimer Modal -->
+    {% include 'parent_dashboard/components/disclaimer_modal.html' %}
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Form validation and interaction
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signupForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const requiredCheckboxes = ['agreeTerms', 'agreePrivacy', 'agreeDisclaimer', 'agreeProfessional', 'agreeAge'];
+            
+            // Check if all required checkboxes are checked
+            function validateForm() {
+                const allChecked = requiredCheckboxes.every(id => document.getElementById(id).checked);
+                const passwordsMatch = document.getElementById('password1').value === document.getElementById('password2').value;
+                const passwordsNotEmpty = document.getElementById('password1').value.length > 0;
+                
+                submitBtn.disabled = !(allChecked && passwordsMatch && passwordsNotEmpty);
+            }
+            
+            // Add event listeners to checkboxes
+            requiredCheckboxes.forEach(id => {
+                document.getElementById(id).addEventListener('change', validateForm);
+            });
+            
+            // Password strength checker
+            document.getElementById('password1').addEventListener('input', function(e) {
+                const password = e.target.value;
+                const strengthDiv = document.getElementById('passwordStrength');
+                
+                if (password.length === 0) {
+                    strengthDiv.innerHTML = '';
+                    return;
+                }
+                
+                let strength = 0;
+                if (password.length >= 8) strength++;
+                if (/[a-z]/.test(password)) strength++;
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+                
+                if (strength < 3) {
+                    strengthDiv.innerHTML = '<i class="fas fa-times-circle"></i> Weak password';
+                    strengthDiv.className = 'password-strength strength-weak';
+                } else if (strength < 5) {
+                    strengthDiv.innerHTML = '<i class="fas fa-check-circle"></i> Medium strength';
+                    strengthDiv.className = 'password-strength strength-medium';
+                } else {
+                    strengthDiv.innerHTML = '<i class="fas fa-check-circle"></i> Strong password';
+                    strengthDiv.className = 'password-strength strength-strong';
+                }
+                
+                validateForm();
+            });
+            
+            // Password match checker
+            document.getElementById('password2').addEventListener('input', function(e) {
+                const password1 = document.getElementById('password1').value;
+                const password2 = e.target.value;
+                const matchDiv = document.getElementById('passwordMatch');
+                
+                if (password2.length === 0) {
+                    matchDiv.innerHTML = '';
+                    return;
+                }
+                
+                if (password1 === password2) {
+                    matchDiv.innerHTML = '<i class="fas fa-check-circle"></i> Passwords match';
+                    matchDiv.className = 'password-strength strength-strong';
+                } else {
+                    matchDiv.innerHTML = '<i class="fas fa-times-circle"></i> Passwords don\'t match';
+                    matchDiv.className = 'password-strength strength-weak';
+                }
+                
+                validateForm();
+            });
+            
+            // Username validation
+            document.getElementById('username').addEventListener('input', function(e) {
+                const username = e.target.value;
+                if (!/^[a-zA-Z0-9_]+$/.test(username) && username.length > 0) {
+                    e.target.setCustomValidity('Username can only contain letters, numbers, and underscores');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            });
+        });
+        
+        // Modal acceptance functions
+        function acceptTerms() {
+            document.getElementById('agreeTerms').checked = true;
+            bootstrap.Modal.getInstance(document.getElementById('termsModal')).hide();
+            validateForm();
+        }
+        
+        function acceptPrivacy() {
+            document.getElementById('agreePrivacy').checked = true;
+            bootstrap.Modal.getInstance(document.getElementById('privacyModal')).hide();
+            validateForm();
+        }
+        
+        // Override disclaimer callback
+        window.disclaimerCallback = function() {
+            document.getElementById('agreeDisclaimer').checked = true;
+            validateForm();
+        };
+        
+        // Form submission with additional validation
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            const requiredCheckboxes = ['agreeTerms', 'agreePrivacy', 'agreeDisclaimer', 'agreeProfessional', 'agreeAge'];
+            const unchecked = requiredCheckboxes.filter(id => !document.getElementById(id).checked);
+            
+            if (unchecked.length > 0) {
+                e.preventDefault();
+                alert('Please accept all required terms and conditions before creating your account.');
+                return false;
+            }
+            
+            // Add acceptance timestamp
+            const form = e.target;
+            const timestampInput = document.createElement('input');
+            timestampInput.type = 'hidden';
+            timestampInput.name = 'agreement_timestamp';
+            timestampInput.value = new Date().toISOString();
+            form.appendChild(timestampInput);
+            
+            return true;
+        });
+    </script>
+</body>
+</html>

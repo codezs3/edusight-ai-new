@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'epr_system',
     'workflow_system',
     'parent_dashboard',
+    'legal',
+    'registration',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,635 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Terms of Service - EduSight{% endblock %}
+{% block page_title %}Terms of Service{% endblock %}
+
+{% block extra_css %}
+<style>
+    .legal-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 3rem;
+    }
+
+    .legal-header {
+        text-align: center;
+        padding: 2rem 0;
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        border-left: 4px solid #3498db;
+        padding-left: 1rem;
+        margin: 2rem 0 1rem 0;
+    }
+
+    .warning-box {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+        border-left: 5px solid #a93226;
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+        border-left: 5px solid #1f618d;
+    }
+
+    .framework-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .framework-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+    }
+
+    .toc {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .toc ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .toc li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .toc a {
+        text-decoration: none;
+        color: #3498db;
+        font-weight: 500;
+    }
+
+    .toc a:hover {
+        color: #2980b9;
+    }
+
+    .highlight {
+        background: #fff3cd;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        color: #856404;
+        font-weight: 600;
+    }
+
+    .date-stamp {
+        background: #e9ecef;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        margin: 2rem 0;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-container">
+    <div class="legal-header">
+        <h1 class="display-4 fw-bold text-primary">
+            <i class="fas fa-gavel me-3"></i>Terms of Service
+        </h1>
+        <p class="lead text-muted">EduSight Educational Assessment Platform</p>
+        <div class="date-stamp">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Last Updated: {{ "now"|date:"F d, Y" }} | Version 1.0
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h4 class="fw-bold mb-3"><i class="fas fa-list me-2"></i>Table of Contents</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <ul>
+                    <li><a href="#acceptance">1. Acceptance of Terms</a></li>
+                    <li><a href="#platform-description">2. Platform Description</a></li>
+                    <li><a href="#user-responsibilities">3. User Responsibilities</a></li>
+                    <li><a href="#assessment-limitations">4. Assessment Limitations</a></li>
+                    <li><a href="#ml-disclaimers">5. AI/ML Disclaimers</a></li>
+                    <li><a href="#frameworks">6. Framework Limitations</a></li>
+                    <li><a href="#data-privacy">7. Data Privacy & Security</a></li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul>
+                    <li><a href="#liability">8. Limitation of Liability</a></li>
+                    <li><a href="#professional-consultation">9. Professional Consultation</a></li>
+                    <li><a href="#intellectual-property">10. Intellectual Property</a></li>
+                    <li><a href="#compliance">11. Regulatory Compliance</a></li>
+                    <li><a href="#modifications">12. Terms Modifications</a></li>
+                    <li><a href="#governing-law">13. Governing Law</a></li>
+                    <li><a href="#contact">14. Contact Information</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Critical Warning -->
+    <div class="warning-box">
+        <h4 class="fw-bold mb-3">
+            <i class="fas fa-exclamation-triangle me-2"></i>CRITICAL LEGAL WARNING
+        </h4>
+        <p class="mb-2">
+            <strong>This platform uses artificial intelligence and machine learning to generate educational assessments and predictions. 
+            These are computational tools designed to assist in educational analysis but are NOT substitutes for:</strong>
+        </p>
+        <ul class="mb-3">
+            <li>Professional psychological evaluations</li>
+            <li>Medical diagnoses or clinical assessments</li>
+            <li>Formal educational evaluations by qualified educators</li>
+            <li>Licensed career counseling services</li>
+        </ul>
+        <p class="mb-0">
+            <strong>By using this platform, you acknowledge that all results are probabilistic estimates and should not be the sole basis for important educational, psychological, or career decisions.</strong>
+        </p>
+    </div>
+
+    <!-- Section 1: Acceptance of Terms -->
+    <section id="acceptance">
+        <h2 class="section-title">1. Acceptance of Terms</h2>
+        <p>
+            By accessing, using, or registering for the EduSight platform ("Platform", "Service"), you acknowledge that you have read, 
+            understood, and agree to be bound by these Terms of Service ("Terms") and our Privacy Policy. If you do not agree to these 
+            Terms, you must not use the Platform.
+        </p>
+        <div class="info-box">
+            <strong>Legal Binding:</strong> These Terms constitute a legally binding agreement between you and EduSight. 
+            Your continued use of the Platform constitutes acceptance of any modifications to these Terms.
+        </div>
+    </section>
+
+    <!-- Section 2: Platform Description -->
+    <section id="platform-description">
+        <h2 class="section-title">2. Platform Description</h2>
+        <h4>2.1 Educational Assessment Tool</h4>
+        <p>
+            EduSight is an AI-powered educational assessment platform that provides <span class="highlight">supplementary insights</span> 
+            into student performance and development. The Platform analyzes uploaded academic data using proprietary machine learning 
+            algorithms to generate:
+        </p>
+        <ul>
+            <li>Academic performance analysis</li>
+            <li>Predictive assessments</li>
+            <li>Educational recommendations</li>
+            <li>Career mapping suggestions</li>
+            <li>Psychological insights (educational psychology only)</li>
+        </ul>
+
+        <h4>2.2 Framework Integration</h4>
+        <div class="framework-grid">
+            <div class="framework-card">
+                <h6 class="fw-bold text-primary"><i class="fas fa-book me-2"></i>Academic Frameworks</h6>
+                <p class="small mb-0">CBSE, ICSE, IGCSE, IB, and other curriculum standards for academic assessment.</p>
+            </div>
+            <div class="framework-card">
+                <h6 class="fw-bold text-success"><i class="fas fa-running me-2"></i>Physical Education</h6>
+                <p class="small mb-0">Motor skills, fitness assessments, and physical development indicators.</p>
+            </div>
+            <div class="framework-card">
+                <h6 class="fw-bold text-info"><i class="fas fa-brain me-2"></i>Psychological Frameworks</h6>
+                <p class="small mb-0">Educational psychology principles for cognitive and behavioral analysis.</p>
+            </div>
+            <div class="framework-card">
+                <h6 class="fw-bold text-warning"><i class="fas fa-compass me-2"></i>Career Mapping</h6>
+                <p class="small mb-0">Career guidance frameworks based on aptitude and interest patterns.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: User Responsibilities -->
+    <section id="user-responsibilities">
+        <h2 class="section-title">3. User Responsibilities</h2>
+        <h4>3.1 Data Accuracy</h4>
+        <p>Users are solely responsible for:</p>
+        <ul>
+            <li>Providing accurate and complete information</li>
+            <li>Ensuring proper context and format for submitted data</li>
+            <li>Verifying data quality before uploading</li>
+            <li>Updating information as needed for accuracy</li>
+        </ul>
+
+        <h4>3.2 Appropriate Use</h4>
+        <p>Users agree to:</p>
+        <ul>
+            <li>Use the Platform for educational purposes only</li>
+            <li>Not rely solely on Platform results for major life decisions</li>
+            <li>Seek professional consultation when appropriate</li>
+            <li>Supervise minor children's use of the Platform</li>
+            <li>Respect intellectual property rights</li>
+        </ul>
+
+        <h4>3.3 Prohibited Uses</h4>
+        <p>Users must NOT:</p>
+        <ul>
+            <li>Use the Platform for clinical or medical diagnosis</li>
+            <li>Misrepresent Platform capabilities to others</li>
+            <li>Attempt to reverse engineer proprietary algorithms</li>
+            <li>Use results to discriminate against individuals</li>
+            <li>Share or distribute copyrighted assessment frameworks</li>
+        </ul>
+    </section>
+
+    <!-- Section 4: Assessment Limitations -->
+    <section id="assessment-limitations">
+        <h2 class="section-title">4. Assessment Limitations</h2>
+        <div class="warning-box">
+            <h5 class="fw-bold mb-3">NO GUARANTEES PROVIDED</h5>
+            <p class="mb-2">EduSight makes <strong>NO GUARANTEES</strong> regarding:</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul>
+                        <li>Accuracy of assessments or predictions</li>
+                        <li>Completeness of analysis</li>
+                        <li>Future academic performance</li>
+                        <li>Career success or satisfaction</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul>
+                        <li>Suitability for specific purposes</li>
+                        <li>Achievement of predicted outcomes</li>
+                        <li>Individual variation considerations</li>
+                        <li>Long-term developmental trajectories</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h4>4.1 Parameter Dependencies</h4>
+        <p>Assessment accuracy depends on:</p>
+        <ul>
+            <li>Quality and completeness of input data</li>
+            <li>Proper data format and context</li>
+            <li>Consistency of assessment conditions</li>
+            <li>Cultural and socioeconomic factors</li>
+            <li>Individual learning variations</li>
+        </ul>
+    </section>
+
+    <!-- Section 5: AI/ML Disclaimers -->
+    <section id="ml-disclaimers">
+        <h2 class="section-title">5. Artificial Intelligence & Machine Learning Disclaimers</h2>
+        <h4>5.1 Algorithmic Nature</h4>
+        <p>
+            All assessments are generated using <span class="highlight">proprietary machine learning algorithms</span> that:
+        </p>
+        <ul>
+            <li>Analyze patterns in submitted data</li>
+            <li>Generate probabilistic predictions</li>
+            <li>Compare against statistical benchmarks</li>
+            <li>Apply pattern recognition techniques</li>
+        </ul>
+
+        <h4>5.2 Model Limitations</h4>
+        <div class="info-box">
+            <h6 class="fw-bold mb-3">Understanding AI/ML Limitations:</h6>
+            <ul class="mb-0">
+                <li><strong>Training Data Bias:</strong> Models may reflect biases present in historical training data</li>
+                <li><strong>Probabilistic Nature:</strong> All predictions are estimates, not certainties</li>
+                <li><strong>Variable Dependencies:</strong> Cannot account for all factors affecting human development</li>
+                <li><strong>Temporal Limitations:</strong> Based on historical patterns that may not reflect future conditions</li>
+                <li><strong>Continuous Evolution:</strong> Models require regular updates and validation</li>
+            </ul>
+        </div>
+
+        <h4>5.3 Predictive Accuracy</h4>
+        <p>
+            Users understand that ML predictions are <strong>statistical estimates</strong> with inherent uncertainty. 
+            Confidence levels provided are computational assessments and do not guarantee accuracy.
+        </p>
+    </section>
+
+    <!-- Section 6: Framework Limitations -->
+    <section id="frameworks">
+        <h2 class="section-title">6. Assessment Framework Limitations</h2>
+        
+        <h4>6.1 Academic Frameworks</h4>
+        <ul>
+            <li>Based on general curriculum standards (CBSE, ICSE, IGCSE, IB)</li>
+            <li>May not reflect specific institutional requirements</li>
+            <li>Cannot replace formal academic evaluations by qualified educators</li>
+            <li>Regional variations in standards may affect accuracy</li>
+        </ul>
+
+        <h4>6.2 Physical Education Frameworks</h4>
+        <ul>
+            <li>General fitness and motor skill benchmarks only</li>
+            <li>Not medical or health assessments</li>
+            <li>Cannot diagnose physical conditions or disabilities</li>
+            <li>Requires professional evaluation for health concerns</li>
+        </ul>
+
+        <h4>6.3 Psychological Frameworks</h4>
+        <ul>
+            <li>Educational psychology principles only</li>
+            <li><strong>NOT</strong> clinical psychological evaluations</li>
+            <li>Cannot diagnose mental health conditions</li>
+            <li>Behavioral insights are educational, not therapeutic</li>
+        </ul>
+
+        <h4>6.4 Career Mapping Frameworks</h4>
+        <ul>
+            <li>Based on aptitude and interest indicators</li>
+            <li>Market trend analysis and statistical correlations</li>
+            <li>Not professional career counseling</li>
+            <li>Cannot guarantee career success or satisfaction</li>
+        </ul>
+    </section>
+
+    <!-- Section 7: Data Privacy -->
+    <section id="data-privacy">
+        <h2 class="section-title">7. Data Privacy & Security</h2>
+        <h4>7.1 Data Protection</h4>
+        <p>We implement industry-standard security measures to protect user data, but:</p>
+        <ul>
+            <li>No system is 100% secure against all threats</li>
+            <li>Users assume inherent risks of data breaches</li>
+            <li>We comply with applicable data protection regulations</li>
+            <li>Users retain ownership of their submitted data</li>
+        </ul>
+
+        <h4>7.2 Data Usage</h4>
+        <p>Submitted data may be used for:</p>
+        <ul>
+            <li>Generating personalized assessments and recommendations</li>
+            <li>Improving algorithm accuracy (anonymized)</li>
+            <li>Research and development (de-identified)</li>
+            <li>Compliance with legal requirements</li>
+        </ul>
+    </section>
+
+    <!-- Section 8: Limitation of Liability -->
+    <section id="liability">
+        <h2 class="section-title">8. Limitation of Liability</h2>
+        <div class="warning-box">
+            <h5 class="fw-bold mb-3">MAXIMUM LIABILITY LIMITATION</h5>
+            <p class="mb-2">
+                <strong>EduSight and its affiliates shall NOT be liable for:</strong>
+            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul>
+                        <li>Educational decisions based on Platform results</li>
+                        <li>Career choices influenced by recommendations</li>
+                        <li>Academic outcomes or performance</li>
+                        <li>Psychological or emotional impacts</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul>
+                        <li>Financial losses or opportunity costs</li>
+                        <li>Direct, indirect, or consequential damages</li>
+                        <li>Loss of data or service interruptions</li>
+                        <li>Third-party claims or actions</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mb-0">
+                <strong>Maximum Liability:</strong> In no event shall our total liability exceed the amount paid by the user 
+                for Platform services in the preceding 12 months.
+            </p>
+        </div>
+
+        <h4>8.1 Indemnification</h4>
+        <p>
+            Users agree to indemnify and hold harmless EduSight from any claims, damages, or expenses arising from:
+        </p>
+        <ul>
+            <li>User violation of these Terms</li>
+            <li>Misuse of Platform services</li>
+            <li>Decisions made based on Platform results</li>
+            <li>Third-party claims related to user data</li>
+        </ul>
+    </section>
+
+    <!-- Section 9: Professional Consultation -->
+    <section id="professional-consultation">
+        <h2 class="section-title">9. Professional Consultation Requirements</h2>
+        <div class="info-box">
+            <h5 class="fw-bold mb-3">When to Seek Professional Help</h5>
+            <p class="mb-2">Users MUST consult qualified professionals for:</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul>
+                        <li><strong>Learning Disabilities:</strong> Educational specialists, psychologists</li>
+                        <li><strong>Behavioral Issues:</strong> Child psychologists, counselors</li>
+                        <li><strong>Academic Planning:</strong> School counselors, educators</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul>
+                        <li><strong>Career Guidance:</strong> Licensed career counselors</li>
+                        <li><strong>Health Concerns:</strong> Medical doctors, healthcare providers</li>
+                        <li><strong>Mental Health:</strong> Licensed therapists, psychiatrists</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h4>9.1 Professional Standards</h4>
+        <p>Platform results should be considered alongside, not instead of:</p>
+        <ul>
+            <li>Formal educational assessments</li>
+            <li>Professional psychological evaluations</li>
+            <li>Medical examinations and diagnoses</li>
+            <li>Licensed career counseling services</li>
+        </ul>
+    </section>
+
+    <!-- Section 10: Intellectual Property -->
+    <section id="intellectual-property">
+        <h2 class="section-title">10. Intellectual Property Rights</h2>
+        <h4>10.1 Proprietary Technology</h4>
+        <p>All Platform components are protected by intellectual property laws:</p>
+        <ul>
+            <li><strong>Algorithms:</strong> Trade secrets and patent applications (pending)</li>
+            <li><strong>Assessment Frameworks:</strong> Proprietary methodologies</li>
+            <li><strong>Software:</strong> Copyright protection</li>
+            <li><strong>Data Models:</strong> Confidential and proprietary</li>
+        </ul>
+
+        <h4>10.2 User Content</h4>
+        <p>Users retain ownership of submitted data but grant EduSight license to:</p>
+        <ul>
+            <li>Process and analyze data for assessment purposes</li>
+            <li>Use anonymized data for research and improvement</li>
+            <li>Generate reports and recommendations</li>
+            <li>Comply with legal and regulatory requirements</li>
+        </ul>
+    </section>
+
+    <!-- Section 11: Regulatory Compliance -->
+    <section id="compliance">
+        <h2 class="section-title">11. Regulatory Compliance</h2>
+        <h4>11.1 Educational Standards</h4>
+        <p>While we strive to align with recognized standards:</p>
+        <ul>
+            <li>Educational standards vary by region and institution</li>
+            <li>Local regulations may supersede Platform recommendations</li>
+            <li>Users must verify compliance with local requirements</li>
+            <li>Platform assessments are supplementary to formal standards</li>
+        </ul>
+
+        <h4>11.2 Privacy Regulations</h4>
+        <p>We comply with applicable regulations including:</p>
+        <ul>
+            <li>GDPR (General Data Protection Regulation)</li>
+            <li>COPPA (Children's Online Privacy Protection Act)</li>
+            <li>FERPA (Family Educational Rights and Privacy Act)</li>
+            <li>Local and regional data protection laws</li>
+        </ul>
+    </section>
+
+    <!-- Section 12: Terms Modifications -->
+    <section id="modifications">
+        <h2 class="section-title">12. Modifications to Terms</h2>
+        <h4>12.1 Right to Modify</h4>
+        <p>EduSight reserves the right to modify these Terms at any time. Changes will be effective upon:</p>
+        <ul>
+            <li>Posting of updated Terms on the Platform</li>
+            <li>Email notification to registered users</li>
+            <li>In-platform notification systems</li>
+            <li>Continued use constitutes acceptance</li>
+        </ul>
+
+        <h4>12.2 Significant Changes</h4>
+        <p>For material changes affecting user rights or obligations:</p>
+        <ul>
+            <li>30-day advance notice will be provided</li>
+            <li>Users may terminate accounts before changes take effect</li>
+            <li>Continued use after notice period constitutes acceptance</li>
+        </ul>
+    </section>
+
+    <!-- Section 13: Governing Law -->
+    <section id="governing-law">
+        <h2 class="section-title">13. Governing Law & Dispute Resolution</h2>
+        <h4>13.1 Jurisdiction</h4>
+        <p>These Terms are governed by the laws of [Your Jurisdiction] without regard to conflict of law principles.</p>
+
+        <h4>13.2 Dispute Resolution Process</h4>
+        <ol>
+            <li><strong>Good Faith Negotiation:</strong> 30-day period for direct resolution</li>
+            <li><strong>Mediation:</strong> Binding mediation if negotiation fails</li>
+            <li><strong>Arbitration:</strong> Final binding arbitration for unresolved disputes</li>
+        </ol>
+
+        <h4>13.3 Severability</h4>
+        <p>If any provision is found unenforceable, remaining provisions remain in full force and effect.</p>
+    </section>
+
+    <!-- Section 14: Contact Information -->
+    <section id="contact">
+        <h2 class="section-title">14. Contact Information</h2>
+        <div class="info-box">
+            <h5 class="fw-bold mb-3">Legal and Support Contact</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Legal Inquiries:</strong><br>
+                    Email: legal@edusight.com<br>
+                    Phone: [Your Legal Contact Number]</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Technical Support:</strong><br>
+                    Email: support@edusight.com<br>
+                    Phone: [Your Support Number]</p>
+                </div>
+            </div>
+            <p><strong>Business Address:</strong><br>
+            [Your Complete Business Address]</p>
+        </div>
+    </section>
+
+    <!-- Final Acknowledgment -->
+    <div class="warning-box">
+        <h4 class="fw-bold mb-3">
+            <i class="fas fa-check-circle me-2"></i>ACKNOWLEDGMENT OF UNDERSTANDING
+        </h4>
+        <p class="mb-2">
+            <strong>By using the EduSight Platform, you acknowledge that you have:</strong>
+        </p>
+        <ul class="mb-3">
+            <li>Read and understood these complete Terms of Service</li>
+            <li>Understood the limitations of AI/ML assessment tools</li>
+            <li>Agreed to seek professional consultation when appropriate</li>
+            <li>Accepted all risks associated with Platform use</li>
+            <li>Agreed not to rely solely on Platform results for major decisions</li>
+        </ul>
+        <p class="mb-0">
+            <strong>These Terms constitute the complete agreement between you and EduSight regarding Platform use.</strong>
+        </p>
+    </div>
+
+    <div class="date-stamp">
+        <i class="fas fa-shield-alt me-2"></i>
+        This document constitutes a legally binding agreement. Please consult legal counsel if you have questions about these Terms.
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scrolling for table of contents links
+document.querySelectorAll('.toc a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Highlight current section in TOC
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('section[id]');
+    const tocLinks = document.querySelectorAll('.toc a[href^="#"]');
+    
+    let currentSection = '';
+    sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= 100 && rect.bottom >= 100) {
+            currentSection = section.id;
+        }
+    });
+    
+    tocLinks.forEach(link => {
+        if (link.getAttribute('href') === `#${currentSection}`) {
+            link.style.fontWeight = 'bold';
+            link.style.color = '#2980b9';
+        } else {
+            link.style.fontWeight = '500';
+            link.style.color = '#3498db';
+        }
+    });
+});
+</script>
+{% endblock %}

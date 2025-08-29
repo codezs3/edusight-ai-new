@@ -66,6 +66,10 @@ urlpatterns = [
     # Authentication (Django built-in)
     path('accounts/', include('django.contrib.auth.urls')),
     
+    # Legal Pages and Registration
+    path('legal/', include('legal.urls')),
+    path('signup/', include('registration.urls')),
+    
     # Legacy redirects (for backward compatibility with PHP) - Using relative URLs
     path('dashboard.php', RedirectView.as_view(pattern_name='dashboard', permanent=True)),
     path('students.php', RedirectView.as_view(pattern_name='students:student_list', permanent=True)),

@@ -1031,12 +1031,15 @@
                                 <i class="fas fa-users me-2"></i>Parent Login
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'book_assessment' %}">
-                                <i class="fas fa-calendar-plus me-2"></i>Book Assessment
-                            </a></li>
-                        </ul>
-                    </div>
-                    <a href="{% url 'dashboard' %}" class="btn btn-primary-custom">Demo Dashboard</a>
+                                                <li><a class="dropdown-item" href="{% url 'book_assessment' %}">
+                        <i class="fas fa-calendar-plus me-2"></i>Book Assessment
+                    </a></li>
+                </ul>
+            </div>
+            <a href="{% url 'registration:signup' %}" class="btn btn-success me-2">
+                <i class="fas fa-user-plus me-1"></i>Sign Up
+            </a>
+            <a href="{% url 'dashboard' %}" class="btn btn-primary-custom">Demo Dashboard</a>
                 </div>
             </div>
         </div>
