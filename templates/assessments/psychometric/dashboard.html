@@ -1,0 +1,389 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Psychometric Assessment Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notification-popup {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        max-width: 400px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        color: white;
+        animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .student-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        background: white;
+        border-left: 4px solid #3498db;
+    }
+    
+    .student-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .progress-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: conic-gradient(#3498db var(--progress), #e9ecef var(--progress));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .progress-circle::before {
+        content: '';
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: white;
+        position: absolute;
+    }
+    
+    .progress-text {
+        position: relative;
+        z-index: 1;
+        font-weight: bold;
+        color: #3498db;
+    }
+    
+    .recommendation-badge {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .test-category-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-brain text-primary me-2"></i>
+                Psychometric Assessment Dashboard
+            </h1>
+            <p class="text-muted">Monitor your children's psychological development and well-being</p>
+        </div>
+        <button class="btn btn-primary" onclick="refreshRecommendations()">
+            <i class="fas fa-sync-alt me-2"></i>Refresh Recommendations
+        </button>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="test-category-icon" style="background: rgba(255,255,255,0.2);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>{{ total_students }}</h3>
+                <p class="mb-0">Total Students</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                <div class="test-category-icon" style="background: rgba(255,255,255,0.2);">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>{{ students_with_recommendations }}</h3>
+                <p class="mb-0">Pending Assessments</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="test-category-icon" style="background: rgba(255,255,255,0.2);">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>100%</h3>
+                <p class="mb-0">Care & Support</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="test-category-icon" style="background: rgba(255,255,255,0.2);">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>Pro</h3>
+                <p class="mb-0">Professional Insights</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students Overview -->
+    <div class="row">
+        {% for student_data in students %}
+        <div class="col-lg-6 mb-4">
+            <div class="student-card p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="mb-2">
+                            <i class="fas fa-user-graduate text-primary me-2"></i>
+                            {{ student_data.student.user.get_full_name }}
+                        </h5>
+                        <p class="text-muted mb-2">
+                            Grade {{ student_data.student.grade }}{{ student_data.student.section }} • 
+                            Age {{ student_data.student.user.calculate_age }} years
+                        </p>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Assessment Completion</small>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" 
+                                     style="width: {{ student_data.completion_rate }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ student_data.completion_rate|floatformat:1 }}% Complete</small>
+                        </div>
+                        
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% if student_data.pending_recommendations > 0 %}
+                            <span class="recommendation-badge">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ student_data.pending_recommendations }} Recommendations
+                            </span>
+                            {% endif %}
+                            
+                            {% if student_data.high_priority_recommendations > 0 %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-flag me-1"></i>
+                                {{ student_data.high_priority_recommendations }} High Priority
+                            </span>
+                            {% endif %}
+                            
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>
+                                {{ student_data.completed_tests }} Completed
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 text-center">
+                        <div class="progress-circle" 
+                             style="--progress: {{ student_data.completion_rate }}%;">
+                            <span class="progress-text">{{ student_data.completion_rate|floatformat:0 }}%</span>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'assessments:student_recommendations' student_data.student.id %}" 
+                               class="btn btn-outline-primary btn-sm me-2">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                            
+                            {% if student_data.pending_recommendations > 0 %}
+                            <button class="btn btn-primary btn-sm" 
+                                    onclick="showRecommendations({{ student_data.student.id }})">
+                                <i class="fas fa-play me-1"></i>Start Tests
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-user-plus fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Students Found</h4>
+                <p class="text-muted">Add student information to begin psychometric assessments.</p>
+                <a href="{% url 'students:student_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Student
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Notification Popups -->
+{% for notification in notifications %}
+<div class="notification-popup" id="notification-{{ forloop.counter }}" data-student-id="{{ notification.student_id }}">
+    <div class="p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <h6 class="mb-0">
+                <i class="fas fa-bell me-2"></i>
+                Assessment Recommendations
+            </h6>
+            <button type="button" class="btn-close btn-close-white" 
+                    onclick="closeNotification({{ forloop.counter }})"></button>
+        </div>
+        
+        <h6 class="mb-2">{{ notification.student_name }}</h6>
+        <p class="mb-3 small">{{ notification.message }}</p>
+        
+        <div class="mb-3">
+            {% for rec in notification.recommendations|slice:":3" %}
+            <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded" 
+                 style="background: rgba(255,255,255,0.1);">
+                <div>
+                    <small class="fw-bold">{{ rec.test_name }}</small>
+                    <br>
+                    <small class="opacity-75">{{ rec.duration }} min • {{ rec.priority|title }}</small>
+                </div>
+                <span class="badge bg-light text-dark">{{ rec.category }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-light btn-sm flex-fill" 
+                    onclick="viewRecommendations({{ notification.student_id }})">
+                <i class="fas fa-eye me-1"></i>View All
+            </button>
+            <button class="btn btn-success btn-sm flex-fill" 
+                    onclick="acceptRecommendations({{ notification.student_id }})">
+                <i class="fas fa-check me-1"></i>Start Tests
+            </button>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Recommendation Modal -->
+<div class="modal fade" id="recommendationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assessment Recommendations</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="recommendationModalBody">
+                <!-- Content loaded via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function closeNotification(id) {
+    const notification = document.getElementById(`notification-${id}`);
+    notification.style.animation = 'slideOut 0.3s ease-in';
+    setTimeout(() => notification.remove(), 300);
+}
+
+function viewRecommendations(studentId) {
+    window.location.href = `/assessments/psychometric/student/${studentId}/recommendations/`;
+}
+
+function acceptRecommendations(studentId) {
+    // Trigger acceptance for all high-priority recommendations
+    fetch('/assessments/psychometric/api/accept-recommendations/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            student_id: studentId,
+            accept_all_high: true
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function showRecommendations(studentId) {
+    fetch(`/assessments/psychometric/api/student/${studentId}/recommendations/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('recommendationModalBody').innerHTML = data.html;
+            new bootstrap.Modal(document.getElementById('recommendationModal')).show();
+        });
+}
+
+function refreshRecommendations() {
+    const btn = event.target.closest('button');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Refreshing...';
+    
+    fetch('/assessments/psychometric/api/refresh-recommendations/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .finally(() => {
+        btn.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Refresh Recommendations';
+    });
+}
+
+// Auto-hide notifications after 10 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const notifications = document.querySelectorAll('.notification-popup');
+    notifications.forEach((notification, index) => {
+        setTimeout(() => {
+            if (notification.parentNode) {
+                closeNotification(index + 1);
+            }
+        }, 10000 + (index * 2000)); // Stagger the auto-hide
+    });
+});
+
+// Add slide-out animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
