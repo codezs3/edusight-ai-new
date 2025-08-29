@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'student_portal',
     'epr_system',
     'workflow_system',
+    'parent_dashboard',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,921 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Assessment Workflow - Parent Dashboard{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .workflow-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .workflow-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .workflow-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+    
+    .workflow-steps::before {
+        content: '';
+        position: absolute;
+        top: 25px;
+        left: 8%;
+        right: 8%;
+        height: 3px;
+        background: #e9ecef;
+        z-index: 1;
+    }
+    
+    .workflow-step {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+    }
+    
+    .step-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .step-circle.active {
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+    }
+    
+    .step-circle.completed {
+        background: #28a745;
+        color: white;
+    }
+    
+    .step-circle.pending {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 2px solid #e9ecef;
+    }
+    
+    .step-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .step-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .workflow-content {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        min-height: 500px;
+    }
+    
+    .upload-zone {
+        border: 3px dashed #3498db;
+        border-radius: 15px;
+        padding: 3rem;
+        text-align: center;
+        background: #f8f9ff;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .upload-zone:hover {
+        border-color: #2980b9;
+        background: #ecf0ff;
+    }
+    
+    .upload-zone.dragover {
+        border-color: #27ae60;
+        background: #e8f5e8;
+    }
+    
+    .upload-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .upload-option {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .upload-option:hover {
+        border-color: #3498db;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .upload-option.selected {
+        border-color: #3498db;
+        background: #f8f9ff;
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #3498db;
+    }
+    
+    .data-preview-table {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+    }
+    
+    .editable-cell {
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .editable-cell:hover {
+        background: #f8f9fa;
+    }
+    
+    .cell-input {
+        border: none;
+        background: transparent;
+        width: 100%;
+        padding: 0.5rem;
+    }
+    
+    .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .btn-workflow {
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #2980b9, #27ae60);
+        transform: scale(1.05);
+    }
+    
+    .analysis-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        border-left: 4px solid #3498db;
+    }
+    
+    .prediction-chart {
+        height: 400px;
+        margin: 2rem 0;
+    }
+    
+    .insight-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .insight-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .insight-icon.strength {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .insight-icon.improvement {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .insight-icon.recommendation {
+        background: #cce7ff;
+        color: #004085;
+    }
+    
+    .comparison-chart {
+        height: 300px;
+        margin: 1rem 0;
+    }
+    
+    .pdf-preview {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 2rem;
+        background: #f8f9fa;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="workflow-container">
+    <!-- Workflow Header -->
+    <div class="workflow-header">
+        <h1><i class="fas fa-route me-3"></i>Student Assessment Workflow</h1>
+        <p>Follow our 5-step process to get comprehensive insights about your child's academic performance</p>
+    </div>
+
+    <!-- Workflow Steps Navigation -->
+    <div class="workflow-steps">
+        <div class="workflow-step">
+            <div class="step-circle active" id="step-1-circle">1</div>
+            <div class="step-title">Upload Data</div>
+            <div class="step-description">Upload or enter academic data</div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-circle pending" id="step-2-circle">2</div>
+            <div class="step-title">Refine & Edit</div>
+            <div class="step-description">Review and edit data</div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-circle pending" id="step-3-circle">3</div>
+            <div class="step-title">Analysis</div>
+            <div class="step-description">AI-powered analysis</div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-circle pending" id="step-4-circle">4</div>
+            <div class="step-title">Predictions</div>
+            <div class="step-description">Future performance insights</div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-circle pending" id="step-5-circle">5</div>
+            <div class="step-title">Report</div>
+            <div class="step-description">Downloadable PDF report</div>
+        </div>
+    </div>
+
+    <!-- Workflow Content -->
+    <div class="workflow-content">
+        <!-- Step 1: Upload Data -->
+        <div id="step-1-content" class="step-content">
+            <h3><i class="fas fa-cloud-upload-alt text-primary me-2"></i>Step 1: Upload Academic Data</h3>
+            <p class="text-muted mb-4">Choose how you'd like to provide your child's academic information:</p>
+            
+            <div class="upload-options">
+                <div class="upload-option" onclick="selectUploadType('file')">
+                    <div class="upload-icon"><i class="fas fa-file-upload"></i></div>
+                    <h5>Upload File</h5>
+                    <p>Excel, CSV, or Image files<br>Automatic data extraction</p>
+                </div>
+                <div class="upload-option" onclick="selectUploadType('manual')">
+                    <div class="upload-icon"><i class="fas fa-keyboard"></i></div>
+                    <h5>Manual Entry</h5>
+                    <p>Enter data manually<br>Subject-wise scores</p>
+                </div>
+                <div class="upload-option" onclick="selectUploadType('camera')">
+                    <div class="upload-icon"><i class="fas fa-camera"></i></div>
+                    <h5>Take Photo</h5>
+                    <p>Capture report card<br>OCR text extraction</p>
+                </div>
+            </div>
+            
+            <!-- File Upload Zone -->
+            <div id="file-upload-zone" class="upload-zone mt-4" style="display: none;">
+                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                <h4>Drag & Drop Files Here</h4>
+                <p>Or click to browse files</p>
+                <input type="file" id="file-input" accept=".xlsx,.xls,.csv,.jpg,.jpeg,.png,.pdf" style="display: none;">
+                <div class="mt-3">
+                    <small class="text-muted">Supported formats: Excel (.xlsx, .xls), CSV (.csv), Images (.jpg, .png), PDF</small>
+                </div>
+            </div>
+            
+            <!-- Manual Entry Form -->
+            <div id="manual-entry-form" class="mt-4" style="display: none;">
+                <form id="manual-data-form">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label">Curriculum</label>
+                            <select class="form-select" id="curriculum">
+                                <option value="CBSE">CBSE</option>
+                                <option value="ICSE">ICSE</option>
+                                <option value="IGCSE">IGCSE</option>
+                                <option value="IB">IB</option>
+                                <option value="State Board">State Board</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Semester/Term</label>
+                            <input type="text" class="form-control" id="semester" placeholder="e.g., Semester 1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Academic Year</label>
+                            <input type="text" class="form-control" id="academic-year" placeholder="e.g., 2024-25">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Subject Scores</h5>
+                        <div id="subjects-container">
+                            <!-- Dynamic subject inputs will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" onclick="addSubject()">
+                            <i class="fas fa-plus me-2"></i>Add Subject
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 2: Refine & Edit -->
+        <div id="step-2-content" class="step-content" style="display: none;">
+            <h3><i class="fas fa-edit text-warning me-2"></i>Step 2: Refine & Edit Data</h3>
+            <p class="text-muted mb-4">Review the extracted data and make any necessary corrections:</p>
+            
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Detected Curriculum</label>
+                    <input type="text" class="form-control" id="detected-curriculum" value="CBSE">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Detected Semester</label>
+                    <input type="text" class="form-control" id="detected-semester" value="Semester 1">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Detected Year</label>
+                    <input type="text" class="form-control" id="detected-year" value="2024-25">
+                </div>
+            </div>
+            
+            <div class="data-preview-table">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Test 1</th>
+                            <th>Test 2</th>
+                            <th>Test 3</th>
+                            <th>Average</th>
+                            <th>Max Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-preview-body">
+                        <!-- Dynamic data rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle me-2"></i>
+                Click on any cell to edit the values. Changes will be automatically saved.
+            </div>
+        </div>
+
+        <!-- Step 3: Analysis -->
+        <div id="step-3-content" class="step-content" style="display: none;">
+            <h3><i class="fas fa-chart-bar text-success me-2"></i>Step 3: AI-Powered Analysis</h3>
+            <p class="text-muted mb-4">Our AI has analyzed your child's performance data:</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="analysis-card">
+                        <h5><i class="fas fa-trophy text-warning me-2"></i>Strengths</h5>
+                        <div id="strengths-list">
+                            <!-- Dynamic strengths will be populated -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="analysis-card">
+                        <h5><i class="fas fa-exclamation-triangle text-danger me-2"></i>Areas for Improvement</h5>
+                        <div id="improvements-list">
+                            <!-- Dynamic improvements will be populated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analysis-card">
+                <h5><i class="fas fa-chart-pie text-info me-2"></i>Performance Overview</h5>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h3 class="text-primary" id="academic-score">88.5</h3>
+                        <p>Academic Score</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-success" id="psychological-score">82.3</h3>
+                        <p>Psychological Score</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-warning" id="physical-score">75.8</h3>
+                        <p>Physical Score</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-info" id="overall-score">85.2</h3>
+                        <p>Overall Score</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analysis-card">
+                <h5><i class="fas fa-lightbulb text-primary me-2"></i>Key Insights</h5>
+                <div id="insights-container">
+                    <!-- Dynamic insights will be populated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Predictions -->
+        <div id="step-4-content" class="step-content" style="display: none;">
+            <h3><i class="fas fa-crystal-ball text-info me-2"></i>Step 4: Future Performance Predictions</h3>
+            <p class="text-muted mb-4">Based on current performance, here are AI-powered predictions:</p>
+            
+            <!-- Interactive Prediction Chart -->
+            <div class="prediction-chart">
+                <canvas id="prediction-canvas"></canvas>
+            </div>
+            
+            <!-- National Average Comparison -->
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-chart-line me-2"></i>Performance vs National Average</h5>
+                    <div class="comparison-chart">
+                        <canvas id="comparison-canvas"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5><i class="fas fa-target me-2"></i>Recommended Actions</h5>
+                    <div id="recommendations-list">
+                        <!-- Dynamic recommendations will be populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: PDF Report -->
+        <div id="step-5-content" class="step-content" style="display: none;">
+            <h3><i class="fas fa-file-pdf text-danger me-2"></i>Step 5: Comprehensive Report</h3>
+            <p class="text-muted mb-4">Your detailed assessment report is ready for download:</p>
+            
+            <div class="pdf-preview">
+                <i class="fas fa-file-pdf fa-5x text-danger mb-3"></i>
+                <h4>Student Assessment Report</h4>
+                <p class="text-muted">Alex Johnson - Grade 8 - CBSE Curriculum</p>
+                <p>Report includes analysis, predictions, recommendations, and career guidance</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h6>Report Includes:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Performance Analysis</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Future Predictions</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Personalized Recommendations</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Career Mapping</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Report Features:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Professional Layout</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Charts & Visualizations</li>
+                            <li><i class="fas fa-check text-success me-2"></i>EduSight Branding</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Shareable Format</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button class="btn btn-danger btn-lg mt-4" onclick="downloadReport()">
+                    <i class="fas fa-download me-2"></i>Download PDF Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button class="btn btn-outline-secondary btn-workflow" id="prev-btn" onclick="previousStep()" style="display: none;">
+                <i class="fas fa-arrow-left me-2"></i>Previous
+            </button>
+            <button class="btn btn-primary btn-workflow" id="next-btn" onclick="nextStep()">
+                Next<i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let currentStep = 1;
+let totalSteps = 5;
+let uploadedData = {};
+
+// Initialize workflow
+document.addEventListener('DOMContentLoaded', function() {
+    // Add some sample subjects for manual entry
+    addSubject('Mathematics', '88');
+    addSubject('English', '85');
+    addSubject('Science', '92');
+    
+    // Setup file upload
+    setupFileUpload();
+    
+    // Populate sample data for demo
+    populateSampleData();
+});
+
+function selectUploadType(type) {
+    // Remove previous selections
+    document.querySelectorAll('.upload-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    
+    // Hide all upload forms
+    document.getElementById('file-upload-zone').style.display = 'none';
+    document.getElementById('manual-entry-form').style.display = 'none';
+    
+    // Select current option
+    event.target.closest('.upload-option').classList.add('selected');
+    
+    // Show appropriate form
+    if (type === 'file') {
+        document.getElementById('file-upload-zone').style.display = 'block';
+    } else if (type === 'manual') {
+        document.getElementById('manual-entry-form').style.display = 'block';
+    } else if (type === 'camera') {
+        // Implement camera functionality
+        alert('Camera functionality will be implemented');
+    }
+}
+
+function setupFileUpload() {
+    const uploadZone = document.getElementById('file-upload-zone');
+    const fileInput = document.getElementById('file-input');
+    
+    uploadZone.addEventListener('click', () => fileInput.click());
+    
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        handleFileUpload(files[0]);
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        handleFileUpload(e.target.files[0]);
+    });
+}
+
+function handleFileUpload(file) {
+    if (!file) return;
+    
+    // Show upload progress
+    const uploadZone = document.getElementById('file-upload-zone');
+    uploadZone.innerHTML = `
+        <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+        <h4>Processing ${file.name}</h4>
+        <p>Extracting data from your file...</p>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 75%"></div>
+        </div>
+    `;
+    
+    // Simulate processing
+    setTimeout(() => {
+        uploadZone.innerHTML = `
+            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+            <h4>File Processed Successfully!</h4>
+            <p>${file.name} has been analyzed and data extracted.</p>
+            <small class="text-muted">Detected: CBSE Curriculum, 6 subjects, Grade 8</small>
+        `;
+        
+        // Enable next button
+        document.getElementById('next-btn').disabled = false;
+    }, 3000);
+}
+
+function addSubject(name = '', score = '') {
+    const container = document.getElementById('subjects-container');
+    const subjectDiv = document.createElement('div');
+    subjectDiv.className = 'row mb-3 subject-row';
+    subjectDiv.innerHTML = `
+        <div class="col-md-6">
+            <input type="text" class="form-control" placeholder="Subject Name" value="${name}">
+        </div>
+        <div class="col-md-4">
+            <input type="number" class="form-control" placeholder="Score" value="${score}" min="0" max="100">
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-outline-danger" onclick="removeSubject(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(subjectDiv);
+}
+
+function removeSubject(btn) {
+    btn.closest('.subject-row').remove();
+}
+
+function populateSampleData() {
+    const sampleData = [
+        { subject: 'Mathematics', test1: 88, test2: 92, test3: 85, average: 88.3, maxScore: 100 },
+        { subject: 'English', test1: 85, test2: 88, test3: 90, average: 87.7, maxScore: 100 },
+        { subject: 'Science', test1: 90, test2: 87, test3: 93, average: 90.0, maxScore: 100 },
+        { subject: 'Social Studies', test1: 82, test2: 85, test3: 80, average: 82.3, maxScore: 100 },
+        { subject: 'Hindi', test1: 75, test2: 78, test3: 80, average: 77.7, maxScore: 100 },
+        { subject: 'Computer Science', test1: 95, test2: 98, test3: 94, average: 95.7, maxScore: 100 }
+    ];
+    
+    const tbody = document.getElementById('data-preview-body');
+    tbody.innerHTML = '';
+    
+    sampleData.forEach(data => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td class="editable-cell">${data.subject}</td>
+            <td class="editable-cell">${data.test1}</td>
+            <td class="editable-cell">${data.test2}</td>
+            <td class="editable-cell">${data.test3}</td>
+            <td class="fw-bold">${data.average}</td>
+            <td>${data.maxScore}</td>
+        `;
+    });
+    
+    // Make cells editable
+    document.querySelectorAll('.editable-cell').forEach(cell => {
+        cell.addEventListener('click', makeCellEditable);
+    });
+}
+
+function makeCellEditable(event) {
+    const cell = event.target;
+    const currentValue = cell.textContent;
+    
+    cell.innerHTML = `<input type="text" class="cell-input" value="${currentValue}" onblur="saveCell(this)" onkeypress="handleCellKeypress(event, this)">`;
+    cell.querySelector('input').focus();
+}
+
+function saveCell(input) {
+    const cell = input.parentElement;
+    cell.textContent = input.value;
+}
+
+function handleCellKeypress(event, input) {
+    if (event.key === 'Enter') {
+        input.blur();
+    }
+}
+
+function nextStep() {
+    if (currentStep < totalSteps) {
+        // Hide current step
+        document.getElementById(`step-${currentStep}-content`).style.display = 'none';
+        document.getElementById(`step-${currentStep}-circle`).classList.remove('active');
+        document.getElementById(`step-${currentStep}-circle`).classList.add('completed');
+        
+        // Show next step
+        currentStep++;
+        document.getElementById(`step-${currentStep}-content`).style.display = 'block';
+        document.getElementById(`step-${currentStep}-circle`).classList.add('active');
+        
+        // Update navigation buttons
+        document.getElementById('prev-btn').style.display = 'block';
+        
+        if (currentStep === totalSteps) {
+            document.getElementById('next-btn').style.display = 'none';
+        }
+        
+        // Initialize step-specific content
+        if (currentStep === 3) {
+            initializeAnalysisStep();
+        } else if (currentStep === 4) {
+            initializePredictionsStep();
+        }
+    }
+}
+
+function previousStep() {
+    if (currentStep > 1) {
+        // Hide current step
+        document.getElementById(`step-${currentStep}-content`).style.display = 'none';
+        document.getElementById(`step-${currentStep}-circle`).classList.remove('active');
+        
+        // Show previous step
+        currentStep--;
+        document.getElementById(`step-${currentStep}-content`).style.display = 'block';
+        document.getElementById(`step-${currentStep}-circle`).classList.remove('completed');
+        document.getElementById(`step-${currentStep}-circle`).classList.add('active');
+        
+        // Update navigation buttons
+        if (currentStep === 1) {
+            document.getElementById('prev-btn').style.display = 'none';
+        }
+        document.getElementById('next-btn').style.display = 'block';
+    }
+}
+
+function initializeAnalysisStep() {
+    // Populate strengths
+    const strengths = ['Computer Science', 'Science', 'Mathematics'];
+    const strengthsList = document.getElementById('strengths-list');
+    strengthsList.innerHTML = strengths.map(strength => 
+        `<div class="insight-item">
+            <div class="insight-icon strength"><i class="fas fa-star"></i></div>
+            <div>
+                <strong>${strength}</strong>
+                <p class="mb-0 text-muted">Excellent performance with consistent high scores</p>
+            </div>
+        </div>`
+    ).join('');
+    
+    // Populate improvements
+    const improvements = ['Hindi', 'Social Studies'];
+    const improvementsList = document.getElementById('improvements-list');
+    improvementsList.innerHTML = improvements.map(improvement => 
+        `<div class="insight-item">
+            <div class="insight-icon improvement"><i class="fas fa-arrow-up"></i></div>
+            <div>
+                <strong>${improvement}</strong>
+                <p class="mb-0 text-muted">Potential for improvement with focused practice</p>
+            </div>
+        </div>`
+    ).join('');
+    
+    // Populate insights
+    const insights = [
+        'Strong analytical and logical thinking skills',
+        'Excellent aptitude for STEM subjects',
+        'Consistent performance across multiple assessments',
+        'Recommended for advanced programming courses'
+    ];
+    const insightsContainer = document.getElementById('insights-container');
+    insightsContainer.innerHTML = insights.map(insight => 
+        `<div class="insight-item">
+            <div class="insight-icon recommendation"><i class="fas fa-lightbulb"></i></div>
+            <div>
+                <p class="mb-0">${insight}</p>
+            </div>
+        </div>`
+    ).join('');
+}
+
+function initializePredictionsStep() {
+    // Initialize prediction chart
+    const predictionCtx = document.getElementById('prediction-canvas').getContext('2d');
+    new Chart(predictionCtx, {
+        type: 'line',
+        data: {
+            labels: ['Current', 'Next Month', 'Next Semester', 'Next Year'],
+            datasets: [{
+                label: 'Academic Performance',
+                data: [88.5, 90.2, 92.1, 94.5],
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Psychological Well-being',
+                data: [82.3, 84.1, 85.8, 87.2],
+                borderColor: '#2ecc71',
+                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Physical Health',
+                data: [75.8, 77.5, 79.2, 81.0],
+                borderColor: '#f39c12',
+                backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 70,
+                    max: 100
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Performance Prediction Timeline'
+                }
+            }
+        }
+    });
+    
+    // Initialize comparison chart
+    const comparisonCtx = document.getElementById('comparison-canvas').getContext('2d');
+    new Chart(comparisonCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Mathematics', 'English', 'Science', 'Social Studies', 'Hindi', 'Computer Science'],
+            datasets: [{
+                label: 'Alex Johnson',
+                data: [88.3, 87.7, 90.0, 82.3, 77.7, 95.7],
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                pointBackgroundColor: '#3498db'
+            }, {
+                label: 'National Average',
+                data: [75, 78, 74, 76, 80, 72],
+                borderColor: '#95a5a6',
+                backgroundColor: 'rgba(149, 165, 166, 0.2)',
+                pointBackgroundColor: '#95a5a6'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+    
+    // Populate recommendations
+    const recommendations = [
+        'Continue excelling in STEM subjects',
+        'Focus on language skills improvement',
+        'Consider advanced mathematics courses',
+        'Explore career options in technology'
+    ];
+    const recommendationsList = document.getElementById('recommendations-list');
+    recommendationsList.innerHTML = recommendations.map(rec => 
+        `<div class="alert alert-info">
+            <i class="fas fa-lightbulb me-2"></i>${rec}
+        </div>`
+    ).join('');
+}
+
+function downloadReport() {
+    // Simulate PDF generation and download
+    const link = document.createElement('a');
+    link.href = '#'; // In real implementation, this would be the PDF file URL
+    link.download = 'Alex_Johnson_Assessment_Report.pdf';
+    link.click();
+    
+    // Show success message
+    alert('Report downloaded successfully!');
+}
+</script>
+{% endblock %}

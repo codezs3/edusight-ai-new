@@ -1,0 +1,344 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Parent Dashboard - EduSight{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .dashboard-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        border-left: 4px solid #3498db;
+    }
+    
+    .upload-zone {
+        border: 2px dashed #3498db;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        background: #f8f9ff;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-zone:hover {
+        border-color: #2980b9;
+        background: #ecf0ff;
+    }
+    
+    .student-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+    }
+    
+    .student-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .quick-action-btn {
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action-btn:hover {
+        background: linear-gradient(45deg, #2980b9, #27ae60);
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-2">
+                            <i class="fas fa-home me-3"></i>
+                            Welcome to Parent Dashboard
+                        </h1>
+                        <p class="mb-0 opacity-90">
+                            Monitor your child's academic progress, get AI-powered insights, and receive personalized recommendations.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{% url 'parent_dashboard:upload' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-upload me-2"></i>Upload New Data
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h3 class="text-primary mb-1">{{ students.count }}</h3>
+                        <p class="text-muted mb-0">Registered Students</p>
+                    </div>
+                    <div class="text-primary">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h3 class="text-success mb-1">{{ total_assessments }}</h3>
+                        <p class="text-muted mb-0">Total Assessments</p>
+                    </div>
+                    <div class="text-success">
+                        <i class="fas fa-chart-bar fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h3 class="text-warning mb-1">{{ completed_predictions }}</h3>
+                        <p class="text-muted mb-0">AI Predictions</p>
+                    </div>
+                    <div class="text-warning">
+                        <i class="fas fa-brain fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h3 class="text-info mb-1">{{ recent_uploads.count }}</h3>
+                        <p class="text-muted mb-0">Recent Uploads</p>
+                    </div>
+                    <div class="text-info">
+                        <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Students Section -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-graduation-cap text-primary me-2"></i>
+                        Your Students
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if students %}
+                        <div class="row">
+                            {% for student in students %}
+                            <div class="col-md-6 mb-3">
+                                <div class="student-card">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="avatar-circle bg-primary text-white me-3">
+                                            {{ student.name|first }}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">{{ student.name }}</h5>
+                                            <p class="text-muted mb-0">{{ student.class_name|default:"Class not specified" }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'parent_dashboard:progress_tracking' student.id %}" 
+                                           class="btn btn-outline-primary btn-sm flex-fill">
+                                            <i class="fas fa-chart-line me-1"></i>Progress
+                                        </a>
+                                        <a href="{% url 'parent_dashboard:career_explorer' student.id %}" 
+                                           class="btn btn-outline-success btn-sm flex-fill">
+                                            <i class="fas fa-compass me-1"></i>Career
+                                        </a>
+                                        <a href="{% url 'parent_dashboard:upload' %}?student={{ student.id }}" 
+                                           class="btn btn-primary btn-sm flex-fill">
+                                            <i class="fas fa-upload me-1"></i>Upload
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-user-plus fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No students registered yet</h5>
+                            <p class="text-muted">Add your children to start tracking their progress</p>
+                            <a href="{% url 'students:student_create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Add Student
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Upload Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-tachometer-alt text-success me-2"></i>
+                        Quick Upload
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="upload-zone">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                        <h5 class="mb-2">Smart Upload System</h5>
+                        <p class="text-muted mb-4">
+                            Upload Excel, CSV files, or images of report cards. Our AI will automatically detect curriculum, subjects, and scores.
+                        </p>
+                        <a href="{% url 'parent_dashboard:workflow' %}" class="quick-action-btn">
+                            <i class="fas fa-route me-2"></i>Start Assessment Workflow
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity & Quick Actions -->
+        <div class="col-lg-4">
+            <!-- Recent Uploads -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history text-info me-2"></i>
+                        Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_uploads %}
+                        {% for upload in recent_uploads %}
+                        <div class="d-flex align-items-center mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="me-3">
+                                {% if upload.status == 'completed' %}
+                                    <div class="badge bg-success-subtle text-success">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                {% elif upload.status == 'processing' %}
+                                    <div class="badge bg-warning-subtle text-warning">
+                                        <i class="fas fa-spinner"></i>
+                                    </div>
+                                {% elif upload.status == 'failed' %}
+                                    <div class="badge bg-danger-subtle text-danger">
+                                        <i class="fas fa-times"></i>
+                                    </div>
+                                {% else %}
+                                    <div class="badge bg-secondary-subtle text-secondary">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ upload.student.name }}</h6>
+                                <p class="text-muted small mb-0">
+                                    {{ upload.get_upload_type_display }} • {{ upload.created_at|timesince }} ago
+                                </p>
+                            </div>
+                            {% if upload.status == 'completed' %}
+                            <a href="{% url 'parent_dashboard:assessment_results' upload.id %}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No recent activity</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt text-warning me-2"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'parent_dashboard:upload' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-upload me-2"></i>Upload New Assessment
+                        </a>
+                        <a href="#" class="btn btn-outline-success">
+                            <i class="fas fa-chart-bar me-2"></i>View All Reports
+                        </a>
+                        <a href="#" class="btn btn-outline-info">
+                            <i class="fas fa-calendar me-2"></i>Schedule Consultation
+                        </a>
+                        <a href="#" class="btn btn-outline-warning">
+                            <i class="fas fa-question-circle me-2"></i>Help & Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add any JavaScript for dashboard interactivity
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh activity feed every 30 seconds
+    setInterval(function() {
+        // You can add AJAX call to refresh recent activity
+    }, 30000);
+});
+</script>
+{% endblock %}
