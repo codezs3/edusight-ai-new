@@ -65,11 +65,11 @@ urlpatterns = [
     # Authentication (Django built-in)
     path('accounts/', include('django.contrib.auth.urls')),
     
-    # Legacy redirects (for backward compatibility with PHP)
-    path('dashboard.php', RedirectView.as_view(url='/dashboard/', permanent=True)),
-    path('students.php', RedirectView.as_view(url='/students/', permanent=True)),
-    path('assessments.php', RedirectView.as_view(url='/assessments/', permanent=True)),
-    path('analytics.php', RedirectView.as_view(url='/analytics/', permanent=True)),
+    # Legacy redirects (for backward compatibility with PHP) - Using relative URLs
+    path('dashboard.php', RedirectView.as_view(pattern_name='dashboard', permanent=True)),
+    path('students.php', RedirectView.as_view(pattern_name='students:student_list', permanent=True)),
+    path('assessments.php', RedirectView.as_view(pattern_name='assessments:assessment_list', permanent=True)),
+    path('analytics.php', RedirectView.as_view(pattern_name='analytics:dashboard', permanent=True)),
 ]
 
 # Serve static and media files in development

@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "framework": null,
+  "builds": [
+    {
+      "src": "manage.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.11"
+      }
+    },
+    {
+      "src": "static/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "manage.py"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "edusight_django.settings",
+    "PYTHONPATH": ".",
+    "DEBUG": "False"
+  },
+  "functions": {
+    "manage.py": {
+      "includeFiles": "**"
+    }
+  }
+}
