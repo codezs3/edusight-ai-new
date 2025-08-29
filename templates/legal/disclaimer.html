@@ -1,0 +1,159 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Legal Disclaimer - EduSight{% endblock %}
+{% block page_title %}Legal Disclaimer{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-dark text-center py-4">
+                    <h1 class="display-5 fw-bold mb-2">
+                        <i class="fas fa-exclamation-triangle me-3"></i>Legal Disclaimer
+                    </h1>
+                    <p class="lead mb-0">EduSight Educational Assessment Platform</p>
+                    <small>Last Updated: {{ "now"|date:"F d, Y" }} | Version 1.0</small>
+                </div>
+                
+                <div class="card-body p-5">
+                    <!-- Critical Warning -->
+                    <div class="alert alert-danger border-danger">
+                        <h4 class="alert-heading fw-bold">
+                            <i class="fas fa-exclamation-triangle me-2"></i>CRITICAL LEGAL WARNING
+                        </h4>
+                        <p class="mb-2">
+                            <strong>This platform uses artificial intelligence and machine learning to generate educational assessments and predictions. 
+                            These are computational tools designed to assist in educational analysis but are NOT substitutes for:</strong>
+                        </p>
+                        <ul class="mb-3">
+                            <li>Professional psychological evaluations</li>
+                            <li>Medical diagnoses or clinical assessments</li>
+                            <li>Formal educational evaluations by qualified educators</li>
+                            <li>Licensed career counseling services</li>
+                        </ul>
+                        <p class="mb-0">
+                            <strong>By using this platform, you acknowledge that all results are probabilistic estimates and should not be the sole basis for important educational, psychological, or career decisions.</strong>
+                        </p>
+                    </div>
+
+                    <h3 class="text-danger border-bottom pb-2 mb-3">What This Platform IS NOT</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="text-danger">
+                                <li><i class="fas fa-times me-2"></i>Professional psychological evaluation</li>
+                                <li><i class="fas fa-times me-2"></i>Medical diagnosis tool</li>
+                                <li><i class="fas fa-times me-2"></i>Replacement for qualified educators</li>
+                                <li><i class="fas fa-times me-2"></i>Career counseling service</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="text-danger">
+                                <li><i class="fas fa-times me-2"></i>Clinical assessment instrument</li>
+                                <li><i class="fas fa-times me-2"></i>Guaranteed predictor of future success</li>
+                                <li><i class="fas fa-times me-2"></i>Substitute for professional judgment</li>
+                                <li><i class="fas fa-times me-2"></i>Definitive measure of ability or potential</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 class="text-primary border-bottom pb-2 mb-3 mt-4">AI/ML Limitations</h3>
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-brain me-2"></i>Understanding Artificial Intelligence Limitations</h5>
+                        <ul class="mb-0">
+                            <li><strong>Probabilistic Nature:</strong> All predictions are statistical estimates, not certainties</li>
+                            <li><strong>Training Data Bias:</strong> Models may reflect biases present in historical data</li>
+                            <li><strong>Variable Dependencies:</strong> Cannot account for all factors affecting human development</li>
+                            <li><strong>Temporal Limitations:</strong> Based on patterns that may not reflect future conditions</li>
+                            <li><strong>Individual Variations:</strong> May not capture unique personal circumstances</li>
+                        </ul>
+                    </div>
+
+                    <h3 class="text-success border-bottom pb-2 mb-3 mt-4">When to Seek Professional Help</h3>
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-user-md me-2"></i>Consult Qualified Professionals For:</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>Learning Disabilities:</strong> Educational specialists, psychologists</li>
+                                    <li><strong>Behavioral Issues:</strong> Child psychologists, counselors</li>
+                                    <li><strong>Academic Planning:</strong> School counselors, educators</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>Career Guidance:</strong> Licensed career counselors</li>
+                                    <li><strong>Health Concerns:</strong> Medical doctors, healthcare providers</li>
+                                    <li><strong>Mental Health:</strong> Licensed therapists, psychiatrists</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-warning border-bottom pb-2 mb-3 mt-4">No Guarantees</h3>
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-shield-alt me-2"></i>EduSight Makes NO GUARANTEES Regarding:</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li>Accuracy of assessments or predictions</li>
+                                    <li>Future academic performance</li>
+                                    <li>Career success or satisfaction</li>
+                                    <li>Achievement of predicted outcomes</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li>Completeness of analysis</li>
+                                    <li>Suitability for specific purposes</li>
+                                    <li>Individual variation considerations</li>
+                                    <li>Long-term developmental trajectories</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-dark border-bottom pb-2 mb-3 mt-4">Limitation of Liability</h3>
+                    <div class="alert alert-dark">
+                        <h5><i class="fas fa-gavel me-2"></i>Legal Protection</h5>
+                        <p><strong>EduSight and its affiliates shall NOT be liable for:</strong></p>
+                        <ul class="mb-2">
+                            <li>Educational decisions based on Platform results</li>
+                            <li>Career choices influenced by recommendations</li>
+                            <li>Academic outcomes or performance</li>
+                            <li>Any direct, indirect, or consequential damages</li>
+                        </ul>
+                        <p class="mb-0">
+                            <strong>Maximum Liability:</strong> Limited to amounts paid for services in preceding 12 months.
+                        </p>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-light border rounded">
+                        <h5 class="text-center mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            By Using This Platform, You Acknowledge:
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Understanding of AI/ML limitations</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Need for professional consultation</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Acceptance of inherent uncertainties</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Supplementary nature of insights</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Responsibility for major decisions</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Agreement to all terms and conditions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
