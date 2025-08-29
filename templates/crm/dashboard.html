@@ -162,7 +162,7 @@
             <div class="recent-activity">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5><i class="fas fa-user-plus me-2"></i>Recent Leads</h5>
-                    <a href="{% url 'crm:lead_list' %}" class="btn btn-primary btn-sm">
+                    <a href="{% url 'crm:leads_list' %}" class="btn btn-primary btn-sm">
                         <i class="fas fa-eye me-1"></i>View All
                     </a>
                 </div>
@@ -209,10 +209,10 @@
                     <a href="{% url 'crm:appointment_create' %}" class="btn btn-success">
                         <i class="fas fa-calendar-plus me-2"></i>Schedule Appointment
                     </a>
-                    <a href="{% url 'crm:follow_up_list' %}" class="btn btn-warning">
+                    <a href="{% url 'crm:followups_list' %}" class="btn btn-warning">
                         <i class="fas fa-tasks me-2"></i>Follow-ups
                     </a>
-                    <a href="{% url 'crm:call_log_list' %}" class="btn btn-info">
+                    <a href="{% url 'crm:calls_list' %}" class="btn btn-info">
                         <i class="fas fa-phone me-2"></i>Call Logs
                     </a>
                     <a href="{% url 'crm:reports' %}" class="btn btn-secondary">

@@ -1,0 +1,269 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Student{% else %}Add Student{% endif %} - EduSight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+    }
+    
+    .form-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    
+    .section-title {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 0.5rem;
+        color: var(--primary-color);
+    }
+    
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Form Header -->
+    <div class="form-header text-center">
+        <div class="container">
+            <h1>
+                <i class="fas fa-user-graduate me-3"></i>
+                {% if form.instance.pk %}Edit Student{% else %}Add New Student{% endif %}
+            </h1>
+            <p class="lead">{% if form.instance.pk %}Update student information{% else %}Add a new student to the system{% endif %}</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-container">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Personal Information -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-user"></i>Personal Information
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.user.first_name }}
+                                    <label for="{{ form.user.first_name.id_for_label }}">First Name *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.user.last_name }}
+                                    <label for="{{ form.user.last_name.id_for_label }}">Last Name *</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.user.email }}
+                                    <label for="{{ form.user.email.id_for_label }}">Email Address *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.date_of_birth }}
+                                    <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth *</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-graduation-cap"></i>Academic Information
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ form.student_id }}
+                                    <label for="{{ form.student_id.id_for_label }}">Student ID *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ form.grade }}
+                                    <label for="{{ form.grade.id_for_label }}">Grade *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ form.section }}
+                                    <label for="{{ form.section.id_for_label }}">Section</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.roll_number }}
+                                    <label for="{{ form.roll_number.id_for_label }}">Roll Number</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.admission_date }}
+                                    <label for="{{ form.admission_date.id_for_label }}">Admission Date *</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-phone"></i>Contact Information
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.emergency_contact }}
+                                    <label for="{{ form.emergency_contact.id_for_label }}">Emergency Contact</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.blood_group }}
+                                    <label for="{{ form.blood_group.id_for_label }}">Blood Group</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating">
+                            {{ form.address }}
+                            <label for="{{ form.address.id_for_label }}">Address</label>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'students:student_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Students
+                        </a>
+                        
+                        <div>
+                            {% if form.instance.pk %}
+                                <a href="{% url 'students:student_detail' form.instance.pk %}" class="btn btn-outline-info me-2">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a>
+                            {% endif %}
+                            <button type="submit" class="btn btn-save text-white">
+                                <i class="fas fa-save me-2"></i>
+                                {% if form.instance.pk %}Update Student{% else %}Add Student{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Form Validation Errors -->
+                {% if form.errors %}
+                    <div class="alert alert-danger mt-3">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
+                        <ul class="mb-0">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field|title }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('form');
+    
+    form.addEventListener('submit', function(e) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+        }
+    });
+    
+    // Date input formatting
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        if (!input.value) {
+            input.type = 'text';
+            input.placeholder = 'YYYY-MM-DD';
+            input.addEventListener('focus', function() {
+                this.type = 'date';
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

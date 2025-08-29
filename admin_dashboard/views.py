@@ -416,7 +416,7 @@ def workflow_management(request):
     
     if not AIRFLOW_AVAILABLE:
         messages.error(request, 'Airflow integration is not available')
-        return redirect('admin_overview')
+        return redirect('admin_dashboard:overview')
     
     if request.method == 'POST':
         action = request.POST.get('action')

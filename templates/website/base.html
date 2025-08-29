@@ -776,6 +776,100 @@
                 justify-content: center;
             }
         }
+        
+        /* Mega Menu Styles */
+        .dropdown-mega .mega-menu {
+            width: 760px;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            margin-top: 0.5rem;
+            background: white;
+        }
+        
+        .mega-menu-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+        }
+        
+        .mega-menu-column h6 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .mega-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.4rem 0.6rem;
+            text-decoration: none;
+            color: #6c757d;
+            border-radius: 5px;
+            transition: all 0.25s ease;
+            margin-bottom: 0.2rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .mega-menu-item:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            transform: translateX(3px);
+        }
+        
+        .mega-menu-item i {
+            width: 14px;
+            height: 14px;
+            margin-right: 0.5rem;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.8;
+        }
+        
+        .mega-menu-item:hover i {
+            opacity: 1;
+        }
+        
+        /* DMIT Dropdown Styles */
+        .dmit-dropdown .dropdown-menu {
+            min-width: 280px;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dmit-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            text-decoration: none;
+            color: #6c757d;
+            border-radius: 6px;
+            transition: all 0.25s ease;
+            margin-bottom: 0.3rem;
+            font-size: 0.85rem;
+        }
+        
+        .dmit-menu-item:hover {
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+            color: white;
+        }
+        
+        .dmit-menu-item i {
+            width: 16px;
+            margin-right: 0.6rem;
+            font-size: 0.85rem;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -794,101 +888,132 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                                            <li class="nav-item">
-                            <a class="nav-link" href="{% url 'website_home' %}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'website_about' %}">About Us</a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'website_home' %}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'website_about' %}">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
+                    </li>
                     
-                    <!-- Frameworks Mega Menu -->
+                    <!-- EPR Assessment Mega Menu -->
                     <li class="nav-item dropdown dropdown-mega">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Frameworks
+                            <i class="fas fa-chart-line me-1"></i>EPR Assessment
                         </a>
                         <div class="dropdown-menu mega-menu">
                             <div class="mega-menu-content">
                                 <div class="mega-menu-column">
-                                    <h6><i class="fas fa-graduation-cap me-2"></i>Academic Frameworks</h6>
+                                    <h6><i class="fas fa-graduation-cap"></i>Academic Frameworks</h6>
                                     <a href="{% url 'framework_cbse' %}" class="mega-menu-item">
-                                        <i class="fas fa-school"></i>CBSE - Central Board
+                                        <i class="fas fa-school"></i>CBSE Board
                                     </a>
                                     <a href="{% url 'framework_icse' %}" class="mega-menu-item">
-                                        <i class="fas fa-book-open"></i>ICSE - Indian Certificate
+                                        <i class="fas fa-book-open"></i>ICSE Board
                                     </a>
                                     <a href="{% url 'framework_igcse' %}" class="mega-menu-item">
-                                        <i class="fas fa-globe-americas"></i>IGCSE - International
+                                        <i class="fas fa-globe"></i>IGCSE International
                                     </a>
                                     <a href="{% url 'framework_ib' %}" class="mega-menu-item">
-                                        <i class="fas fa-university"></i>IB - Baccalaureate
+                                        <i class="fas fa-university"></i>IB Programme
                                     </a>
-                                    <a href="{% url 'framework_cbse' %}" class="mega-menu-item">
-                                        <i class="fas fa-chart-line"></i>Assessment Standards
+                                    <a href="{% url 'pricing_plans' %}" class="mega-menu-item">
+                                        <i class="fas fa-tags"></i>Assessment Plans
                                     </a>
                                 </div>
                                 <div class="mega-menu-column">
-                                    <h6><i class="fas fa-brain me-2"></i>Psychological Frameworks</h6>
+                                    <h6><i class="fas fa-brain"></i>Psychological Assessment</h6>
                                     <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
-                                        <i class="fas fa-head-side-virus"></i>Cognitive Assessment
+                                        <i class="fas fa-head-side-brain"></i>Cognitive Skills
                                     </a>
                                     <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
                                         <i class="fas fa-heart"></i>Emotional Intelligence
                                     </a>
                                     <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
-                                        <i class="fas fa-people-arrows"></i>Social Skills Assessment
+                                        <i class="fas fa-users"></i>Social Skills
                                     </a>
                                     <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
-                                        <i class="fas fa-lightbulb"></i>Learning Style Analysis
+                                        <i class="fas fa-lightbulb"></i>Learning Styles
                                     </a>
                                     <a href="{% url 'framework_psychological' %}" class="mega-menu-item">
-                                        <i class="fas fa-smile"></i>Personality Assessment
+                                        <i class="fas fa-smile"></i>Personality Traits
                                     </a>
                                 </div>
                                 <div class="mega-menu-column">
-                                    <h6><i class="fas fa-dumbbell me-2"></i>Physical Education</h6>
+                                    <h6><i class="fas fa-dumbbell"></i>Physical Health</h6>
                                     <a href="{% url 'framework_physical' %}" class="mega-menu-item">
-                                        <i class="fas fa-running"></i>Fitness Assessment
+                                        <i class="fas fa-running"></i>Fitness Level
                                     </a>
                                     <a href="{% url 'framework_physical' %}" class="mega-menu-item">
-                                        <i class="fas fa-child"></i>Motor Skills Development
+                                        <i class="fas fa-child"></i>Motor Skills
                                     </a>
                                     <a href="{% url 'framework_physical' %}" class="mega-menu-item">
                                         <i class="fas fa-heartbeat"></i>Health Monitoring
                                     </a>
                                     <a href="{% url 'framework_physical' %}" class="mega-menu-item">
-                                        <i class="fas fa-trophy"></i>Sports Analytics
+                                        <i class="fas fa-trophy"></i>Sports Aptitude
                                     </a>
                                     <a href="{% url 'framework_physical' %}" class="mega-menu-item">
-                                        <i class="fas fa-balance-scale"></i>BMI & Growth Tracking
+                                        <i class="fas fa-weight"></i>Growth Tracking
                                     </a>
                                 </div>
                                 <div class="mega-menu-column">
-                                    <h6><i class="fas fa-tools me-2"></i>Assessment Tools</h6>
+                                    <h6><i class="fas fa-tools"></i>Get Started</h6>
                                     <a href="{% url 'pricing_plans' %}" class="mega-menu-item">
-                                        <i class="fas fa-chart-bar"></i>EPR Assessment Plans
-                                    </a>
-                                    <a href="{% url 'dmit_info' %}" class="mega-menu-item">
-                                        <i class="fas fa-fingerprint"></i>DMIT Analysis
+                                        <i class="fas fa-shopping-cart"></i>Choose Plan
                                     </a>
                                     <a href="{% url 'book_assessment' %}" class="mega-menu-item">
-                                        <i class="fas fa-calendar-check"></i>Book Assessment
+                                        <i class="fas fa-calendar-plus"></i>Book Assessment
                                     </a>
                                     <a href="{% url 'dashboard' %}" class="mega-menu-item">
-                                        <i class="fas fa-tachometer-alt"></i>Demo Dashboard
+                                        <i class="fas fa-desktop"></i>Demo Dashboard
                                     </a>
                                     <a href="{% url 'website_contact' %}" class="mega-menu-item">
-                                        <i class="fas fa-headset"></i>Get Consultation
+                                        <i class="fas fa-phone"></i>Get Consultation
+                                    </a>
+                                    <a href="{% url 'pricing_plans' %}" class="mega-menu-item">
+                                        <i class="fas fa-info"></i>Learn More
                                     </a>
                                 </div>
                             </div>
                         </div>
                     </li>
                     
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'pricing_plans' %}">EPR Assessment</a>
+                    <!-- DMIT Separate Dropdown -->
+                    <li class="nav-item dropdown dmit-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-fingerprint me-1"></i>DMIT
+                        </a>
+                        <div class="dropdown-menu">
+                            <h6 class="dropdown-header">
+                                <i class="fas fa-fingerprint me-2"></i>DMIT Services
+                            </h6>
+                            <a href="{% url 'dmit_info' %}" class="dmit-menu-item">
+                                <i class="fas fa-info-circle"></i>About DMIT
+                            </a>
+                            <a href="{% url 'dmit_info' %}#benefits" class="dmit-menu-item">
+                                <i class="fas fa-star"></i>Benefits & Features
+                            </a>
+                            <a href="{% url 'dmit_info' %}#process" class="dmit-menu-item">
+                                <i class="fas fa-cogs"></i>Testing Process
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{% url 'book_assessment' %}?service=dmit" class="dmit-menu-item">
+                                <i class="fas fa-calendar-check"></i>Book DMIT Test
+                            </a>
+                            <a href="{% url 'pricing_plans' %}#dmit" class="dmit-menu-item">
+                                <i class="fas fa-rupee-sign"></i>₹2,999 (Home Service)
+                            </a>
+                        </div>
                     </li>
+                    
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'website_contact' %}">Contact Us</a>
+                        <a class="nav-link" href="{% url 'website_contact' %}">
+                            <i class="fas fa-envelope me-1"></i>Contact
+                        </a>
                     </li>
                 </ul>
                 
