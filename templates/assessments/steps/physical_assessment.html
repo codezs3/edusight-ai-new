@@ -1,0 +1,765 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Physical Education Assessment - {{ workflow.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .assessment-step {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .step-header {
+        background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .progress-container {
+        background: #f8fafc;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .progress-bar-custom {
+        height: 10px;
+        border-radius: 5px;
+        background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+    }
+    
+    .form-section {
+        padding: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+        border-bottom: 2px solid #fecaca;
+        padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-icon {
+        color: #dc2626;
+        margin-right: 0.75rem;
+        font-size: 1.5rem;
+    }
+    
+    .fitness-metric-card {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        border: 2px solid #fca5a5;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .fitness-metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.15);
+    }
+    
+    .metric-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .metric-icon {
+        font-size: 2rem;
+        color: #dc2626;
+        margin-right: 1rem;
+    }
+    
+    .metric-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #7f1d1d;
+    }
+    
+    .rating-container {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid #fca5a5;
+    }
+    
+    .rating-scale {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .rating-label {
+        font-size: 0.875rem;
+        color: #7f1d1d;
+        font-weight: 500;
+    }
+    
+    .rating-slider {
+        flex: 1;
+        height: 8px;
+        border-radius: 4px;
+        background: #fecaca;
+        outline: none;
+        appearance: none;
+    }
+    
+    .rating-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .rating-value {
+        font-weight: 700;
+        color: #dc2626;
+        min-width: 40px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+    
+    .activity-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .activity-card {
+        background: white;
+        border: 2px solid #fca5a5;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .activity-card:hover {
+        border-color: #dc2626;
+        box-shadow: 0 5px 15px rgba(220, 38, 38, 0.1);
+    }
+    
+    .activity-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .activity-icon {
+        font-size: 1.5rem;
+        color: #dc2626;
+        margin-right: 0.75rem;
+    }
+    
+    .likert-scale {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .likert-option {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .likert-option input[type="radio"] {
+        display: none;
+    }
+    
+    .likert-option label {
+        display: block;
+        padding: 0.75rem 0.25rem;
+        border: 2px solid #fca5a5;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: white;
+    }
+    
+    .likert-option input[type="radio"]:checked + label {
+        border-color: #dc2626;
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        color: #7f1d1d;
+        transform: scale(1.05);
+    }
+    
+    .health-habits-section {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border: 2px solid #86efac;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .enterprise-features {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border: 2px solid #93c5fd;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .feature-badge {
+        background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .step-navigation {
+        background: #f8fafc;
+        padding: 2rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .estimated-time {
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        color: #7f1d1d;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-pe-primary {
+        background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-pe-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="assessment-step">
+                <!-- Step Header -->
+                <div class="step-header">
+                    <h2>
+                        <i class="fas fa-running me-3"></i>
+                        {{ step.title }}
+                    </h2>
+                    <p class="mb-0">{{ step.description }}</p>
+                </div>
+                
+                <!-- Progress -->
+                <div class="progress-container">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold">Progress</span>
+                        <span>{{ workflow.current_step }}/{{ workflow.total_steps }}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-custom" 
+                             style="width: {{ progress_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="estimated-time">
+                        <i class="fas fa-stopwatch"></i>
+                        Estimated completion time: {{ step.estimated_duration }} minutes
+                    </div>
+                    
+                    <!-- Form Errors -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <div>{{ field }}: {{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Assessment Form -->
+                    <form method="post" id="physicalAssessmentForm">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Fitness Metrics -->
+                        <div class="section-title">
+                            <i class="fas fa-heartbeat section-icon"></i>
+                            Fitness & Physical Performance
+                        </div>
+                        
+                        <div class="fitness-metric-card">
+                            <div class="metric-header">
+                                <i class="fas fa-heart metric-icon"></i>
+                                <div class="metric-title">Cardiovascular Endurance</div>
+                            </div>
+                            <div class="rating-container">
+                                <p class="mb-2">Rate the student's cardiovascular fitness and endurance levels:</p>
+                                <div class="rating-scale">
+                                    <span class="rating-label">Poor</span>
+                                    <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                           name="fitness_cardiovascular_endurance" id="cardio_rating"
+                                           onchange="updateRatingValue(this, 'cardio_value')">
+                                    <span class="rating-label">Excellent</span>
+                                    <span class="rating-value" id="cardio_value">5</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="fitness-metric-card">
+                            <div class="metric-header">
+                                <i class="fas fa-dumbbell metric-icon"></i>
+                                <div class="metric-title">Muscular Strength</div>
+                            </div>
+                            <div class="rating-container">
+                                <p class="mb-2">Assess the student's overall muscular strength and power:</p>
+                                <div class="rating-scale">
+                                    <span class="rating-label">Weak</span>
+                                    <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                           name="fitness_muscular_strength" id="strength_rating"
+                                           onchange="updateRatingValue(this, 'strength_value')">
+                                    <span class="rating-label">Very Strong</span>
+                                    <span class="rating-value" id="strength_value">5</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="fitness-metric-card">
+                                    <div class="metric-header">
+                                        <i class="fas fa-expand-arrows-alt metric-icon"></i>
+                                        <div class="metric-title">Flexibility</div>
+                                    </div>
+                                    <div class="rating-container">
+                                        <div class="rating-scale">
+                                            <span class="rating-label">Stiff</span>
+                                            <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                                   name="fitness_flexibility" id="flex_rating"
+                                                   onchange="updateRatingValue(this, 'flex_value')">
+                                            <span class="rating-label">Very Flexible</span>
+                                            <span class="rating-value" id="flex_value">5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="fitness-metric-card">
+                                    <div class="metric-header">
+                                        <i class="fas fa-balance-scale metric-icon"></i>
+                                        <div class="metric-title">Balance & Coordination</div>
+                                    </div>
+                                    <div class="rating-container">
+                                        <div class="rating-scale">
+                                            <span class="rating-label">Poor</span>
+                                            <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                                   name="fitness_coordination" id="coord_rating"
+                                                   onchange="updateRatingValue(this, 'coord_value')">
+                                            <span class="rating-label">Excellent</span>
+                                            <span class="rating-value" id="coord_value">5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sports & Activities -->
+                        <div class="section-title">
+                            <i class="fas fa-futbol section-icon"></i>
+                            Sports & Physical Activities
+                        </div>
+                        
+                        <div class="activity-grid">
+                            <div class="activity-card">
+                                <div class="activity-header">
+                                    <i class="fas fa-users activity-icon"></i>
+                                    <h6>Team Sports Participation</h6>
+                                </div>
+                                <p class="small text-muted mb-2">How much does the student enjoy and participate in team sports?</p>
+                                <div class="likert-scale">
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_team_sports" value="1" id="team_1">
+                                        <label for="team_1">
+                                            <div class="fw-bold">1</div>
+                                            <div>Never</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_team_sports" value="2" id="team_2">
+                                        <label for="team_2">
+                                            <div class="fw-bold">2</div>
+                                            <div>Rarely</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_team_sports" value="3" id="team_3">
+                                        <label for="team_3">
+                                            <div class="fw-bold">3</div>
+                                            <div>Sometimes</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_team_sports" value="4" id="team_4">
+                                        <label for="team_4">
+                                            <div class="fw-bold">4</div>
+                                            <div>Often</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_team_sports" value="5" id="team_5">
+                                        <label for="team_5">
+                                            <div class="fw-bold">5</div>
+                                            <div>Always</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-card">
+                                <div class="activity-header">
+                                    <i class="fas fa-user activity-icon"></i>
+                                    <h6>Individual Sports</h6>
+                                </div>
+                                <p class="small text-muted mb-2">Student's engagement in individual sports and activities:</p>
+                                <div class="likert-scale">
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_individual_sports" value="1" id="ind_1">
+                                        <label for="ind_1">
+                                            <div class="fw-bold">1</div>
+                                            <div>Never</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_individual_sports" value="2" id="ind_2">
+                                        <label for="ind_2">
+                                            <div class="fw-bold">2</div>
+                                            <div>Rarely</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_individual_sports" value="3" id="ind_3">
+                                        <label for="ind_3">
+                                            <div class="fw-bold">3</div>
+                                            <div>Sometimes</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_individual_sports" value="4" id="ind_4">
+                                        <label for="ind_4">
+                                            <div class="fw-bold">4</div>
+                                            <div>Often</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="activity_individual_sports" value="5" id="ind_5">
+                                        <label for="ind_5">
+                                            <div class="fw-bold">5</div>
+                                            <div>Always</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Health Habits -->
+                        <div class="health-habits-section">
+                            <div class="section-title" style="border-color: #86efac;">
+                                <i class="fas fa-leaf section-icon" style="color: #16a34a;"></i>
+                                Physical Health Habits
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6><i class="fas fa-running me-2 text-success"></i>Regular Exercise</h6>
+                                    <div class="likert-scale">
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_regular_exercise" value="1" id="exercise_1">
+                                            <label for="exercise_1" style="border-color: #86efac;">
+                                                <div class="fw-bold">1</div>
+                                                <div>Never</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_regular_exercise" value="2" id="exercise_2">
+                                            <label for="exercise_2" style="border-color: #86efac;">
+                                                <div class="fw-bold">2</div>
+                                                <div>Rarely</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_regular_exercise" value="3" id="exercise_3">
+                                            <label for="exercise_3" style="border-color: #86efac;">
+                                                <div class="fw-bold">3</div>
+                                                <div>Sometimes</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_regular_exercise" value="4" id="exercise_4">
+                                            <label for="exercise_4" style="border-color: #86efac;">
+                                                <div class="fw-bold">4</div>
+                                                <div>Often</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_regular_exercise" value="5" id="exercise_5">
+                                            <label for="exercise_5" style="border-color: #86efac;">
+                                                <div class="fw-bold">5</div>
+                                                <div>Always</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <h6><i class="fas fa-apple-alt me-2 text-success"></i>Healthy Diet</h6>
+                                    <div class="likert-scale">
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_healthy_diet" value="1" id="diet_1">
+                                            <label for="diet_1" style="border-color: #86efac;">
+                                                <div class="fw-bold">1</div>
+                                                <div>Poor</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_healthy_diet" value="2" id="diet_2">
+                                            <label for="diet_2" style="border-color: #86efac;">
+                                                <div class="fw-bold">2</div>
+                                                <div>Fair</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_healthy_diet" value="3" id="diet_3">
+                                            <label for="diet_3" style="border-color: #86efac;">
+                                                <div class="fw-bold">3</div>
+                                                <div>Good</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_healthy_diet" value="4" id="diet_4">
+                                            <label for="diet_4" style="border-color: #86efac;">
+                                                <div class="fw-bold">4</div>
+                                                <div>Very Good</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="health_healthy_diet" value="5" id="diet_5">
+                                            <label for="diet_5" style="border-color: #86efac;">
+                                                <div class="fw-bold">5</div>
+                                                <div>Excellent</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Enterprise Features -->
+                        {% if workflow.pricing_plan.plan_type == 'enterprise' %}
+                        <div class="enterprise-features">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="section-title" style="border: none; margin-bottom: 0;">
+                                    <i class="fas fa-star section-icon" style="color: #2563eb;"></i>
+                                    Advanced Motor Skills Analysis
+                                </div>
+                                <span class="feature-badge ms-auto">ENTERPRISE</span>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6><i class="fas fa-hand-paper me-2 text-primary"></i>Fine Motor Control</h6>
+                                    <div class="rating-scale">
+                                        <span class="rating-label">Poor</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="motor_fine_motor_control" id="fine_motor"
+                                               onchange="updateRatingValue(this, 'fine_motor_value')"
+                                               style="background: #bfdbfe;">
+                                        <span class="rating-label">Excellent</span>
+                                        <span class="rating-value" id="fine_motor_value" style="color: #2563eb;">5</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <h6><i class="fas fa-walking me-2 text-primary"></i>Gross Motor Skills</h6>
+                                    <div class="rating-scale">
+                                        <span class="rating-label">Poor</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="motor_gross_motor_skills" id="gross_motor"
+                                               onchange="updateRatingValue(this, 'gross_motor_value')"
+                                               style="background: #bfdbfe;">
+                                        <span class="rating-label">Excellent</span>
+                                        <span class="rating-value" id="gross_motor_value" style="color: #2563eb;">5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="step-navigation">
+                    <div class="step-info">
+                        <strong>Step {{ workflow.current_step }} of {{ workflow.total_steps }}:</strong> {{ step.title }}
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        {% if can_go_back %}
+                        <a href="{% url 'assessments:workflow_step' workflow.id workflow.current_step|add:'-1' %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Previous
+                        </a>
+                        {% endif %}
+                        
+                        <button type="button" class="btn btn-outline-info" onclick="saveDraft()">
+                            <i class="fas fa-save me-2"></i>Save Draft
+                        </button>
+                        
+                        {% if is_last_step %}
+                        <button type="submit" form="physicalAssessmentForm" class="btn-pe-primary">
+                            <i class="fas fa-check me-2"></i>Complete Assessment
+                        </button>
+                        {% else %}
+                        <button type="submit" form="physicalAssessmentForm" class="btn-pe-primary">
+                            Next Step<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateRatingValue(slider, valueId) {
+    const valueDisplay = document.getElementById(valueId);
+    if (valueDisplay) {
+        valueDisplay.textContent = slider.value;
+    }
+}
+
+function saveDraft() {
+    const formData = new FormData(document.getElementById('physicalAssessmentForm'));
+    formData.append('action', 'save_draft');
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Physical assessment draft saved successfully!', 'success');
+        } else {
+            showNotification('Error saving draft', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Error saving draft', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Auto-save functionality
+let autoSaveTimer;
+document.getElementById('physicalAssessmentForm').addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(saveDraft, 30000);
+});
+
+// Initialize rating values
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all slider values
+    updateRatingValue(document.getElementById('cardio_rating'), 'cardio_value');
+    updateRatingValue(document.getElementById('strength_rating'), 'strength_value');
+    updateRatingValue(document.getElementById('flex_rating'), 'flex_value');
+    updateRatingValue(document.getElementById('coord_rating'), 'coord_value');
+    
+    {% if workflow.pricing_plan.plan_type == 'enterprise' %}
+    updateRatingValue(document.getElementById('fine_motor'), 'fine_motor_value');
+    updateRatingValue(document.getElementById('gross_motor'), 'gross_motor_value');
+    {% endif %}
+    
+    // Add animation to cards
+    const cards = document.querySelectorAll('.fitness-metric-card, .activity-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.style.animation = 'fadeInUp 0.6s ease forwards';
+    });
+});
+
+// CSS Animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

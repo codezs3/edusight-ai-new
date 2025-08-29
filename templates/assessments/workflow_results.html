@@ -1,0 +1,802 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Assessment Results - {{ workflow.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .results-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .results-header {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .completion-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+    
+    .results-summary {
+        padding: 2rem;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-bottom: 1px solid #bbf7d0;
+    }
+    
+    .overall-score {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, #059669 0deg, #10b981 calc(var(--score) * 3.6deg), #e5e7eb calc(var(--score) * 3.6deg));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        position: relative;
+    }
+    
+    .score-circle::before {
+        content: '';
+        width: 90px;
+        height: 90px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+    }
+    
+    .score-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #059669;
+        z-index: 1;
+    }
+    
+    .score-label {
+        color: #374151;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .assessment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .assessment-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .assessment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .assessment-card.academic {
+        border-color: #3b82f6;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    }
+    
+    .assessment-card.physical {
+        border-color: #dc2626;
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    }
+    
+    .assessment-card.psychological {
+        border-color: #7c3aed;
+        background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%);
+    }
+    
+    .assessment-card.career {
+        border-color: #059669;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    }
+    
+    .assessment-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .assessment-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+    }
+    
+    .assessment-icon.academic { color: #3b82f6; }
+    .assessment-icon.physical { color: #dc2626; }
+    .assessment-icon.psychological { color: #7c3aed; }
+    .assessment-icon.career { color: #059669; }
+    
+    .assessment-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .assessment-score {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .score-bar {
+        width: 100%;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+    
+    .score-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s ease;
+    }
+    
+    .score-fill.academic { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+    .score-fill.physical { background: linear-gradient(90deg, #dc2626, #b91c1c); }
+    .score-fill.psychological { background: linear-gradient(90deg, #7c3aed, #6d28d9); }
+    .score-fill.career { background: linear-gradient(90deg, #059669, #047857); }
+    
+    .detailed-scores {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .detail-score {
+        text-align: center;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .detail-score-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-score-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .ml-insights-section {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border: 2px solid #0ea5e9;
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .insights-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .insights-icon {
+        font-size: 2rem;
+        color: #0ea5e9;
+        margin-right: 1rem;
+    }
+    
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .insight-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid #bae6fd;
+    }
+    
+    .insight-title {
+        font-weight: 600;
+        color: #0c4a6e;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .insight-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .insight-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f9ff;
+        display: flex;
+        align-items: center;
+    }
+    
+    .insight-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .insight-list li i {
+        margin-right: 0.75rem;
+        color: #0ea5e9;
+    }
+    
+    .recommendations-section {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        border: 2px solid #fbbf24;
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .recommendation-item {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #fbbf24;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .recommendation-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .report-actions {
+        background: #f8fafc;
+        padding: 2rem;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .btn-report {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-report:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(5, 150, 105, 0.3);
+        color: white;
+    }
+    
+    .confidence-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+    }
+    
+    .confidence-bar {
+        width: 100px;
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #059669, #10b981);
+        border-radius: 3px;
+        transition: width 1s ease;
+    }
+    
+    .timeline-section {
+        background: white;
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 1rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, #059669, #10b981);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -1.75rem;
+        top: 0.25rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #059669;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #059669;
+    }
+    
+    .timeline-content {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 3px solid #059669;
+    }
+    
+    .timeline-date {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0.25rem 0;
+    }
+    
+    .loading-animation {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f4f6;
+        border-radius: 50%;
+        border-top-color: #059669;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="results-container">
+                <!-- Results Header -->
+                <div class="results-header">
+                    <div class="completion-badge">
+                        <i class="fas fa-check-circle me-2"></i>Assessment Completed
+                    </div>
+                    <h2>
+                        <i class="fas fa-chart-line me-3"></i>
+                        Assessment Results for {{ workflow.student.user.get_full_name }}
+                    </h2>
+                    <p class="mb-0">{{ workflow.pricing_plan.name }} • Completed on {{ workflow.completed_at|date:"F d, Y" }}</p>
+                </div>
+                
+                <!-- Results Summary -->
+                <div class="results-summary">
+                    {% if results.overall_score %}
+                    <div class="overall-score">
+                        <div class="score-circle" style="--score: {{ results.overall_score }}">
+                            <div class="score-value">{{ results.overall_score|floatformat:0 }}%</div>
+                        </div>
+                        <div class="score-label">Overall Assessment Score</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="fas fa-clock fa-2x text-success mb-2"></i>
+                                <div class="fw-bold">Duration</div>
+                                <div class="text-muted">
+                                    {% if workflow.started_at and workflow.completed_at %}
+                                        {{ workflow.completed_at|timesince:workflow.started_at }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="fas fa-tasks fa-2x text-success mb-2"></i>
+                                <div class="fw-bold">Steps Completed</div>
+                                <div class="text-muted">{{ workflow.total_steps }}/{{ workflow.total_steps }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="fas fa-star fa-2x text-success mb-2"></i>
+                                <div class="fw-bold">Plan Type</div>
+                                <div class="text-muted">{{ workflow.pricing_plan.get_plan_type_display }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="fas fa-chart-bar fa-2x text-success mb-2"></i>
+                                <div class="fw-bold">Assessments</div>
+                                <div class="text-muted">{{ results.assessment_scores|length }} Completed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Assessment Results Grid -->
+                {% if results.assessment_scores %}
+                <div class="form-section" style="padding: 2rem;">
+                    <h4 class="mb-4">
+                        <i class="fas fa-clipboard-check me-2"></i>
+                        Detailed Assessment Results
+                    </h4>
+                    
+                    <div class="assessment-grid">
+                        {% for assessment_type, scores in results.assessment_scores.items %}
+                        <div class="assessment-card {{ assessment_type }}">
+                            <div class="assessment-header">
+                                {% if assessment_type == 'academic' %}
+                                    <i class="fas fa-graduation-cap assessment-icon academic"></i>
+                                {% elif assessment_type == 'physical' %}
+                                    <i class="fas fa-running assessment-icon physical"></i>
+                                {% elif assessment_type == 'psychological' %}
+                                    <i class="fas fa-brain assessment-icon psychological"></i>
+                                {% elif assessment_type == 'career' %}
+                                    <i class="fas fa-compass assessment-icon career"></i>
+                                {% endif %}
+                                <div class="assessment-title">
+                                    {% if assessment_type == 'academic' %}Academic Performance
+                                    {% elif assessment_type == 'physical' %}Physical Education
+                                    {% elif assessment_type == 'psychological' %}Psychological Well-being
+                                    {% elif assessment_type == 'career' %}Career Mapping
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="assessment-score {{ assessment_type }}">
+                                {{ scores.overall_score|floatformat:0 }}%
+                            </div>
+                            
+                            <div class="score-bar">
+                                <div class="score-fill {{ assessment_type }}" 
+                                     style="width: {{ scores.overall_score }}%"></div>
+                            </div>
+                            
+                            {% if scores.detailed_scores %}
+                            <div class="detailed-scores">
+                                {% for category, score in scores.detailed_scores.items %}
+                                <div class="detail-score">
+                                    <div class="detail-score-value">{{ score|floatformat:0 }}%</div>
+                                    <div class="detail-score-label">{{ category|title }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- ML Insights -->
+                {% if results.ml_insights and workflow.pricing_plan.ml_predictions %}
+                <div class="form-section" style="padding: 2rem;">
+                    <div class="ml-insights-section">
+                        <div class="insights-header">
+                            <i class="fas fa-robot insights-icon"></i>
+                            <div>
+                                <h4 class="mb-0">AI-Powered Insights & Predictions</h4>
+                                <p class="mb-0 text-muted">Advanced machine learning analysis of assessment data</p>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-grid">
+                            {% if results.ml_insights.predictions.academic_trajectory %}
+                            <div class="insight-card">
+                                <div class="insight-title">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    Academic Trajectory
+                                </div>
+                                <p class="mb-0">{{ results.ml_insights.predictions.academic_trajectory }}</p>
+                                {% if results.ml_insights.confidence_score %}
+                                <div class="confidence-indicator">
+                                    <span class="small text-muted">Confidence:</span>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" 
+                                             style="width: {{ results.ml_insights.confidence_score|floatformat:0 }}%"></div>
+                                    </div>
+                                    <span class="small fw-bold">{{ results.ml_insights.confidence_score|floatformat:0 }}%</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if results.ml_insights.predictions.strengths %}
+                            <div class="insight-card">
+                                <div class="insight-title">
+                                    <i class="fas fa-trophy me-2"></i>
+                                    Key Strengths
+                                </div>
+                                <ul class="insight-list">
+                                    {% for strength in results.ml_insights.predictions.strengths %}
+                                    <li><i class="fas fa-check-circle"></i>{{ strength }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            {% if results.ml_insights.predictions.risk_factors %}
+                            <div class="insight-card">
+                                <div class="insight-title">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Areas for Attention
+                                </div>
+                                <ul class="insight-list">
+                                    {% for risk in results.ml_insights.predictions.risk_factors %}
+                                    <li><i class="fas fa-info-circle"></i>{{ risk }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Recommendations -->
+                {% if results.ml_insights.recommendations or workflow.pricing_plan.advanced_analytics %}
+                <div class="form-section" style="padding: 2rem;">
+                    <div class="recommendations-section">
+                        <h4 class="mb-4">
+                            <i class="fas fa-lightbulb me-2" style="color: #d97706;"></i>
+                            Personalized Recommendations
+                        </h4>
+                        
+                        {% if results.ml_insights.recommendations %}
+                            {% for recommendation in results.ml_insights.recommendations %}
+                            <div class="recommendation-item">
+                                <i class="fas fa-arrow-right me-2 text-warning"></i>
+                                {{ recommendation }}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="recommendation-item">
+                                <i class="fas fa-arrow-right me-2 text-warning"></i>
+                                Consider additional support in areas showing lower performance scores
+                            </div>
+                            <div class="recommendation-item">
+                                <i class="fas fa-arrow-right me-2 text-warning"></i>
+                                Continue building on identified strengths through targeted activities
+                            </div>
+                            <div class="recommendation-item">
+                                <i class="fas fa-arrow-right me-2 text-warning"></i>
+                                Regular follow-up assessments to track progress over time
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Assessment Timeline -->
+                <div class="form-section" style="padding: 2rem;">
+                    <div class="timeline-section">
+                        <h4 class="mb-4">
+                            <i class="fas fa-history me-2"></i>
+                            Assessment Timeline
+                        </h4>
+                        
+                        <div class="timeline">
+                            {% for step in steps %}
+                            <div class="timeline-item">
+                                <div class="timeline-content">
+                                    <div class="timeline-date">
+                                        {% if step.completed_at %}
+                                            {{ step.completed_at|date:"M d, Y H:i" }}
+                                        {% else %}
+                                            Not completed
+                                        {% endif %}
+                                    </div>
+                                    <div class="timeline-title">{{ step.title }}</div>
+                                    <div class="text-muted small">{{ step.description }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Report Actions -->
+                <div class="report-actions">
+                    {% if can_generate_report %}
+                    <button type="button" class="btn btn-report" onclick="generateReport()">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        <span id="generateText">Generate PDF Report</span>
+                        <span id="generateLoading" style="display: none;">
+                            <span class="loading-animation"></span> Generating...
+                        </span>
+                    </button>
+                    {% else %}
+                    <a href="{% url 'assessments:download_report' workflow.id report.id %}" 
+                       class="btn btn-report">
+                        <i class="fas fa-download me-2"></i>Download PDF Report
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'assessments:workflow_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-list me-2"></i>View All Assessments
+                    </a>
+                    
+                    <a href="{% url 'assessments:select_workflow' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus me-2"></i>Start New Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function generateReport() {
+    const generateText = document.getElementById('generateText');
+    const generateLoading = document.getElementById('generateLoading');
+    
+    generateText.style.display = 'none';
+    generateLoading.style.display = 'inline';
+    
+    fetch('{% url "assessments:generate_report" workflow.id %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showNotification('Report generated successfully! Refreshing page...', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            showNotification('Error generating report: ' + (data.message || 'Unknown error'), 'error');
+            generateText.style.display = 'inline';
+            generateLoading.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        showNotification('Error generating report', 'error');
+        generateText.style.display = 'inline';
+        generateLoading.style.display = 'none';
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate score bars
+    setTimeout(() => {
+        const scoreFills = document.querySelectorAll('.score-fill');
+        scoreFills.forEach(fill => {
+            const width = fill.style.width;
+            fill.style.width = '0%';
+            setTimeout(() => {
+                fill.style.width = width;
+            }, 100);
+        });
+    }, 500);
+    
+    // Animate confidence bars
+    setTimeout(() => {
+        const confidenceFills = document.querySelectorAll('.confidence-fill');
+        confidenceFills.forEach(fill => {
+            const width = fill.style.width;
+            fill.style.width = '0%';
+            setTimeout(() => {
+                fill.style.width = width;
+            }, 100);
+        });
+    }, 1000);
+    
+    // Add fade-in animation to cards
+    const cards = document.querySelectorAll('.assessment-card, .insight-card, .recommendation-item');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in-up');
+    });
+    
+    // Add CSRF token to all forms
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        const meta = document.createElement('meta');
+        meta.name = 'csrf-token';
+        meta.content = '{{ csrf_token }}';
+        document.head.appendChild(meta);
+    }
+});
+
+// Auto-refresh report status if still generating
+{% if report and report.status == 'generating' %}
+setTimeout(() => {
+    window.location.reload();
+}, 30000); // Refresh after 30 seconds
+{% endif %}
+</script>
+{% endblock %}

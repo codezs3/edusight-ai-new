@@ -73,28 +73,80 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'admin_dashboard:pages' %}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-file-alt me-2"></i>
-                            Manage Pages
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:students' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-user-graduate me-2"></i>
+                            Students
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'admin_dashboard:users' %}" class="btn btn-outline-success w-100">
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:assessments' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-clipboard-check me-2"></i>
+                            Assessments
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:users' %}" class="btn btn-outline-info w-100">
                             <i class="fas fa-users me-2"></i>
-                            Manage Users
+                            Users
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'admin_dashboard:backup' %}" class="btn btn-outline-warning w-100">
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:database_settings' %}" class="btn btn-outline-warning w-100">
                             <i class="fas fa-database me-2"></i>
-                            Create Backup
+                            Backup
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'admin_dashboard:analytics' %}" class="btn btn-outline-info w-100">
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:analytics' %}" class="btn btn-outline-secondary w-100">
                             <i class="fas fa-chart-bar me-2"></i>
-                            View Analytics
+                            Analytics
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:settings_overview' %}" class="btn btn-outline-dark w-100">
+                            <i class="fas fa-cogs me-2"></i>
+                            Settings
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Additional Management Tools -->
+                <div class="row mt-3">
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:pages' %}" class="btn btn-light w-100">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Pages
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:menus' %}" class="btn btn-light w-100">
+                            <i class="fas fa-bars me-2"></i>
+                            Menus
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:media' %}" class="btn btn-light w-100">
+                            <i class="fas fa-images me-2"></i>
+                            Media
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:appearance' %}" class="btn btn-light w-100">
+                            <i class="fas fa-paint-brush me-2"></i>
+                            Appearance
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:workflows' %}" class="btn btn-light w-100">
+                            <i class="fas fa-project-diagram me-2"></i>
+                            Workflows
+                        </a>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <a href="{% url 'admin_dashboard:ml_models' %}" class="btn btn-light w-100">
+                            <i class="fas fa-brain me-2"></i>
+                            ML Models
                         </a>
                     </div>
                 </div>

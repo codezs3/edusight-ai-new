@@ -870,11 +870,943 @@
             margin-right: 0.6rem;
             font-size: 0.85rem;
         }
+        
+        /* News Ticker Styles */
+        .news-ticker-container {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 8px 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            z-index: 1030;
+        }
+        
+        .news-ticker {
+            display: flex;
+            align-items: center;
+            height: 32px;
+            position: relative;
+        }
+        
+        .news-ticker-content {
+            display: flex;
+            animation: scroll-left 120s linear infinite;
+            white-space: nowrap;
+        }
+        
+        .news-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 60px;
+            font-size: 14px;
+            font-weight: 500;
+            min-width: max-content;
+        }
+        
+        .news-ticker-controls {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+        
+        .news-control-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+        
+        .news-control-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        @keyframes scroll-left {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .news-ticker.paused .news-ticker-content {
+            animation-play-state: paused;
+        }
+        
+        /* Enhanced Assessment Animations */
+        .assessment-metrics {
+            position: relative;
+        }
+        
+        .metric-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            position: relative;
+            background: conic-gradient(
+                from 0deg,
+                #4f46e5 0deg,
+                #7c3aed var(--progress-angle, 0deg),
+                rgba(255,255,255,0.2) var(--progress-angle, 0deg)
+            );
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotateIn 1.5s ease-out;
+        }
+        
+        .metric-inner {
+            background: rgba(255,255,255,0.95);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #1f2937;
+        }
+        
+        .score-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        
+        .domain-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .domain-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+        
+        .domain-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        
+        .academic-domain .domain-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .psychological-domain .domain-icon {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .physical-domain .domain-icon {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+        }
+        
+        .domain-info {
+            flex: 1;
+        }
+        
+        .domain-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: white;
+        }
+        
+        .domain-score {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .domain-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .domain-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 2s ease-out;
+            width: 0%;
+            position: relative;
+        }
+        
+        .domain-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+        
+        .academic-fill {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .psychological-fill {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .physical-fill {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+        }
+        
+        @keyframes rotateIn {
+            from {
+                transform: rotate(-180deg) scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Pulse animation for icons */
+        .domain-icon i {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Enhanced mobile responsiveness */
+        @media (max-width: 768px) {
+            .news-ticker-container {
+                padding: 6px 0;
+            }
+            
+            .news-item {
+                font-size: 13px;
+                margin-right: 40px;
+            }
+            
+            .metric-circle {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .metric-inner {
+                width: 75px;
+                height: 75px;
+            }
+            
+            .score-text {
+                font-size: 20px;
+            }
+        }
+        
+        /* Hover-based Menu System */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            animation: fadeInDown 0.3s ease-out;
+        }
+        
+        .mega-menu-dropdown:hover .mega-menu {
+            display: block;
+            animation: fadeInDown 0.3s ease-out;
+        }
+        
+        .dmit-dropdown:hover .dropdown-menu {
+            display: block;
+            animation: fadeInDown 0.3s ease-out;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Comprehensive Dashboard Color System - Psychologically Optimized */
+        :root {
+            /* Core Brand Identity */
+            --brand-primary: #2563EB; /* Trustworthy Blue - Intelligence & Reliability */
+            --brand-secondary: #7C3AED; /* Innovation Purple - Creativity & Technology */
+            --brand-accent: #059669; /* Growth Green - Success & Progress */
+            
+            /* Dashboard-Specific Color Schemes */
+            
+            /* 1. Super Admin Dashboard - Authority & Control */
+            --super-admin-primary: #1E293B; /* Commanding Slate */
+            --super-admin-secondary: #DC2626; /* Decisive Red */
+            --super-admin-accent: #F59E0B; /* Warning Amber */
+            --super-admin-gradient: linear-gradient(135deg, #1E293B 0%, #475569 50%, #64748B 100%);
+            --super-admin-text: #F8FAFC;
+            --super-admin-bg: #0F172A;
+            
+            /* 2. Parent Dashboard - Nurturing & Care */
+            --parent-primary: #0EA5E9; /* Caring Sky Blue */
+            --parent-secondary: #EC4899; /* Loving Pink */
+            --parent-accent: #10B981; /* Growth Green */
+            --parent-gradient: linear-gradient(135deg, #0EA5E9 0%, #3B82F6 50%, #6366F1 100%);
+            --parent-text: #FFFFFF;
+            --parent-bg: #F0F9FF;
+            
+            /* 3. School Admin Dashboard - Academic Excellence */
+            --school-admin-primary: #1D4ED8; /* Academic Blue */
+            --school-admin-secondary: #B91C1C; /* Scholastic Red */
+            --school-admin-accent: #059669; /* Achievement Green */
+            --school-admin-gradient: linear-gradient(135deg, #1D4ED8 0%, #2563EB 50%, #3B82F6 100%);
+            --school-admin-text: #FFFFFF;
+            --school-admin-bg: #EFF6FF;
+            
+            /* 4. Counsellor Dashboard - Empathy & Support */
+            --counsellor-primary: #7C3AED; /* Empathetic Purple */
+            --counsellor-secondary: #06B6D4; /* Calming Cyan */
+            --counsellor-accent: #F59E0B; /* Optimistic Amber */
+            --counsellor-gradient: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 50%, #A855F7 100%);
+            --counsellor-text: #FFFFFF;
+            --counsellor-bg: #FAF5FF;
+            
+            /* 5. Physical Education Expert Dashboard - Energy & Vitality */
+            --pe-primary: #DC2626; /* Dynamic Red */
+            --pe-secondary: #EA580C; /* Energetic Orange */
+            --pe-accent: #65A30D; /* Vitality Green */
+            --pe-gradient: linear-gradient(135deg, #DC2626 0%, #EF4444 50%, #F97316 100%);
+            --pe-text: #FFFFFF;
+            --pe-bg: #FEF2F2;
+            
+            /* 6. CRM Dashboard - Relationship & Communication */
+            --crm-primary: #059669; /* Relationship Green */
+            --crm-secondary: #0891B2; /* Communication Cyan */
+            --crm-accent: #7C2D12; /* Professional Brown */
+            --crm-gradient: linear-gradient(135deg, #059669 0%, #10B981 50%, #34D399 100%);
+            --crm-text: #FFFFFF;
+            --crm-bg: #ECFDF5;
+            
+            /* 7. Marketing Dashboard - Creativity & Attraction */
+            --marketing-primary: #EC4899; /* Magnetic Pink */
+            --marketing-secondary: #F59E0B; /* Attention Orange */
+            --marketing-accent: #8B5CF6; /* Creative Purple */
+            --marketing-gradient: linear-gradient(135deg, #EC4899 0%, #F472B6 50%, #FB7185 100%);
+            --marketing-text: #FFFFFF;
+            --marketing-bg: #FDF2F8;
+            
+            /* 8. Accountant Dashboard - Precision & Trust */
+            --accountant-primary: #374151; /* Precise Gray */
+            --accountant-secondary: #059669; /* Profit Green */
+            --accountant-accent: #DC2626; /* Alert Red */
+            --accountant-gradient: linear-gradient(135deg, #374151 0%, #4B5563 50%, #6B7280 100%);
+            --accountant-text: #FFFFFF;
+            --accountant-bg: #F9FAFB;
+            
+            /* 9. Public Analytics Dashboard - Transparency & Insight */
+            --public-primary: #1E40AF; /* Insight Blue */
+            --public-secondary: #7C3AED; /* Data Purple */
+            --public-accent: #059669; /* Public Green */
+            --public-gradient: linear-gradient(135deg, #1E40AF 0%, #2563EB 50%, #3B82F6 100%);
+            --public-text: #FFFFFF;
+            --public-bg: #F0F9FF;
+            
+            /* Universal Colors */
+            --success-color: #10B981; /* Universal Success */
+            --warning-color: #F59E0B; /* Universal Warning */
+            --danger-color: #EF4444; /* Universal Danger */
+            --info-color: #3B82F6; /* Universal Info */
+            
+            /* Neutral Palette */
+            --neutral-50: #F8FAFC;
+            --neutral-100: #F1F5F9;
+            --neutral-200: #E2E8F0;
+            --neutral-300: #CBD5E1;
+            --neutral-400: #94A3B8;
+            --neutral-500: #64748B;
+            --neutral-600: #475569;
+            --neutral-700: #334155;
+            --neutral-800: #1E293B;
+            --neutral-900: #0F172A;
+            
+            /* Text Colors for Better Readability */
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
+            --text-light: #94A3B8;
+            --text-inverse: #F8FAFC;
+            
+            /* Semantic Gradients */
+            --gradient-success: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+            --gradient-warning: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+            --gradient-danger: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+            --gradient-info: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+            
+            /* Special Effects */
+            --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+            
+            /* Animation Easing */
+            --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --ease-sharp: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Dynamic Theme System */
+        body {
+            --current-primary: var(--brand-primary);
+            --current-secondary: var(--brand-secondary);
+            --current-accent: var(--brand-accent);
+            --current-gradient: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+            --current-text: var(--text-inverse);
+            --current-bg: var(--neutral-50);
+        }
+        
+        /* Dashboard-specific theme classes */
+        .theme-super-admin {
+            --current-primary: var(--super-admin-primary);
+            --current-secondary: var(--super-admin-secondary);
+            --current-accent: var(--super-admin-accent);
+            --current-gradient: var(--super-admin-gradient);
+            --current-text: var(--super-admin-text);
+            --current-bg: var(--super-admin-bg);
+        }
+        
+        .theme-parent {
+            --current-primary: var(--parent-primary);
+            --current-secondary: var(--parent-secondary);
+            --current-accent: var(--parent-accent);
+            --current-gradient: var(--parent-gradient);
+            --current-text: var(--parent-text);
+            --current-bg: var(--parent-bg);
+        }
+        
+        .theme-school-admin {
+            --current-primary: var(--school-admin-primary);
+            --current-secondary: var(--school-admin-secondary);
+            --current-accent: var(--school-admin-accent);
+            --current-gradient: var(--school-admin-gradient);
+            --current-text: var(--school-admin-text);
+            --current-bg: var(--school-admin-bg);
+        }
+        
+        .theme-counsellor {
+            --current-primary: var(--counsellor-primary);
+            --current-secondary: var(--counsellor-secondary);
+            --current-accent: var(--counsellor-accent);
+            --current-gradient: var(--counsellor-gradient);
+            --current-text: var(--counsellor-text);
+            --current-bg: var(--counsellor-bg);
+        }
+        
+        .theme-pe {
+            --current-primary: var(--pe-primary);
+            --current-secondary: var(--pe-secondary);
+            --current-accent: var(--pe-accent);
+            --current-gradient: var(--pe-gradient);
+            --current-text: var(--pe-text);
+            --current-bg: var(--pe-bg);
+        }
+        
+        .theme-crm {
+            --current-primary: var(--crm-primary);
+            --current-secondary: var(--crm-secondary);
+            --current-accent: var(--crm-accent);
+            --current-gradient: var(--crm-gradient);
+            --current-text: var(--crm-text);
+            --current-bg: var(--crm-bg);
+        }
+        
+        .theme-marketing {
+            --current-primary: var(--marketing-primary);
+            --current-secondary: var(--marketing-secondary);
+            --current-accent: var(--marketing-accent);
+            --current-gradient: var(--marketing-gradient);
+            --current-text: var(--marketing-text);
+            --current-bg: var(--marketing-bg);
+        }
+        
+        .theme-accountant {
+            --current-primary: var(--accountant-primary);
+            --current-secondary: var(--accountant-secondary);
+            --current-accent: var(--accountant-accent);
+            --current-gradient: var(--accountant-gradient);
+            --current-text: var(--accountant-text);
+            --current-bg: var(--accountant-bg);
+        }
+        
+        .theme-public {
+            --current-primary: var(--public-primary);
+            --current-secondary: var(--public-secondary);
+            --current-accent: var(--public-accent);
+            --current-gradient: var(--public-gradient);
+            --current-text: var(--public-text);
+            --current-bg: var(--public-bg);
+        }
+        
+        /* Enhanced Navbar System */
+        .navbar-custom {
+            background: var(--current-gradient) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-strong);
+            transition: all 0.3s var(--ease-smooth);
+        }
+        
+        .navbar-brand {
+            color: var(--current-text) !important;
+            font-weight: 800;
+            font-size: 1.75rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s var(--ease-smooth);
+            letter-spacing: -0.5px;
+        }
+        
+        .navbar-brand:hover {
+            color: var(--current-text) !important;
+            transform: scale(1.05);
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s var(--ease-smooth);
+            position: relative;
+            padding: 0.75rem 1rem !important;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--current-text);
+            transition: all 0.3s var(--ease-smooth);
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover {
+            color: var(--current-text) !important;
+            text-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+        
+        .nav-link:hover::before {
+            width: 80%;
+        }
+        
+        /* Enhanced Button System */
+        .btn-primary-custom {
+            background: var(--gradient-success);
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-medium);
+            transition: all 0.3s var(--ease-bounce);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-strong);
+            color: white;
+        }
+        
+        .btn-primary-custom:hover::before {
+            left: 100%;
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 0.6rem 1.25rem;
+            transition: all 0.3s var(--ease-smooth);
+        }
+        
+        .btn-outline-primary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 1);
+            color: white;
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
+        
+        /* Enhanced Component Styling */
+        .mega-menu {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.98) 0%, 
+                rgba(248, 250, 252, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-strong);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .mega-menu-item {
+            color: var(--text-primary);
+            transition: all 0.3s var(--ease-smooth);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+        
+        .mega-menu-item:hover {
+            background: var(--current-gradient);
+            color: white;
+            transform: translateX(8px) scale(1.02);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .mega-menu-item i {
+            width: 20px;
+            text-align: center;
+            margin-right: 0.75rem;
+            color: var(--current-primary);
+            transition: all 0.3s var(--ease-smooth);
+        }
+        
+        .mega-menu-item:hover i {
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        /* Enhanced DMIT menu */
+        .dmit-dropdown .dropdown-menu {
+            background: var(--gradient-warning);
+            border: none;
+            box-shadow: var(--shadow-strong);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        
+        .dmit-menu-item {
+            color: white;
+            transition: all 0.3s var(--ease-smooth);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            margin: 0.25rem 0;
+            font-weight: 600;
+        }
+        
+        .dmit-menu-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(5px);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Enhanced Hero Section */
+        .hero-section {
+            background: var(--current-gradient);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        /* Enhanced Assessment Metrics */
+        .academic-domain .domain-icon {
+            background: var(--gradient-success);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .psychological-domain .domain-icon {
+            background: var(--counsellor-gradient);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .physical-domain .domain-icon {
+            background: var(--pe-gradient);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        /* Enhanced News Ticker */
+        .news-ticker-container {
+            background: var(--counsellor-gradient);
+            position: relative;
+        }
+        
+        .news-ticker-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(124, 58, 237, 1) 100%);
+            pointer-events: none;
+        }
+        
+        /* Card Enhancements */
+        .card, .assessment-card, .feature-card {
+            transition: all 0.3s var(--ease-smooth);
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--shadow-soft);
+            background: white;
+            overflow: hidden;
+        }
+        
+        .card:hover, .assessment-card:hover, .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-strong);
+        }
+        
+        .card-header {
+            background: var(--current-gradient);
+            color: var(--current-text);
+            border: none;
+            font-weight: 700;
+        }
+        
+        /* Status Badges */
+        .badge {
+            font-weight: 600;
+            padding: 0.5em 0.8em;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+        
+        .badge.bg-success {
+            background: var(--gradient-success) !important;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        
+        .badge.bg-warning {
+            background: var(--gradient-warning) !important;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+        
+        .badge.bg-danger {
+            background: var(--gradient-danger) !important;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        .badge.bg-info {
+            background: var(--gradient-info) !important;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Form Enhancements */
+        .form-control, .form-select {
+            border: 2px solid var(--neutral-200);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s var(--ease-smooth);
+            font-weight: 500;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--current-primary);
+            box-shadow: 0 0 0 0.2rem rgba(var(--current-primary), 0.25);
+            transform: translateY(-1px);
+        }
+        
+        .form-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Button Variants */
+        .btn {
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            transition: all 0.3s var(--ease-smooth);
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-success {
+            background: var(--gradient-success);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .btn-warning {
+            background: var(--gradient-warning);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .btn-danger {
+            background: var(--gradient-danger);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .btn-info {
+            background: var(--gradient-info);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        /* Enhanced visual effects */
+        .card, .assessment-card, .feature-card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card:hover, .assessment-card:hover, .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Interactive elements */
+        .interactive-element {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .interactive-element::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .interactive-element:hover::before {
+            left: 100%;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- News Ticker -->
+    <div class="news-ticker-container">
+        <div class="news-ticker">
+            <div class="news-ticker-content">
+                <div class="news-item">
+                    <i class="fas fa-star text-warning me-2"></i>
+                    <strong>NEW:</strong> Advanced AI Assessment Module Now Available - Get 30% More Accurate Predictions!
+                </div>
+                <div class="news-item">
+                    <i class="fas fa-gift text-success me-2"></i>
+                    <strong>LIMITED OFFER:</strong> Free Parent Dashboard Premium Access Until December 2024
+                </div>
+                <div class="news-item">
+                    <i class="fas fa-rocket text-primary me-2"></i>
+                    <strong>LAUNCH:</strong> New Career Mapping Feature - Discover Your Child's Future Path
+                </div>
+                <div class="news-item">
+                    <i class="fas fa-trophy text-warning me-2"></i>
+                    <strong>ACHIEVEMENT:</strong> EduSight Recognized as Best EdTech Platform 2024
+                </div>
+                <div class="news-item">
+                    <i class="fas fa-users text-info me-2"></i>
+                    <strong>MILESTONE:</strong> 50,000+ Students Successfully Assessed - Join Our Growing Community!
+                </div>
+                <div class="news-item">
+                    <i class="fas fa-graduation-cap text-success me-2"></i>
+                    <strong>UPDATE:</strong> New Academic Frameworks Added - CBSE, ICSE, IB, IGCSE Support Enhanced
+                </div>
+            </div>
+        </div>
+        <div class="news-ticker-controls">
+            <button class="news-control-btn" onclick="pauseNewsTicker()" title="Pause/Resume">
+                <i class="fas fa-pause" id="pauseIcon"></i>
+            </button>
+            <button class="news-control-btn" onclick="closeNewsTicker()" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNav">
         <div class="container">
@@ -1017,29 +1949,33 @@
                     </li>
                 </ul>
                 
-                <!-- Auth Links -->
-                <div class="d-flex gap-2">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-sign-in-alt me-1"></i>Login
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'login' %}">
-                                <i class="fas fa-user me-2"></i>Student/Admin Login
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'parent_dashboard:parent_login' %}">
-                                <i class="fas fa-users me-2"></i>Parent Login
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item" href="{% url 'book_assessment' %}">
-                        <i class="fas fa-calendar-plus me-2"></i>Book Assessment
-                    </a></li>
-                </ul>
-            </div>
-            <a href="{% url 'registration:signup' %}" class="btn btn-success me-2">
-                <i class="fas fa-user-plus me-1"></i>Sign Up
-            </a>
-            <a href="{% url 'dashboard' %}" class="btn btn-primary-custom">Demo Dashboard</a>
+                            <!-- Auth Links -->
+            <div class="d-flex gap-2">
+                <!-- Combined Auth Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>Account
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><h6 class="dropdown-header"><i class="fas fa-sign-in-alt me-2"></i>Login Options</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'login' %}">
+                            <i class="fas fa-user me-2"></i>Student/Admin Login
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'parent_dashboard:parent_login' %}">
+                            <i class="fas fa-users me-2"></i>Parent Login
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header"><i class="fas fa-user-plus me-2"></i>New User</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'registration:signup' %}">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'book_assessment' %}">
+                            <i class="fas fa-calendar-plus me-2"></i>Book Assessment
+                        </a></li>
+                    </ul>
+                </div>
+                <a href="{% url 'dashboard' %}" class="btn btn-primary-custom">Demo Dashboard</a>
                 </div>
             </div>
         </div>
@@ -1176,5 +2112,384 @@
     </script>
     
     {% block extra_js %}{% endblock %}
+    
+    <!-- News Ticker and Enhanced Animations JavaScript -->
+    <script>
+        // News Ticker Functionality
+        let isNewsPaused = false;
+        
+        function pauseNewsTicker() {
+            const ticker = document.querySelector('.news-ticker');
+            const pauseIcon = document.getElementById('pauseIcon');
+            
+            if (isNewsPaused) {
+                ticker.classList.remove('paused');
+                pauseIcon.className = 'fas fa-pause';
+                isNewsPaused = false;
+            } else {
+                ticker.classList.add('paused');
+                pauseIcon.className = 'fas fa-play';
+                isNewsPaused = true;
+            }
+        }
+        
+        function closeNewsTicker() {
+            const tickerContainer = document.querySelector('.news-ticker-container');
+            tickerContainer.style.animation = 'slideUp 0.5s ease-out';
+            setTimeout(() => {
+                tickerContainer.style.display = 'none';
+            }, 500);
+        }
+        
+        // Enhanced Assessment Animations
+        function animateAssessmentMetrics() {
+            const overallScore = document.getElementById('overallScore');
+            const domainScores = document.querySelectorAll('.domain-score');
+            const domainFills = document.querySelectorAll('.domain-fill');
+            
+            if (overallScore) {
+                // Animate overall score circle
+                let progress = 0;
+                const targetScore = 92;
+                const scoreText = overallScore.querySelector('.score-text');
+                
+                const progressInterval = setInterval(() => {
+                    progress += 2;
+                    const angle = (progress / 100) * 360;
+                    overallScore.style.setProperty('--progress-angle', angle + 'deg');
+                    scoreText.textContent = Math.min(progress, targetScore) + '%';
+                    
+                    if (progress >= targetScore) {
+                        clearInterval(progressInterval);
+                    }
+                }, 50);
+            }
+            
+            // Animate domain scores
+            domainScores.forEach((scoreElement, index) => {
+                const target = parseInt(scoreElement.getAttribute('data-target'));
+                const fill = domainFills[index];
+                
+                setTimeout(() => {
+                    let current = 0;
+                    const increment = target / 50;
+                    
+                    const countInterval = setInterval(() => {
+                        current += increment;
+                        const displayValue = Math.min(Math.round(current), target);
+                        scoreElement.textContent = displayValue + '%';
+                        
+                        if (fill) {
+                            fill.style.width = displayValue + '%';
+                        }
+                        
+                        if (current >= target) {
+                            clearInterval(countInterval);
+                        }
+                    }, 40);
+                }, index * 300);
+            });
+        }
+        
+        // Intersection Observer for scroll animations
+        function setupScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                        
+                        // Trigger assessment animations when visible
+                        if (entry.target.classList.contains('assessment-metrics')) {
+                            setTimeout(animateAssessmentMetrics, 500);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all animatable elements
+            document.querySelectorAll('.card, .assessment-metrics, .feature-card, .stat-card').forEach(el => {
+                observer.observe(el);
+            });
+        }
+        
+        // Enhanced hover effects
+        function setupInteractiveElements() {
+            document.querySelectorAll('.interactive-element').forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        }
+        
+        // Particle effect for hero section
+        function createParticleEffect() {
+            const heroSection = document.querySelector('.hero-section');
+            if (!heroSection) return;
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: absolute;
+                    width: 4px;
+                    height: 4px;
+                    background: rgba(255, 255, 255, 0.6);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    animation: float ${3 + Math.random() * 4}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 2}s;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                `;
+                heroSection.appendChild(particle);
+            }
+        }
+        
+        // Initialize all animations and theme system
+        document.addEventListener('DOMContentLoaded', function() {
+            setupScrollAnimations();
+            setupInteractiveElements();
+            createParticleEffect();
+            initializeThemeSystem();
+            
+            // Add CSS animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideUp {
+                    to { transform: translateY(-100%); opacity: 0; }
+                }
+                
+                @keyframes float {
+                    0%, 100% { transform: translateY(0px) rotate(0deg); }
+                    50% { transform: translateY(-20px) rotate(180deg); }
+                }
+                
+                @keyframes animate-in {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                
+                @keyframes themeTransition {
+                    0% { opacity: 0.8; transform: scale(0.95); }
+                    50% { opacity: 0.9; transform: scale(1.02); }
+                    100% { opacity: 1; transform: scale(1); }
+                }
+                
+                .animate-in {
+                    animation: animate-in 0.8s ease-out forwards;
+                }
+                
+                .theme-transition {
+                    animation: themeTransition 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                }
+                
+                .card, .assessment-card, .feature-card {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+            `;
+            document.head.appendChild(style);
+        });
+        
+        // Theme Management System
+        function initializeThemeSystem() {
+            // Auto-detect dashboard type based on URL or user role
+            const currentPath = window.location.pathname;
+            let dashboardType = 'default';
+            
+            if (currentPath.includes('/admin-panel/')) {
+                dashboardType = 'super-admin';
+            } else if (currentPath.includes('/parent-dashboard/')) {
+                dashboardType = 'parent';
+            } else if (currentPath.includes('/school/')) {
+                dashboardType = 'school-admin';
+            } else if (currentPath.includes('/counsellor/')) {
+                dashboardType = 'counsellor';
+            } else if (currentPath.includes('/pe/')) {
+                dashboardType = 'pe';
+            } else if (currentPath.includes('/crm/')) {
+                dashboardType = 'crm';
+            } else if (currentPath.includes('/marketing/')) {
+                dashboardType = 'marketing';
+            } else if (currentPath.includes('/accountant/')) {
+                dashboardType = 'accountant';
+            } else if (currentPath.includes('/public/')) {
+                dashboardType = 'public';
+            }
+            
+            applyDashboardTheme(dashboardType);
+        }
+        
+        function applyDashboardTheme(themeType) {
+            const body = document.body;
+            
+            // Remove existing theme classes
+            body.classList.remove(
+                'theme-super-admin', 'theme-parent', 'theme-school-admin',
+                'theme-counsellor', 'theme-pe', 'theme-crm',
+                'theme-marketing', 'theme-accountant', 'theme-public'
+            );
+            
+            // Apply new theme
+            if (themeType !== 'default') {
+                body.classList.add(`theme-${themeType}`);
+                body.classList.add('theme-transition');
+                
+                // Remove transition class after animation
+                setTimeout(() => {
+                    body.classList.remove('theme-transition');
+                }, 600);
+            }
+            
+            // Store theme preference
+            localStorage.setItem('dashboardTheme', themeType);
+            
+            // Update page title with dashboard type
+            updatePageTitle(themeType);
+        }
+        
+        function updatePageTitle(themeType) {
+            const dashboardNames = {
+                'super-admin': 'Super Admin Dashboard',
+                'parent': 'Parent Dashboard',
+                'school-admin': 'School Admin Dashboard',
+                'counsellor': 'Counsellor Dashboard',
+                'pe': 'Physical Education Dashboard',
+                'crm': 'CRM Dashboard',
+                'marketing': 'Marketing Dashboard',
+                'accountant': 'Accountant Dashboard',
+                'public': 'Public Analytics Dashboard',
+                'default': 'EduSight Platform'
+            };
+            
+            const dashboardName = dashboardNames[themeType] || dashboardNames['default'];
+            
+            // Add dashboard indicator to navbar brand if not default
+            const navbarBrand = document.querySelector('.navbar-brand');
+            if (navbarBrand && themeType !== 'default') {
+                const originalText = navbarBrand.textContent.split(' - ')[0];
+                navbarBrand.innerHTML = `
+                    <i class="fas fa-brain me-2"></i>
+                    ${originalText}
+                    <small class="d-none d-md-inline ms-2 opacity-75">- ${dashboardName}</small>
+                `;
+            }
+        }
+        
+        // Theme selector for admin users
+        function createThemeSelector() {
+            const themeSelector = document.createElement('div');
+            themeSelector.className = 'theme-selector position-fixed';
+            themeSelector.style.cssText = `
+                top: 50%;
+                right: 20px;
+                transform: translateY(-50%);
+                z-index: 1050;
+                background: white;
+                border-radius: 12px;
+                box-shadow: var(--shadow-strong);
+                padding: 1rem;
+                display: none;
+            `;
+            
+            themeSelector.innerHTML = `
+                <div class="theme-selector-header mb-3">
+                    <h6 class="mb-0">Dashboard Themes</h6>
+                    <small class="text-muted">Choose your dashboard style</small>
+                </div>
+                <div class="theme-options">
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="super-admin">Super Admin</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="parent">Parent</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="school-admin">School Admin</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="counsellor">Counsellor</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="pe">PE Expert</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="crm">CRM</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="marketing">Marketing</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="accountant">Accountant</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary mb-2 w-100" data-theme="public">Public</button>
+                    <button class="theme-option btn btn-sm btn-outline-secondary w-100" data-theme="default">Default</button>
+                </div>
+            `;
+            
+            document.body.appendChild(themeSelector);
+            
+            // Add event listeners
+            themeSelector.querySelectorAll('.theme-option').forEach(button => {
+                button.addEventListener('click', function() {
+                    const theme = this.getAttribute('data-theme');
+                    applyDashboardTheme(theme);
+                    
+                    // Update active state
+                    themeSelector.querySelectorAll('.theme-option').forEach(btn => 
+                        btn.classList.remove('btn-primary', 'btn-outline-secondary')
+                    );
+                    themeSelector.querySelectorAll('.theme-option').forEach(btn => 
+                        btn.classList.add('btn-outline-secondary')
+                    );
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('btn-primary');
+                });
+            });
+            
+            return themeSelector;
+        }
+        
+        // Add theme selector toggle button for admin users
+        function addThemeToggle() {
+            const themeToggle = document.createElement('button');
+            themeToggle.className = 'btn btn-sm btn-light position-fixed';
+            themeToggle.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 1051;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                box-shadow: var(--shadow-medium);
+            `;
+            themeToggle.innerHTML = '<i class="fas fa-palette"></i>';
+            themeToggle.title = 'Theme Selector';
+            
+            const themeSelector = createThemeSelector();
+            
+            themeToggle.addEventListener('click', function() {
+                const isVisible = themeSelector.style.display === 'block';
+                themeSelector.style.display = isVisible ? 'none' : 'block';
+            });
+            
+            // Only show for admin users (check if user has admin privileges)
+            if (window.location.pathname.includes('/admin') || 
+                document.body.classList.contains('admin-user')) {
+                document.body.appendChild(themeToggle);
+            }
+        }
+        
+        // Initialize theme toggle after DOM load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(addThemeToggle, 1000);
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

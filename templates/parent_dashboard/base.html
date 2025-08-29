@@ -32,18 +32,19 @@
             padding: 0;
         }
 
-        /* Sidebar Styles */
+        /* Enhanced Sidebar Styles */
         .sidebar {
             position: fixed;
             top: 0;
             left: 0;
             height: 100vh;
             width: var(--sidebar-width);
-            background: linear-gradient(180deg, #2c3e50 0%, #3498db 100%);
+            background: var(--parent-gradient);
             color: white;
             z-index: 1000;
             transition: all 0.3s ease;
             overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
 
         .sidebar-brand {
@@ -307,21 +308,90 @@
                 <div class="nav-section-title">Students & Data</div>
                 <div class="nav-item">
                     <a href="#" class="nav-link" id="studentsMenu">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-user-graduate"></i>
                         My Students
-                        <span class="badge">{{ students.count|default:0 }}</span>
+                        <span class="badge bg-primary">{{ students.count|default:0 }}</span>
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="{% url 'parent_dashboard:upload' %}" class="nav-link {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
-                        <i class="fas fa-upload"></i>
-                        Upload Data
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Smart Upload
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="#" class="nav-link" id="dataMenu">
-                        <i class="fas fa-database"></i>
-                        Data Management
+                        <i class="fas fa-chart-line"></i>
+                        Data Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="dataHistory">
+                        <i class="fas fa-history"></i>
+                        Upload History
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Assessment Frameworks Section -->
+            <div class="nav-section">
+                <div class="nav-section-title">Assessment Frameworks</div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="academicFramework">
+                        <i class="fas fa-book-open"></i>
+                        Academic Assessment
+                        <span class="badge bg-success">CBSE</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="physicalFramework">
+                        <i class="fas fa-running"></i>
+                        Physical Education
+                        <span class="badge bg-warning">PE</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="psychologicalFramework">
+                        <i class="fas fa-brain"></i>
+                        Psychological Assessment
+                        <span class="badge bg-info">SEL</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="careerMapping">
+                        <i class="fas fa-compass"></i>
+                        Career Mapping
+                        <span class="badge bg-purple">RIASEC</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- ML & Predictions Section -->
+            <div class="nav-section">
+                <div class="nav-section-title">AI & Predictions</div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="mlPredictions">
+                        <i class="fas fa-robot"></i>
+                        ML Predictions
+                        <span class="badge bg-gradient">AI</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="recommendations">
+                        <i class="fas fa-lightbulb"></i>
+                        Recommendations
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="trendAnalysis">
+                        <i class="fas fa-chart-area"></i>
+                        Trend Analysis
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="riskAssessment">
+                        <i class="fas fa-shield-alt"></i>
+                        Risk Assessment
                     </a>
                 </div>
             </div>

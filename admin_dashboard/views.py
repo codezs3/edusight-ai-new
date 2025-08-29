@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from crm.models import Lead, FormSubmission, Appointment, CallLog
 from students.models import User, Student, School
+from students.forms import StudentForm
 from assessments.models import Assessment, AssessmentResult
 from ml_predictions.models import MLPrediction, MLModel
 from data_analytics.models import StudentAnalytics

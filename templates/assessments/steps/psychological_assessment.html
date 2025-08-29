@@ -1,0 +1,907 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Psychological Assessment - {{ workflow.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .assessment-step {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .step-header {
+        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .progress-container {
+        background: #f8fafc;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .progress-bar-custom {
+        height: 10px;
+        border-radius: 5px;
+        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    }
+    
+    .form-section {
+        padding: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+        border-bottom: 2px solid #e9d5ff;
+        padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-icon {
+        color: #7c3aed;
+        margin-right: 0.75rem;
+        font-size: 1.5rem;
+    }
+    
+    .sel-component-card {
+        background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%);
+        border: 2px solid #c4b5fd;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .sel-component-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(124, 58, 237, 0.15);
+        border-color: #7c3aed;
+    }
+    
+    .component-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .component-icon {
+        font-size: 2rem;
+        color: #7c3aed;
+        margin-right: 1rem;
+    }
+    
+    .component-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #581c87;
+    }
+    
+    .component-description {
+        color: #6b46c1;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        font-style: italic;
+    }
+    
+    .likert-scale {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #c4b5fd;
+    }
+    
+    .likert-option {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .likert-option input[type="radio"] {
+        display: none;
+    }
+    
+    .likert-option label {
+        display: block;
+        padding: 0.75rem 0.25rem;
+        border: 2px solid #c4b5fd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: white;
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .likert-option input[type="radio"]:checked + label {
+        border-color: #7c3aed;
+        background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%);
+        color: #581c87;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+    }
+    
+    .likert-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    
+    .likert-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .behavior-pattern-section {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border: 2px solid #7dd3fc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .coping-mechanisms-section {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border: 2px solid #86efac;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .enterprise-personality-section {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        border: 2px solid #fcd34d;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .trait-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .trait-card:hover {
+        border-color: #7c3aed;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+    }
+    
+    .trait-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .trait-icon {
+        font-size: 1.5rem;
+        color: #7c3aed;
+        margin-right: 0.75rem;
+    }
+    
+    .trait-title {
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    .rating-scale {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .rating-slider {
+        flex: 1;
+        height: 8px;
+        border-radius: 4px;
+        background: #e9d5ff;
+        outline: none;
+        appearance: none;
+    }
+    
+    .rating-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .rating-value {
+        font-weight: 700;
+        color: #7c3aed;
+        min-width: 40px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+    
+    .feature-badge {
+        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .wellbeing-indicator {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #c4b5fd;
+        margin-bottom: 0.5rem;
+    }
+    
+    .indicator-icon {
+        font-size: 1.25rem;
+        margin-right: 0.75rem;
+        color: #7c3aed;
+    }
+    
+    .step-navigation {
+        background: #f8fafc;
+        padding: 2rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .estimated-time {
+        background: #faf5ff;
+        border: 1px solid #c4b5fd;
+        color: #581c87;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-psych-primary {
+        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-psych-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+        color: white;
+    }
+    
+    .big-five-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="assessment-step">
+                <!-- Step Header -->
+                <div class="step-header">
+                    <h2>
+                        <i class="fas fa-brain me-3"></i>
+                        {{ step.title }}
+                    </h2>
+                    <p class="mb-0">{{ step.description }}</p>
+                </div>
+                
+                <!-- Progress -->
+                <div class="progress-container">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold">Progress</span>
+                        <span>{{ workflow.current_step }}/{{ workflow.total_steps }}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-custom" 
+                             style="width: {{ progress_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="estimated-time">
+                        <i class="fas fa-brain"></i>
+                        Estimated completion time: {{ step.estimated_duration }} minutes
+                    </div>
+                    
+                    <!-- Form Errors -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <div>{{ field }}: {{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Assessment Form -->
+                    <form method="post" id="psychologicalAssessmentForm">
+                        {% csrf_token %}
+                        
+                        <!-- Social-Emotional Learning (SEL) Components -->
+                        <div class="section-title">
+                            <i class="fas fa-heart section-icon"></i>
+                            Social-Emotional Learning (SEL) Framework
+                        </div>
+                        
+                        <div class="sel-component-card">
+                            <div class="component-header">
+                                <i class="fas fa-eye component-icon"></i>
+                                <div>
+                                    <div class="component-title">Self-Awareness</div>
+                                    <div class="component-description">Understanding one's emotions, thoughts, and values</div>
+                                </div>
+                            </div>
+                            <div class="wellbeing-indicator">
+                                <i class="fas fa-lightbulb indicator-icon"></i>
+                                <strong>How well does the student understand their own emotions?</strong>
+                            </div>
+                            <div class="likert-scale">
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_awareness" value="1" id="self_aware_1">
+                                    <label for="self_aware_1">
+                                        <div class="likert-value">1</div>
+                                        <div class="likert-label">Rarely Aware</div>
+                                    </label>
+                                </div>
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_awareness" value="2" id="self_aware_2">
+                                    <label for="self_aware_2">
+                                        <div class="likert-value">2</div>
+                                        <div class="likert-label">Sometimes Aware</div>
+                                    </label>
+                                </div>
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_awareness" value="3" id="self_aware_3">
+                                    <label for="self_aware_3">
+                                        <div class="likert-value">3</div>
+                                        <div class="likert-label">Moderately Aware</div>
+                                    </label>
+                                </div>
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_awareness" value="4" id="self_aware_4">
+                                    <label for="self_aware_4">
+                                        <div class="likert-value">4</div>
+                                        <div class="likert-label">Usually Aware</div>
+                                    </label>
+                                </div>
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_awareness" value="5" id="self_aware_5">
+                                    <label for="self_aware_5">
+                                        <div class="likert-value">5</div>
+                                        <div class="likert-label">Highly Aware</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="sel-component-card">
+                            <div class="component-header">
+                                <i class="fas fa-cog component-icon"></i>
+                                <div>
+                                    <div class="component-title">Self-Management</div>
+                                    <div class="component-description">Managing emotions, thoughts, and behaviors effectively</div>
+                                </div>
+                            </div>
+                            <div class="wellbeing-indicator">
+                                <i class="fas fa-sliders-h indicator-icon"></i>
+                                <strong>How effectively does the student manage their emotions?</strong>
+                            </div>
+                            <div class="likert-scale">
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_management" value="1" id="self_mgmt_1">
+                                    <label for="self_mgmt_1">
+                                        <div class="likert-value">1</div>
+                                        <div class="likert-label">Poor Control</div>
+                                    </label>
+                                </div>
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_management" value="2" id="self_mgmt_2">
+                                    <label for="self_mgmt_2">
+                                        <div class="likert-value">2</div>
+                                        <div class="likert-label">Fair Control</div>
+                                    </label>
+                                </div>
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_management" value="3" id="self_mgmt_3">
+                                    <label for="self_mgmt_3">
+                                        <div class="likert-value">3</div>
+                                        <div class="likert-label">Good Control</div>
+                                    </label>
+                                </div>
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_management" value="4" id="self_mgmt_4">
+                                    <label for="self_mgmt_4">
+                                        <div class="likert-value">4</div>
+                                        <div class="likert-label">Very Good Control</div>
+                                    </label>
+                                </div>
+                                <div class="likert-option">
+                                    <input type="radio" name="sel_self_management" value="5" id="self_mgmt_5">
+                                    <label for="self_mgmt_5">
+                                        <div class="likert-value">5</div>
+                                        <div class="likert-label">Excellent Control</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="sel-component-card">
+                                    <div class="component-header">
+                                        <i class="fas fa-users component-icon"></i>
+                                        <div>
+                                            <div class="component-title">Social Awareness</div>
+                                            <div class="component-description">Understanding others' emotions and social cues</div>
+                                        </div>
+                                    </div>
+                                    <div class="wellbeing-indicator">
+                                        <i class="fas fa-eye indicator-icon"></i>
+                                        <strong>Recognition of others' emotions</strong>
+                                    </div>
+                                    <div class="likert-scale">
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_social_awareness" value="1" id="social_aware_1">
+                                            <label for="social_aware_1">
+                                                <div class="likert-value">1</div>
+                                                <div class="likert-label">Poor</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_social_awareness" value="2" id="social_aware_2">
+                                            <label for="social_aware_2">
+                                                <div class="likert-value">2</div>
+                                                <div class="likert-label">Fair</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_social_awareness" value="3" id="social_aware_3">
+                                            <label for="social_aware_3">
+                                                <div class="likert-value">3</div>
+                                                <div class="likert-label">Good</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_social_awareness" value="4" id="social_aware_4">
+                                            <label for="social_aware_4">
+                                                <div class="likert-value">4</div>
+                                                <div class="likert-label">Very Good</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_social_awareness" value="5" id="social_aware_5">
+                                            <label for="social_aware_5">
+                                                <div class="likert-value">5</div>
+                                                <div class="likert-label">Excellent</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="sel-component-card">
+                                    <div class="component-header">
+                                        <i class="fas fa-handshake component-icon"></i>
+                                        <div>
+                                            <div class="component-title">Relationship Skills</div>
+                                            <div class="component-description">Building and maintaining healthy relationships</div>
+                                        </div>
+                                    </div>
+                                    <div class="wellbeing-indicator">
+                                        <i class="fas fa-heart indicator-icon"></i>
+                                        <strong>Building positive relationships</strong>
+                                    </div>
+                                    <div class="likert-scale">
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_relationship_skills" value="1" id="relationship_1">
+                                            <label for="relationship_1">
+                                                <div class="likert-value">1</div>
+                                                <div class="likert-label">Poor</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_relationship_skills" value="2" id="relationship_2">
+                                            <label for="relationship_2">
+                                                <div class="likert-value">2</div>
+                                                <div class="likert-label">Fair</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_relationship_skills" value="3" id="relationship_3">
+                                            <label for="relationship_3">
+                                                <div class="likert-value">3</div>
+                                                <div class="likert-label">Good</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_relationship_skills" value="4" id="relationship_4">
+                                            <label for="relationship_4">
+                                                <div class="likert-value">4</div>
+                                                <div class="likert-label">Very Good</div>
+                                            </label>
+                                        </div>
+                                        <div class="likert-option">
+                                            <input type="radio" name="sel_relationship_skills" value="5" id="relationship_5">
+                                            <label for="relationship_5">
+                                                <div class="likert-value">5</div>
+                                                <div class="likert-label">Excellent</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Behavioral Patterns -->
+                        <div class="behavior-pattern-section">
+                            <div class="section-title" style="border-color: #7dd3fc;">
+                                <i class="fas fa-chart-line section-icon" style="color: #0284c7;"></i>
+                                Behavioral Patterns & Regulation
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="trait-card">
+                                        <div class="trait-header">
+                                            <i class="fas fa-focus trait-icon"></i>
+                                            <div class="trait-title">Attention Span</div>
+                                        </div>
+                                        <div class="rating-scale">
+                                            <span class="text-muted small">Short</span>
+                                            <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                                   name="behavior_attention_span" id="attention_rating"
+                                                   onchange="updateRatingValue(this, 'attention_value')">
+                                            <span class="text-muted small">Extended</span>
+                                            <span class="rating-value" id="attention_value">5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="trait-card">
+                                        <div class="trait-header">
+                                            <i class="fas fa-hand-paper trait-icon"></i>
+                                            <div class="trait-title">Impulse Control</div>
+                                        </div>
+                                        <div class="rating-scale">
+                                            <span class="text-muted small">Poor</span>
+                                            <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                                   name="behavior_impulse_control" id="impulse_rating"
+                                                   onchange="updateRatingValue(this, 'impulse_value')">
+                                            <span class="text-muted small">Excellent</span>
+                                            <span class="rating-value" id="impulse_value">5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Coping Mechanisms -->
+                        <div class="coping-mechanisms-section">
+                            <div class="section-title" style="border-color: #86efac;">
+                                <i class="fas fa-shield-alt section-icon" style="color: #16a34a;"></i>
+                                Stress Management & Coping Strategies
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="sel-component-card" style="background: white; border-color: #86efac;">
+                                        <h6><i class="fas fa-thermometer-half me-2 text-success"></i>Stress Recognition</h6>
+                                        <p class="small text-muted">Ability to recognize signs of stress and overwhelm</p>
+                                        <div class="likert-scale">
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_stress_recognition" value="1" id="stress_rec_1">
+                                                <label for="stress_rec_1" style="border-color: #86efac;">
+                                                    <div class="likert-value">1</div>
+                                                    <div class="likert-label">Never</div>
+                                                </label>
+                                            </div>
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_stress_recognition" value="2" id="stress_rec_2">
+                                                <label for="stress_rec_2" style="border-color: #86efac;">
+                                                    <div class="likert-value">2</div>
+                                                    <div class="likert-label">Rarely</div>
+                                                </label>
+                                            </div>
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_stress_recognition" value="3" id="stress_rec_3">
+                                                <label for="stress_rec_3" style="border-color: #86efac;">
+                                                    <div class="likert-value">3</div>
+                                                    <div class="likert-label">Sometimes</div>
+                                                </label>
+                                            </div>
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_stress_recognition" value="4" id="stress_rec_4">
+                                                <label for="stress_rec_4" style="border-color: #86efac;">
+                                                    <div class="likert-value">4</div>
+                                                    <div class="likert-label">Usually</div>
+                                                </label>
+                                            </div>
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_stress_recognition" value="5" id="stress_rec_5">
+                                                <label for="stress_rec_5" style="border-color: #86efac;">
+                                                    <div class="likert-value">5</div>
+                                                    <div class="likert-label">Always</div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="sel-component-card" style="background: white; border-color: #86efac;">
+                                        <h6><i class="fas fa-tools me-2 text-success"></i>Coping Strategies</h6>
+                                        <p class="small text-muted">Uses healthy strategies to manage stress and challenges</p>
+                                        <div class="likert-scale">
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_coping_strategies" value="1" id="coping_str_1">
+                                                <label for="coping_str_1" style="border-color: #86efac;">
+                                                    <div class="likert-value">1</div>
+                                                    <div class="likert-label">Never</div>
+                                                </label>
+                                            </div>
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_coping_strategies" value="2" id="coping_str_2">
+                                                <label for="coping_str_2" style="border-color: #86efac;">
+                                                    <div class="likert-value">2</div>
+                                                    <div class="likert-label">Rarely</div>
+                                                </label>
+                                            </div>
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_coping_strategies" value="3" id="coping_str_3">
+                                                <label for="coping_str_3" style="border-color: #86efac;">
+                                                    <div class="likert-value">3</div>
+                                                    <div class="likert-label">Sometimes</div>
+                                                </label>
+                                            </div>
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_coping_strategies" value="4" id="coping_str_4">
+                                                <label for="coping_str_4" style="border-color: #86efac;">
+                                                    <div class="likert-value">4</div>
+                                                    <div class="likert-label">Usually</div>
+                                                </label>
+                                            </div>
+                                            <div class="likert-option">
+                                                <input type="radio" name="coping_coping_strategies" value="5" id="coping_str_5">
+                                                <label for="coping_str_5" style="border-color: #86efac;">
+                                                    <div class="likert-value">5</div>
+                                                    <div class="likert-label">Always</div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Enterprise Personality Assessment -->
+                        {% if workflow.pricing_plan.plan_type == 'enterprise' %}
+                        <div class="enterprise-personality-section">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="section-title" style="border: none; margin-bottom: 0;">
+                                    <i class="fas fa-user-tie section-icon" style="color: #d97706;"></i>
+                                    Personality Assessment (Big Five)
+                                </div>
+                                <span class="feature-badge ms-auto" style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);">ENTERPRISE</span>
+                            </div>
+                            
+                            <div class="big-five-grid">
+                                <div class="trait-card">
+                                    <div class="trait-header">
+                                        <i class="fas fa-lightbulb trait-icon" style="color: #d97706;"></i>
+                                        <div class="trait-title">Openness to Experience</div>
+                                    </div>
+                                    <p class="small text-muted">Creative, curious, and open to new ideas</p>
+                                    <div class="rating-scale">
+                                        <span class="text-muted small">Traditional</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="personality_openness" id="openness_rating"
+                                               onchange="updateRatingValue(this, 'openness_value')"
+                                               style="background: #fcd34d;">
+                                        <span class="text-muted small">Creative</span>
+                                        <span class="rating-value" id="openness_value" style="color: #d97706;">5</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="trait-card">
+                                    <div class="trait-header">
+                                        <i class="fas fa-check-circle trait-icon" style="color: #d97706;"></i>
+                                        <div class="trait-title">Conscientiousness</div>
+                                    </div>
+                                    <p class="small text-muted">Organized, responsible, and disciplined</p>
+                                    <div class="rating-scale">
+                                        <span class="text-muted small">Flexible</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="personality_conscientiousness" id="conscient_rating"
+                                               onchange="updateRatingValue(this, 'conscient_value')"
+                                               style="background: #fcd34d;">
+                                        <span class="text-muted small">Disciplined</span>
+                                        <span class="rating-value" id="conscient_value" style="color: #d97706;">5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="step-navigation">
+                    <div class="step-info">
+                        <strong>Step {{ workflow.current_step }} of {{ workflow.total_steps }}:</strong> {{ step.title }}
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        {% if can_go_back %}
+                        <a href="{% url 'assessments:workflow_step' workflow.id workflow.current_step|add:'-1' %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Previous
+                        </a>
+                        {% endif %}
+                        
+                        <button type="button" class="btn btn-outline-info" onclick="saveDraft()">
+                            <i class="fas fa-save me-2"></i>Save Draft
+                        </button>
+                        
+                        {% if is_last_step %}
+                        <button type="submit" form="psychologicalAssessmentForm" class="btn-psych-primary">
+                            <i class="fas fa-check me-2"></i>Complete Assessment
+                        </button>
+                        {% else %}
+                        <button type="submit" form="psychologicalAssessmentForm" class="btn-psych-primary">
+                            Next Step<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateRatingValue(slider, valueId) {
+    const valueDisplay = document.getElementById(valueId);
+    if (valueDisplay) {
+        valueDisplay.textContent = slider.value;
+    }
+}
+
+function saveDraft() {
+    const formData = new FormData(document.getElementById('psychologicalAssessmentForm'));
+    formData.append('action', 'save_draft');
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Psychological assessment draft saved successfully!', 'success');
+        } else {
+            showNotification('Error saving draft', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Error saving draft', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Auto-save functionality
+let autoSaveTimer;
+document.getElementById('psychologicalAssessmentForm').addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(saveDraft, 30000);
+});
+
+// Initialize rating values
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all slider values
+    updateRatingValue(document.getElementById('attention_rating'), 'attention_value');
+    updateRatingValue(document.getElementById('impulse_rating'), 'impulse_value');
+    
+    {% if workflow.pricing_plan.plan_type == 'enterprise' %}
+    updateRatingValue(document.getElementById('openness_rating'), 'openness_value');
+    updateRatingValue(document.getElementById('conscient_rating'), 'conscient_value');
+    {% endif %}
+    
+    // Add staggered animation to cards
+    const cards = document.querySelectorAll('.sel-component-card, .trait-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.style.animation = 'fadeInUp 0.6s ease forwards';
+    });
+});
+
+// CSS Animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

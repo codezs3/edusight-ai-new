@@ -1,0 +1,701 @@
+{% extends "parent_dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Comprehensive Assessment Dashboard - Parent Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .framework-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        color: white;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .framework-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
+    
+    .framework-card.academic {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .framework-card.physical {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .framework-card.psychological {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .framework-card.career {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .framework-card.ml {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    
+    .framework-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+    }
+    
+    .framework-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .framework-subtitle {
+        opacity: 0.9;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .assessment-metrics {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .metric-circle {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1rem;
+    }
+    
+    .metric-circle canvas {
+        transform: rotate(-90deg);
+    }
+    
+    .metric-inner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    
+    .score-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .score-label {
+        font-size: 0.8rem;
+        color: #7f8c8d;
+    }
+    
+    .prediction-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+        border-left: 4px solid #3498db;
+    }
+    
+    .prediction-icon {
+        font-size: 2rem;
+        color: #3498db;
+        margin-bottom: 1rem;
+    }
+    
+    .confidence-bar {
+        height: 8px;
+        background: #ecf0f1;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    
+    .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #27ae60 100%);
+        transition: width 1s ease;
+    }
+    
+    .recommendation-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-left: 3px solid #27ae60;
+        transition: all 0.3s ease;
+    }
+    
+    .recommendation-item:hover {
+        background: #e8f5e8;
+        transform: translateX(5px);
+    }
+    
+    .career-match {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .career-match:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .match-score {
+        font-weight: 700;
+        color: #27ae60;
+        font-size: 1.1rem;
+    }
+    
+    .progress-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 2rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -2rem;
+        top: 0.5rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #3498db;
+    }
+    
+    .timeline-item::after {
+        content: '';
+        position: absolute;
+        left: -1.7rem;
+        top: 1.2rem;
+        width: 2px;
+        height: calc(100% - 1.2rem);
+        background: #bdc3c7;
+    }
+    
+    .timeline-item:last-child::after {
+        display: none;
+    }
+    
+    .quick-action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-action {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        cursor: pointer;
+    }
+    
+    .quick-action:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .quick-action-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #3498db;
+    }
+    
+    .interactive-chart {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">Welcome to Your Child's Assessment Journey</h1>
+                    <p class="text-muted mb-0">Comprehensive insights powered by advanced frameworks and AI</p>
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="startNewAssessment()">
+                        <i class="fas fa-plus me-2"></i>New Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Framework Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="framework-card academic" onclick="openFramework('academic')">
+                <div class="framework-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div class="framework-title">Academic Assessment</div>
+                <div class="framework-subtitle">CBSE, ICSE, IB, IGCSE Frameworks</div>
+                <div class="d-flex justify-content-between">
+                    <span>15 Subjects</span>
+                    <span>Grade 1-12</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="framework-card physical" onclick="openFramework('physical')">
+                <div class="framework-icon">
+                    <i class="fas fa-running"></i>
+                </div>
+                <div class="framework-title">Physical Education</div>
+                <div class="framework-subtitle">Fitness & Motor Skills Assessment</div>
+                <div class="d-flex justify-content-between">
+                    <span>5 Components</span>
+                    <span>Age 5-18</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="framework-card psychological" onclick="openFramework('psychological')">
+                <div class="framework-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="framework-title">Psychological Assessment</div>
+                <div class="framework-subtitle">Cognitive & Behavioral Analysis</div>
+                <div class="d-flex justify-content-between">
+                    <span>9 Frameworks</span>
+                    <span>SEL Focused</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="framework-card career" onclick="openFramework('career')">
+                <div class="framework-icon">
+                    <i class="fas fa-compass"></i>
+                </div>
+                <div class="framework-title">Career Mapping</div>
+                <div class="framework-subtitle">Future Pathway Guidance</div>
+                <div class="d-flex justify-content-between">
+                    <span>RIASEC Model</span>
+                    <span>500+ Careers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ML Predictions Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="framework-card ml">
+                <div class="framework-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="framework-title">AI-Powered Insights</div>
+                <div class="framework-subtitle">Machine Learning Predictions</div>
+                <div class="row mt-3">
+                    <div class="col-6 text-center">
+                        <div class="h4 mb-0">94.2%</div>
+                        <small>Accuracy</small>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="h4 mb-0">8</div>
+                        <small>ML Models</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <!-- Quick Actions Grid -->
+            <div class="quick-action-grid">
+                <div class="quick-action" onclick="uploadData()">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h6>Smart Upload</h6>
+                    <small>Excel, CSV, Images</small>
+                </div>
+                <div class="quick-action" onclick="viewProgress()">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h6>Progress Tracking</h6>
+                    <small>Timeline & Trends</small>
+                </div>
+                <div class="quick-action" onclick="generateReport()">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h6>Download Report</h6>
+                    <small>Comprehensive PDF</small>
+                </div>
+                <div class="quick-action" onclick="exploreCareer()">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h6>Career Explorer</h6>
+                    <small>Future Pathways</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assessment Metrics Dashboard -->
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Interactive Assessment Chart -->
+            <div class="interactive-chart">
+                <h5 class="mb-3">
+                    <i class="fas fa-chart-area text-primary me-2"></i>
+                    Comprehensive Assessment Overview
+                </h5>
+                <div id="assessmentRadarChart" style="height: 400px;"></div>
+            </div>
+            
+            <!-- Progress Timeline -->
+            <div class="assessment-metrics">
+                <h5 class="mb-3">
+                    <i class="fas fa-timeline text-primary me-2"></i>
+                    Assessment Progress Timeline
+                </h5>
+                <div class="progress-timeline">
+                    <div class="timeline-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Data Upload Completed</h6>
+                                <small class="text-muted">Academic performance data processed</small>
+                            </div>
+                            <span class="badge bg-success">Completed</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Framework Analysis</h6>
+                                <small class="text-muted">CBSE framework assessment complete</small>
+                            </div>
+                            <span class="badge bg-success">Completed</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">ML Prediction Generation</h6>
+                                <small class="text-muted">AI models processing assessment data</small>
+                            </div>
+                            <span class="badge bg-warning">In Progress</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Report Generation</h6>
+                                <small class="text-muted">Comprehensive PDF report preparation</small>
+                            </div>
+                            <span class="badge bg-secondary">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Overall Assessment Score -->
+            <div class="assessment-metrics">
+                <h5 class="mb-3 text-center">Overall Assessment Score</h5>
+                <div class="metric-circle" id="overallScore">
+                    <canvas width="120" height="120"></canvas>
+                    <div class="metric-inner">
+                        <div class="score-text">92%</div>
+                        <div class="score-label">Excellent</div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">Based on comprehensive framework analysis</small>
+                </div>
+            </div>
+            
+            <!-- ML Predictions -->
+            <div class="prediction-card">
+                <div class="prediction-icon">
+                    <i class="fas fa-crystal-ball"></i>
+                </div>
+                <h6>Academic Trajectory Prediction</h6>
+                <p class="mb-2">Expected to maintain high performance with 94% confidence</p>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: 94%;"></div>
+                </div>
+            </div>
+            
+            <div class="prediction-card">
+                <div class="prediction-icon">
+                    <i class="fas fa-route"></i>
+                </div>
+                <h6>Career Path Recommendation</h6>
+                <p class="mb-2">Strong alignment with STEM careers, particularly technology sector</p>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: 87%;"></div>
+                </div>
+            </div>
+            
+            <!-- Recommendations -->
+            <div class="assessment-metrics">
+                <h5 class="mb-3">Personalized Recommendations</h5>
+                <div class="recommendation-item">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        <small>Focus on advanced mathematics programs</small>
+                    </div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-users text-info me-2"></i>
+                        <small>Enhance social interaction skills</small>
+                    </div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-dumbbell text-danger me-2"></i>
+                        <small>Increase physical activity levels</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Career Matching Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="assessment-metrics">
+                <h5 class="mb-3">
+                    <i class="fas fa-bullseye text-primary me-2"></i>
+                    Career Match Analysis
+                </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="career-match">
+                            <div>
+                                <h6 class="mb-1">Software Engineer</h6>
+                                <small class="text-muted">Technology Sector</small>
+                            </div>
+                            <div class="match-score">94%</div>
+                        </div>
+                        <div class="career-match">
+                            <div>
+                                <h6 class="mb-1">Data Scientist</h6>
+                                <small class="text-muted">Analytics & AI</small>
+                            </div>
+                            <div class="match-score">89%</div>
+                        </div>
+                        <div class="career-match">
+                            <div>
+                                <h6 class="mb-1">Research Scientist</h6>
+                                <small class="text-muted">Academic Research</small>
+                            </div>
+                            <div class="match-score">82%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="careerMatchChart" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Framework Detail Modals -->
+{% include 'parent_dashboard/modals/framework_modals.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize Assessment Radar Chart
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAssessmentRadarChart();
+    initializeCareerMatchChart();
+    initializeOverallScoreCircle();
+});
+
+function initializeAssessmentRadarChart() {
+    const data = [{
+        type: 'scatterpolar',
+        r: [92, 85, 78, 88, 76, 90],
+        theta: ['Academic', 'Physical', 'Cognitive', 'Emotional', 'Social', 'Creative'],
+        fill: 'toself',
+        name: 'Current Assessment',
+        line: {
+            color: '#3498db'
+        },
+        fillcolor: 'rgba(52, 152, 219, 0.3)'
+    }, {
+        type: 'scatterpolar',
+        r: [75, 75, 75, 75, 75, 75],
+        theta: ['Academic', 'Physical', 'Cognitive', 'Emotional', 'Social', 'Creative'],
+        fill: 'toself',
+        name: 'National Average',
+        line: {
+            color: '#95a5a6'
+        },
+        fillcolor: 'rgba(149, 165, 166, 0.2)'
+    }];
+
+    const layout = {
+        polar: {
+            radialaxis: {
+                visible: true,
+                range: [0, 100]
+            }
+        },
+        showlegend: true,
+        margin: {
+            l: 50,
+            r: 50,
+            t: 50,
+            b: 50
+        }
+    };
+
+    Plotly.newPlot('assessmentRadarChart', data, layout, {responsive: true});
+}
+
+function initializeCareerMatchChart() {
+    const data = [{
+        x: ['Software Engineer', 'Data Scientist', 'Research Scientist', 'Teacher', 'Doctor'],
+        y: [94, 89, 82, 65, 58],
+        type: 'bar',
+        marker: {
+            color: ['#e74c3c', '#f39c12', '#f1c40f', '#2ecc71', '#3498db'],
+            opacity: 0.8
+        }
+    }];
+
+    const layout = {
+        title: 'Career Match Scores',
+        xaxis: {
+            title: 'Career Options'
+        },
+        yaxis: {
+            title: 'Match Percentage',
+            range: [0, 100]
+        },
+        margin: {
+            l: 60,
+            r: 30,
+            t: 50,
+            b: 120
+        }
+    };
+
+    Plotly.newPlot('careerMatchChart', data, layout, {responsive: true});
+}
+
+function initializeOverallScoreCircle() {
+    const canvas = document.querySelector('#overallScore canvas');
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 45;
+    
+    // Background circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#ecf0f1';
+    ctx.stroke();
+    
+    // Progress circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, -Math.PI/2, -Math.PI/2 + (92/100) * 2 * Math.PI);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#27ae60';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+}
+
+// Framework interaction functions
+function openFramework(type) {
+    const modals = {
+        'academic': '#academicFrameworkModal',
+        'physical': '#physicalFrameworkModal',
+        'psychological': '#psychologicalFrameworkModal',
+        'career': '#careerFrameworkModal'
+    };
+    
+    if (modals[type]) {
+        $(modals[type]).modal('show');
+    }
+}
+
+function startNewAssessment() {
+    window.location.href = "{% url 'parent_dashboard:workflow' %}";
+}
+
+function uploadData() {
+    window.location.href = "{% url 'parent_dashboard:upload' %}";
+}
+
+function viewProgress() {
+    // Implement progress tracking view
+    alert('Progress tracking feature coming soon!');
+}
+
+function generateReport() {
+    // Implement report generation
+    alert('Report generation started. You will receive an email when ready.');
+}
+
+function exploreCareer() {
+    // Implement career explorer
+    alert('Career explorer feature coming soon!');
+}
+
+// Animation for assessment metrics
+function animateAssessmentMetrics() {
+    const elements = document.querySelectorAll('.framework-card, .prediction-card, .recommendation-item');
+    elements.forEach((element, index) => {
+        setTimeout(() => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'all 0.6s ease';
+            
+            setTimeout(() => {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 100);
+    });
+}
+
+// Initialize animations when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(animateAssessmentMetrics, 500);
+});
+</script>
+{% endblock %}

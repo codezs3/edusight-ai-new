@@ -1,0 +1,483 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Academic Assessment - {{ workflow.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .assessment-step {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .step-header {
+        background: var(--current-gradient);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .progress-container {
+        background: #f8fafc;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .progress-bar-custom {
+        height: 10px;
+        border-radius: 5px;
+        background: var(--current-gradient);
+    }
+    
+    .form-section {
+        padding: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--current-primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .likert-scale {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .likert-option {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .likert-option input[type="radio"] {
+        display: none;
+    }
+    
+    .likert-option label {
+        display: block;
+        padding: 1rem 0.5rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .likert-option input[type="radio"]:checked + label {
+        border-color: var(--current-primary);
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--current-primary);
+    }
+    
+    .rating-input-group {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .rating-slider {
+        flex: 1;
+        height: 8px;
+        border-radius: 4px;
+        background: #e5e7eb;
+        outline: none;
+        appearance: none;
+    }
+    
+    .rating-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--current-primary);
+        cursor: pointer;
+    }
+    
+    .rating-value {
+        font-weight: 600;
+        color: var(--current-primary);
+        min-width: 30px;
+        text-align: center;
+    }
+    
+    .help-text {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+    
+    .error-message {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .step-navigation {
+        background: #f8fafc;
+        padding: 2rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .step-info {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .btn-group-nav {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .estimated-time {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="assessment-step">
+                <!-- Step Header -->
+                <div class="step-header">
+                    <h2>{{ step.title }}</h2>
+                    <p class="mb-0">{{ step.description }}</p>
+                </div>
+                
+                <!-- Progress -->
+                <div class="progress-container">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold">Progress</span>
+                        <span>{{ workflow.current_step }}/{{ workflow.total_steps }}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-custom" 
+                             style="width: {{ progress_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <!-- Estimated Time -->
+                <div class="form-section">
+                    <div class="estimated-time">
+                        <i class="fas fa-clock me-2"></i>
+                        Estimated completion time: {{ step.estimated_duration }} minutes
+                    </div>
+                    
+                    <!-- Form Errors -->
+                    {% if form.errors %}
+                    <div class="error-message">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <div>{{ field }}: {{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Assessment Form -->
+                    <form method="post" id="assessmentForm">
+                        {% csrf_token %}
+                        
+                        <!-- Core Subjects Performance -->
+                        <div class="section-title">
+                            <i class="fas fa-graduation-cap me-2"></i>Core Subject Performance
+                        </div>
+                        
+                        <div class="row">
+                            {% for field in form %}
+                                {% if 'performance' in field.name %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="form-group">
+                                        <label class="form-label">{{ field.label }}</label>
+                                        <div class="rating-input-group">
+                                            <input type="range" 
+                                                   class="rating-slider form-range" 
+                                                   min="0" max="100" step="0.1"
+                                                   name="{{ field.name }}"
+                                                   value="{{ field.value|default:50 }}"
+                                                   id="{{ field.auto_id }}"
+                                                   onchange="updateRatingValue(this)">
+                                            <span class="rating-value" id="{{ field.auto_id }}_value">{{ field.value|default:50 }}%</span>
+                                        </div>
+                                        {% if field.help_text %}
+                                        <div class="help-text">{{ field.help_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Study Habits -->
+                        <div class="section-title">
+                            <i class="fas fa-book me-2"></i>Study Habits & Behaviors
+                        </div>
+                        
+                        {% for field in form %}
+                            {% if field.field.widget.input_type == 'radio' and 'homework' in field.name or 'class_participation' in field.name or 'note_taking' in field.name or 'time_management' in field.name %}
+                            <div class="form-group">
+                                <label class="form-label">{{ field.label }}</label>
+                                <div class="likert-scale">
+                                    {% for choice in field.field.choices %}
+                                    <div class="likert-option">
+                                        <input type="radio" 
+                                               name="{{ field.name }}" 
+                                               value="{{ choice.0 }}" 
+                                               id="{{ field.auto_id }}_{{ choice.0 }}"
+                                               {% if field.value == choice.0 %}checked{% endif %}>
+                                        <label for="{{ field.auto_id }}_{{ choice.0 }}">
+                                            <div class="fw-bold">{{ choice.0 }}</div>
+                                            <div class="small">{{ choice.1 }}</div>
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if field.help_text %}
+                                <div class="help-text">{{ field.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <!-- Learning Preferences -->
+                        <div class="section-title">
+                            <i class="fas fa-brain me-2"></i>Learning Style Preferences
+                        </div>
+                        
+                        <div class="row">
+                            {% for field in form %}
+                                {% if 'learning_style' in field.name %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="form-group">
+                                        <label class="form-label">{{ field.label }}</label>
+                                        <div class="rating-input-group">
+                                            <span class="small me-2">Low</span>
+                                            <input type="range" 
+                                                   class="rating-slider form-range" 
+                                                   min="1" max="10" step="1"
+                                                   name="{{ field.name }}"
+                                                   value="{{ field.value|default:5 }}"
+                                                   id="{{ field.auto_id }}"
+                                                   onchange="updateRatingValue(this)">
+                                            <span class="small ms-2">High</span>
+                                            <span class="rating-value" id="{{ field.auto_id }}_value">{{ field.value|default:5 }}</span>
+                                        </div>
+                                        {% if field.help_text %}
+                                        <div class="help-text">{{ field.help_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Premium/Enterprise Fields -->
+                        {% if workflow.pricing_plan.plan_type != 'basic' %}
+                        <div class="section-title">
+                            <i class="fas fa-chart-line me-2"></i>Advanced Academic Assessment
+                        </div>
+                        
+                        <!-- Advanced subjects, difficulties, motivation, etc. would go here -->
+                        <!-- This would be populated dynamically based on the form fields -->
+                        {% for field in form %}
+                            {% if field.name not in 'mathematics_performance,science_performance,english_performance,social_studies_performance' and 'learning_style' not in field.name and field.name not in 'homework_completion,class_participation,note_taking,time_management' %}
+                            <div class="form-group">
+                                {% if field.field.widget.input_type == 'radio' %}
+                                <label class="form-label">{{ field.label }}</label>
+                                <div class="likert-scale">
+                                    {% for choice in field.field.choices %}
+                                    <div class="likert-option">
+                                        <input type="radio" 
+                                               name="{{ field.name }}" 
+                                               value="{{ choice.0 }}" 
+                                               id="{{ field.auto_id }}_{{ choice.0 }}"
+                                               {% if field.value == choice.0 %}checked{% endif %}>
+                                        <label for="{{ field.auto_id }}_{{ choice.0 }}">
+                                            <div class="fw-bold">{{ choice.0 }}</div>
+                                            <div class="small">{{ choice.1 }}</div>
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% elif field.field.widget.input_type == 'number' %}
+                                <label class="form-label">{{ field.label }}</label>
+                                <div class="rating-input-group">
+                                    <span class="small me-2">{{ field.field.min_value|default:1 }}</span>
+                                    <input type="range" 
+                                           class="rating-slider form-range" 
+                                           min="{{ field.field.min_value|default:1 }}" 
+                                           max="{{ field.field.max_value|default:10 }}" 
+                                           step="1"
+                                           name="{{ field.name }}"
+                                           value="{{ field.value|default:5 }}"
+                                           id="{{ field.auto_id }}"
+                                           onchange="updateRatingValue(this)">
+                                    <span class="small ms-2">{{ field.field.max_value|default:10 }}</span>
+                                    <span class="rating-value" id="{{ field.auto_id }}_value">{{ field.value|default:5 }}</span>
+                                </div>
+                                {% else %}
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% endif %}
+                                
+                                {% if field.help_text %}
+                                <div class="help-text">{{ field.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    </form>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="step-navigation">
+                    <div class="step-info">
+                        <strong>Step {{ workflow.current_step }} of {{ workflow.total_steps }}:</strong> {{ step.title }}
+                    </div>
+                    
+                    <div class="btn-group-nav">
+                        {% if can_go_back %}
+                        <a href="{% url 'assessments:workflow_step' workflow.id workflow.current_step|add:'-1' %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Previous
+                        </a>
+                        {% endif %}
+                        
+                        <button type="button" class="btn btn-outline-info" onclick="saveDraft()">
+                            <i class="fas fa-save me-2"></i>Save Draft
+                        </button>
+                        
+                        {% if is_last_step %}
+                        <button type="submit" form="assessmentForm" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>Complete Assessment
+                        </button>
+                        {% else %}
+                        <button type="submit" form="assessmentForm" class="btn btn-primary">
+                            Next Step<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateRatingValue(slider) {
+    const valueDisplay = document.getElementById(slider.id + '_value');
+    if (valueDisplay) {
+        if (slider.max == 100) {
+            valueDisplay.textContent = slider.value + '%';
+        } else {
+            valueDisplay.textContent = slider.value;
+        }
+    }
+}
+
+function saveDraft() {
+    const formData = new FormData(document.getElementById('assessmentForm'));
+    formData.append('action', 'save_draft');
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Draft saved successfully!', 'success');
+        } else {
+            showNotification('Error saving draft', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Error saving draft', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Auto-save functionality
+let autoSaveTimer;
+document.getElementById('assessmentForm').addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(saveDraft, 30000); // Auto-save after 30 seconds of inactivity
+});
+
+// Initialize rating values
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.rating-slider').forEach(slider => {
+        updateRatingValue(slider);
+    });
+});
+</script>
+{% endblock %}

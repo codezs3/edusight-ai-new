@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to EduSight - Registration Successful</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .success-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 5rem;
+            color: var(--success-color);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+        
+        .success-title {
+            color: var(--dark-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .success-subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        
+        .next-steps {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .step-item:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-number {
+            background: var(--success-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .btn-dashboard {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .btn-dashboard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+            color: white;
+        }
+        
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+        
+        .btn-success-custom:hover {
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .feature-highlight {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .social-proof {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        
+        <h1 class="success-title display-4">Welcome to EduSight!</h1>
+        <p class="success-subtitle lead">
+            Your account has been created successfully. You're now part of our AI-powered educational community.
+        </p>
+        
+        <div class="alert alert-success border-success">
+            <i class="fas fa-user-check me-2"></i>
+            <strong>Account Status:</strong> Active and ready to use
+        </div>
+        
+        <div class="next-steps">
+            <h5 class="fw-bold mb-3">
+                <i class="fas fa-route me-2 text-primary"></i>What's Next?
+            </h5>
+            
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Complete Your Profile</strong>
+                    <div class="text-muted small">Add additional information to personalize your experience</div>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Explore Your Dashboard</strong>
+                    <div class="text-muted small">Familiarize yourself with available features and tools</div>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Upload Student Data</strong>
+                    <div class="text-muted small">Start your first assessment by uploading academic records</div>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Get AI-Powered Insights</strong>
+                    <div class="text-muted small">Receive personalized recommendations and predictions</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature-highlight">
+            <h6 class="fw-bold text-success mb-2">
+                <i class="fas fa-magic me-2"></i>Ready to Get Started?
+            </h6>
+            <p class="mb-0 small">
+                Your account includes access to our comprehensive assessment workflow, 
+                interactive analytics, and personalized recommendation engine.
+            </p>
+        </div>
+        
+        <div class="d-flex justify-content-center flex-wrap">
+            <a href="{% url 'parent_dashboard:dashboard' %}" class="btn btn-dashboard btn-success-custom">
+                <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+            </a>
+            <a href="{% url 'parent_dashboard:workflow' %}" class="btn btn-dashboard">
+                <i class="fas fa-play me-2"></i>Start Assessment
+            </a>
+        </div>
+        
+        <div class="social-proof">
+            <h6 class="fw-bold mb-3">
+                <i class="fas fa-star text-warning me-2"></i>Join Thousands of Satisfied Users
+            </h6>
+            <div class="row text-center">
+                <div class="col-4">
+                    <h4 class="text-primary fw-bold">15K+</h4>
+                    <small class="text-muted">Active Users</small>
+                </div>
+                <div class="col-4">
+                    <h4 class="text-success fw-bold">98%</h4>
+                    <small class="text-muted">Satisfaction Rate</small>
+                </div>
+                <div class="col-4">
+                    <h4 class="text-info fw-bold">50K+</h4>
+                    <small class="text-muted">Assessments</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <p class="text-muted small">
+                Need help getting started? 
+                <a href="mailto:support@edusight.com" class="text-primary">Contact our support team</a> 
+                or visit our <a href="#" class="text-primary">help center</a>.
+            </p>
+        </div>
+        
+        <div class="mt-3">
+            <a href="{% url 'website_home' %}" class="text-muted text-decoration-none">
+                <i class="fas fa-home me-1"></i>Back to Home
+            </a>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Confetti effect for celebration
+        function createConfetti() {
+            const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#7c3aed'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = '-10px';
+                    confetti.style.opacity = '0.8';
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.pointerEvents = 'none';
+                    confetti.style.zIndex = '9999';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    let position = -10;
+                    const fall = setInterval(() => {
+                        position += 5;
+                        confetti.style.top = position + 'px';
+                        confetti.style.transform = `rotate(${position * 2}deg)`;
+                        
+                        if (position > window.innerHeight) {
+                            clearInterval(fall);
+                            confetti.remove();
+                        }
+                    }, 50);
+                }, i * 100);
+            }
+        }
+        
+        // Trigger confetti on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(createConfetti, 500);
+        });
+    </script>
+</body>
+</html>

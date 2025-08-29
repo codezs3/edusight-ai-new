@@ -1,0 +1,970 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Career Mapping Assessment - {{ workflow.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .assessment-step {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .step-header {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .progress-container {
+        background: #f8fafc;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .progress-bar-custom {
+        height: 10px;
+        border-radius: 5px;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    }
+    
+    .form-section {
+        padding: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+        border-bottom: 2px solid #86efac;
+        padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-icon {
+        color: #059669;
+        margin-right: 0.75rem;
+        font-size: 1.5rem;
+    }
+    
+    .riasec-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .riasec-card {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border: 2px solid #86efac;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .riasec-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(5, 150, 105, 0.2);
+        border-color: #059669;
+    }
+    
+    .riasec-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .riasec-icon {
+        font-size: 2.5rem;
+        color: #059669;
+        margin-right: 1rem;
+    }
+    
+    .riasec-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #064e3b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .riasec-subtitle {
+        font-size: 0.875rem;
+        color: #16a34a;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .riasec-description {
+        color: #374151;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+    
+    .rating-scale {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #86efac;
+    }
+    
+    .rating-slider {
+        flex: 1;
+        height: 8px;
+        border-radius: 4px;
+        background: #dcfce7;
+        outline: none;
+        appearance: none;
+    }
+    
+    .rating-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .rating-value {
+        font-weight: 700;
+        color: #059669;
+        min-width: 40px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+    
+    .skills-section {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border: 2px solid #60a5fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .skill-card {
+        background: white;
+        border: 2px solid #93c5fd;
+        border-radius: 10px;
+        padding: 1.25rem;
+        transition: all 0.3s ease;
+    }
+    
+    .skill-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+    
+    .skill-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .skill-icon {
+        font-size: 1.5rem;
+        color: #3b82f6;
+        margin-right: 0.75rem;
+    }
+    
+    .skill-title {
+        font-weight: 600;
+        color: #1e40af;
+    }
+    
+    .values-section {
+        background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%);
+        border: 2px solid #c4b5fd;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .value-item {
+        background: white;
+        border: 2px solid #c4b5fd;
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .value-item:hover {
+        border-color: #7c3aed;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+    }
+    
+    .value-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .value-icon {
+        font-size: 1.25rem;
+        color: #7c3aed;
+        margin-right: 0.75rem;
+    }
+    
+    .value-title {
+        font-weight: 600;
+        color: #581c87;
+    }
+    
+    .likert-scale {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .likert-option {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .likert-option input[type="radio"] {
+        display: none;
+    }
+    
+    .likert-option label {
+        display: block;
+        padding: 0.75rem 0.25rem;
+        border: 2px solid #c4b5fd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: white;
+        min-height: 70px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .likert-option input[type="radio"]:checked + label {
+        border-color: #7c3aed;
+        background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%);
+        color: #581c87;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+    }
+    
+    .enterprise-features {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        border: 2px solid #fbbf24;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .feature-badge {
+        background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .career-readiness-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .readiness-card {
+        background: white;
+        border: 2px solid #fcd34d;
+        border-radius: 10px;
+        padding: 1.25rem;
+        transition: all 0.3s ease;
+    }
+    
+    .readiness-card:hover {
+        border-color: #d97706;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+    }
+    
+    .readiness-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .readiness-icon {
+        font-size: 1.5rem;
+        color: #d97706;
+        margin-right: 0.75rem;
+    }
+    
+    .readiness-title {
+        font-weight: 600;
+        color: #92400e;
+    }
+    
+    .step-navigation {
+        background: #f8fafc;
+        padding: 2rem;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .estimated-time {
+        background: #f0fdf4;
+        border: 1px solid #86efac;
+        color: #064e3b;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-career-primary {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-career-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(5, 150, 105, 0.3);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="assessment-step">
+                <!-- Step Header -->
+                <div class="step-header">
+                    <h2>
+                        <i class="fas fa-compass me-3"></i>
+                        {{ step.title }}
+                    </h2>
+                    <p class="mb-0">{{ step.description }}</p>
+                </div>
+                
+                <!-- Progress -->
+                <div class="progress-container">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold">Progress</span>
+                        <span>{{ workflow.current_step }}/{{ workflow.total_steps }}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-custom" 
+                             style="width: {{ progress_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="estimated-time">
+                        <i class="fas fa-compass"></i>
+                        Estimated completion time: {{ step.estimated_duration }} minutes
+                    </div>
+                    
+                    <!-- Form Errors -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <div>{{ field }}: {{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Assessment Form -->
+                    <form method="post" id="careerAssessmentForm">
+                        {% csrf_token %}
+                        
+                        <!-- RIASEC Interest Areas -->
+                        <div class="section-title">
+                            <i class="fas fa-heart section-icon"></i>
+                            Career Interest Areas (RIASEC Model)
+                        </div>
+                        
+                        <div class="riasec-grid">
+                            <div class="riasec-card">
+                                <div class="riasec-header">
+                                    <i class="fas fa-tools riasec-icon"></i>
+                                    <div>
+                                        <div class="riasec-title">Realistic (R)</div>
+                                        <div class="riasec-subtitle">Hands-On & Practical</div>
+                                    </div>
+                                </div>
+                                <div class="riasec-description">
+                                    Enjoys working with tools, machines, and physical objects. Prefers practical, hands-on activities and problem-solving.
+                                </div>
+                                <div class="rating-scale">
+                                    <span class="text-muted small">Low Interest</span>
+                                    <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                           name="interest_realistic" id="realistic_rating"
+                                           onchange="updateRatingValue(this, 'realistic_value')">
+                                    <span class="text-muted small">High Interest</span>
+                                    <span class="rating-value" id="realistic_value">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="riasec-card">
+                                <div class="riasec-header">
+                                    <i class="fas fa-microscope riasec-icon"></i>
+                                    <div>
+                                        <div class="riasec-title">Investigative (I)</div>
+                                        <div class="riasec-subtitle">Research & Analysis</div>
+                                    </div>
+                                </div>
+                                <div class="riasec-description">
+                                    Enjoys research, analysis, and investigating complex problems. Prefers intellectual challenges and scientific thinking.
+                                </div>
+                                <div class="rating-scale">
+                                    <span class="text-muted small">Low Interest</span>
+                                    <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                           name="interest_investigative" id="investigative_rating"
+                                           onchange="updateRatingValue(this, 'investigative_value')">
+                                    <span class="text-muted small">High Interest</span>
+                                    <span class="rating-value" id="investigative_value">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="riasec-card">
+                                <div class="riasec-header">
+                                    <i class="fas fa-palette riasec-icon"></i>
+                                    <div>
+                                        <div class="riasec-title">Artistic (A)</div>
+                                        <div class="riasec-subtitle">Creative & Expressive</div>
+                                    </div>
+                                </div>
+                                <div class="riasec-description">
+                                    Values creativity, self-expression, and artistic activities. Enjoys working in unstructured environments with creative freedom.
+                                </div>
+                                <div class="rating-scale">
+                                    <span class="text-muted small">Low Interest</span>
+                                    <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                           name="interest_artistic" id="artistic_rating"
+                                           onchange="updateRatingValue(this, 'artistic_value')">
+                                    <span class="text-muted small">High Interest</span>
+                                    <span class="rating-value" id="artistic_value">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="riasec-card">
+                                <div class="riasec-header">
+                                    <i class="fas fa-users riasec-icon"></i>
+                                    <div>
+                                        <div class="riasec-title">Social (S)</div>
+                                        <div class="riasec-subtitle">Helping & Teaching</div>
+                                    </div>
+                                </div>
+                                <div class="riasec-description">
+                                    Enjoys helping others, teaching, and working in service-oriented roles. Values making a positive impact on people's lives.
+                                </div>
+                                <div class="rating-scale">
+                                    <span class="text-muted small">Low Interest</span>
+                                    <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                           name="interest_social" id="social_rating"
+                                           onchange="updateRatingValue(this, 'social_value')">
+                                    <span class="text-muted small">High Interest</span>
+                                    <span class="rating-value" id="social_value">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="riasec-card">
+                                <div class="riasec-header">
+                                    <i class="fas fa-chart-line riasec-icon"></i>
+                                    <div>
+                                        <div class="riasec-title">Enterprising (E)</div>
+                                        <div class="riasec-subtitle">Leadership & Business</div>
+                                    </div>
+                                </div>
+                                <div class="riasec-description">
+                                    Enjoys leadership roles, business activities, and influencing others. Values achievement, competition, and economic success.
+                                </div>
+                                <div class="rating-scale">
+                                    <span class="text-muted small">Low Interest</span>
+                                    <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                           name="interest_enterprising" id="enterprising_rating"
+                                           onchange="updateRatingValue(this, 'enterprising_value')">
+                                    <span class="text-muted small">High Interest</span>
+                                    <span class="rating-value" id="enterprising_value">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="riasec-card">
+                                <div class="riasec-header">
+                                    <i class="fas fa-file-alt riasec-icon"></i>
+                                    <div>
+                                        <div class="riasec-title">Conventional (C)</div>
+                                        <div class="riasec-subtitle">Organized & Detail-Oriented</div>
+                                    </div>
+                                </div>
+                                <div class="riasec-description">
+                                    Prefers structured, organized work environments. Enjoys working with data, details, and following established procedures.
+                                </div>
+                                <div class="rating-scale">
+                                    <span class="text-muted small">Low Interest</span>
+                                    <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                           name="interest_conventional" id="conventional_rating"
+                                           onchange="updateRatingValue(this, 'conventional_value')">
+                                    <span class="text-muted small">High Interest</span>
+                                    <span class="rating-value" id="conventional_value">5</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Key Skills Assessment -->
+                        <div class="skills-section">
+                            <div class="section-title" style="border-color: #60a5fa;">
+                                <i class="fas fa-cogs section-icon" style="color: #3b82f6;"></i>
+                                Key Skills Assessment
+                            </div>
+                            
+                            <div class="skills-grid">
+                                <div class="skill-card">
+                                    <div class="skill-header">
+                                        <i class="fas fa-comments skill-icon"></i>
+                                        <div class="skill-title">Communication Skills</div>
+                                    </div>
+                                    <div class="rating-scale">
+                                        <span class="text-muted small">Developing</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="skill_communication" id="comm_rating"
+                                               onchange="updateRatingValue(this, 'comm_value')"
+                                               style="background: #dbeafe;">
+                                        <span class="text-muted small">Expert</span>
+                                        <span class="rating-value" id="comm_value" style="color: #3b82f6;">5</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="skill-card">
+                                    <div class="skill-header">
+                                        <i class="fas fa-puzzle-piece skill-icon"></i>
+                                        <div class="skill-title">Problem Solving</div>
+                                    </div>
+                                    <div class="rating-scale">
+                                        <span class="text-muted small">Developing</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="skill_problem_solving" id="problem_rating"
+                                               onchange="updateRatingValue(this, 'problem_value')"
+                                               style="background: #dbeafe;">
+                                        <span class="text-muted small">Expert</span>
+                                        <span class="rating-value" id="problem_value" style="color: #3b82f6;">5</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="skill-card">
+                                    <div class="skill-header">
+                                        <i class="fas fa-users skill-icon"></i>
+                                        <div class="skill-title">Teamwork</div>
+                                    </div>
+                                    <div class="rating-scale">
+                                        <span class="text-muted small">Developing</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="skill_teamwork" id="team_rating"
+                                               onchange="updateRatingValue(this, 'team_value')"
+                                               style="background: #dbeafe;">
+                                        <span class="text-muted small">Expert</span>
+                                        <span class="rating-value" id="team_value" style="color: #3b82f6;">5</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="skill-card">
+                                    <div class="skill-header">
+                                        <i class="fas fa-crown skill-icon"></i>
+                                        <div class="skill-title">Leadership</div>
+                                    </div>
+                                    <div class="rating-scale">
+                                        <span class="text-muted small">Developing</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="skill_leadership" id="leader_rating"
+                                               onchange="updateRatingValue(this, 'leader_value')"
+                                               style="background: #dbeafe;">
+                                        <span class="text-muted small">Expert</span>
+                                        <span class="rating-value" id="leader_value" style="color: #3b82f6;">5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Career Values -->
+                        <div class="values-section">
+                            <div class="section-title" style="border-color: #c4b5fd;">
+                                <i class="fas fa-star section-icon" style="color: #7c3aed;"></i>
+                                Career Values & Priorities
+                            </div>
+                            
+                            <div class="value-item">
+                                <div class="value-header">
+                                    <i class="fas fa-balance-scale value-icon"></i>
+                                    <div class="value-title">Work-Life Balance</div>
+                                </div>
+                                <p class="small text-muted mb-2">Having time for family, hobbies, and personal interests</p>
+                                <div class="likert-scale">
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_work_life_balance" value="1" id="balance_1">
+                                        <label for="balance_1">
+                                            <div class="fw-bold">1</div>
+                                            <div>Not Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_work_life_balance" value="2" id="balance_2">
+                                        <label for="balance_2">
+                                            <div class="fw-bold">2</div>
+                                            <div>Slightly Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_work_life_balance" value="3" id="balance_3">
+                                        <label for="balance_3">
+                                            <div class="fw-bold">3</div>
+                                            <div>Moderately Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_work_life_balance" value="4" id="balance_4">
+                                        <label for="balance_4">
+                                            <div class="fw-bold">4</div>
+                                            <div>Very Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_work_life_balance" value="5" id="balance_5">
+                                        <label for="balance_5">
+                                            <div class="fw-bold">5</div>
+                                            <div>Extremely Important</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="value-item">
+                                <div class="value-header">
+                                    <i class="fas fa-dollar-sign value-icon"></i>
+                                    <div class="value-title">Financial Security</div>
+                                </div>
+                                <p class="small text-muted mb-2">Having a stable income and financial independence</p>
+                                <div class="likert-scale">
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_financial_security" value="1" id="financial_1">
+                                        <label for="financial_1">
+                                            <div class="fw-bold">1</div>
+                                            <div>Not Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_financial_security" value="2" id="financial_2">
+                                        <label for="financial_2">
+                                            <div class="fw-bold">2</div>
+                                            <div>Slightly Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_financial_security" value="3" id="financial_3">
+                                        <label for="financial_3">
+                                            <div class="fw-bold">3</div>
+                                            <div>Moderately Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_financial_security" value="4" id="financial_4">
+                                        <label for="financial_4">
+                                            <div class="fw-bold">4</div>
+                                            <div>Very Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_financial_security" value="5" id="financial_5">
+                                        <label for="financial_5">
+                                            <div class="fw-bold">5</div>
+                                            <div>Extremely Important</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="value-item">
+                                <div class="value-header">
+                                    <i class="fas fa-hands-helping value-icon"></i>
+                                    <div class="value-title">Helping Others</div>
+                                </div>
+                                <p class="small text-muted mb-2">Making a positive difference in people's lives and society</p>
+                                <div class="likert-scale">
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_helping_others" value="1" id="helping_1">
+                                        <label for="helping_1">
+                                            <div class="fw-bold">1</div>
+                                            <div>Not Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_helping_others" value="2" id="helping_2">
+                                        <label for="helping_2">
+                                            <div class="fw-bold">2</div>
+                                            <div>Slightly Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_helping_others" value="3" id="helping_3">
+                                        <label for="helping_3">
+                                            <div class="fw-bold">3</div>
+                                            <div>Moderately Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_helping_others" value="4" id="helping_4">
+                                        <label for="helping_4">
+                                            <div class="fw-bold">4</div>
+                                            <div>Very Important</div>
+                                        </label>
+                                    </div>
+                                    <div class="likert-option">
+                                        <input type="radio" name="value_helping_others" value="5" id="helping_5">
+                                        <label for="helping_5">
+                                            <div class="fw-bold">5</div>
+                                            <div>Extremely Important</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Enterprise Career Readiness -->
+                        {% if workflow.pricing_plan.plan_type == 'enterprise' %}
+                        <div class="enterprise-features">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="section-title" style="border: none; margin-bottom: 0;">
+                                    <i class="fas fa-rocket section-icon" style="color: #d97706;"></i>
+                                    Advanced Career Readiness Assessment
+                                </div>
+                                <span class="feature-badge ms-auto">ENTERPRISE</span>
+                            </div>
+                            
+                            <div class="career-readiness-grid">
+                                <div class="readiness-card">
+                                    <div class="readiness-header">
+                                        <i class="fas fa-target readiness-icon"></i>
+                                        <div class="readiness-title">Goal Setting</div>
+                                    </div>
+                                    <p class="small text-muted">Ability to set and work toward career goals</p>
+                                    <div class="rating-scale">
+                                        <span class="text-muted small">Developing</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="readiness_goal_setting" id="goals_rating"
+                                               onchange="updateRatingValue(this, 'goals_value')"
+                                               style="background: #fef3c7;">
+                                        <span class="text-muted small">Advanced</span>
+                                        <span class="rating-value" id="goals_value" style="color: #d97706;">5</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="readiness-card">
+                                    <div class="readiness-header">
+                                        <i class="fas fa-network-wired readiness-icon"></i>
+                                        <div class="readiness-title">Networking</div>
+                                    </div>
+                                    <p class="small text-muted">Building professional relationships and connections</p>
+                                    <div class="rating-scale">
+                                        <span class="text-muted small">Developing</span>
+                                        <input type="range" class="rating-slider" min="1" max="10" value="5" 
+                                               name="readiness_networking" id="network_rating"
+                                               onchange="updateRatingValue(this, 'network_value')"
+                                               style="background: #fef3c7;">
+                                        <span class="text-muted small">Advanced</span>
+                                        <span class="rating-value" id="network_value" style="color: #d97706;">5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="step-navigation">
+                    <div class="step-info">
+                        <strong>Step {{ workflow.current_step }} of {{ workflow.total_steps }}:</strong> {{ step.title }}
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        {% if can_go_back %}
+                        <a href="{% url 'assessments:workflow_step' workflow.id workflow.current_step|add:'-1' %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Previous
+                        </a>
+                        {% endif %}
+                        
+                        <button type="button" class="btn btn-outline-info" onclick="saveDraft()">
+                            <i class="fas fa-save me-2"></i>Save Draft
+                        </button>
+                        
+                        {% if is_last_step %}
+                        <button type="submit" form="careerAssessmentForm" class="btn-career-primary">
+                            <i class="fas fa-check me-2"></i>Complete Assessment
+                        </button>
+                        {% else %}
+                        <button type="submit" form="careerAssessmentForm" class="btn-career-primary">
+                            Next Step<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateRatingValue(slider, valueId) {
+    const valueDisplay = document.getElementById(valueId);
+    if (valueDisplay) {
+        valueDisplay.textContent = slider.value;
+    }
+}
+
+function saveDraft() {
+    const formData = new FormData(document.getElementById('careerAssessmentForm'));
+    formData.append('action', 'save_draft');
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Career assessment draft saved successfully!', 'success');
+        } else {
+            showNotification('Error saving draft', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Error saving draft', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Auto-save functionality
+let autoSaveTimer;
+document.getElementById('careerAssessmentForm').addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(saveDraft, 30000);
+});
+
+// Initialize rating values
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all RIASEC sliders
+    updateRatingValue(document.getElementById('realistic_rating'), 'realistic_value');
+    updateRatingValue(document.getElementById('investigative_rating'), 'investigative_value');
+    updateRatingValue(document.getElementById('artistic_rating'), 'artistic_value');
+    updateRatingValue(document.getElementById('social_rating'), 'social_value');
+    updateRatingValue(document.getElementById('enterprising_rating'), 'enterprising_value');
+    updateRatingValue(document.getElementById('conventional_rating'), 'conventional_value');
+    
+    // Initialize skill sliders
+    updateRatingValue(document.getElementById('comm_rating'), 'comm_value');
+    updateRatingValue(document.getElementById('problem_rating'), 'problem_value');
+    updateRatingValue(document.getElementById('team_rating'), 'team_value');
+    updateRatingValue(document.getElementById('leader_rating'), 'leader_value');
+    
+    {% if workflow.pricing_plan.plan_type == 'enterprise' %}
+    // Initialize enterprise sliders
+    updateRatingValue(document.getElementById('goals_rating'), 'goals_value');
+    updateRatingValue(document.getElementById('network_rating'), 'network_value');
+    {% endif %}
+    
+    // Add staggered animation to RIASEC cards
+    const riasecCards = document.querySelectorAll('.riasec-card');
+    riasecCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.15}s`;
+        card.style.animation = 'fadeInUp 0.8s ease forwards';
+    });
+    
+    // Add animation to other cards
+    const otherCards = document.querySelectorAll('.skill-card, .value-item, .readiness-card');
+    otherCards.forEach((card, index) => {
+        card.style.animationDelay = `${(index + riasecCards.length) * 0.1}s`;
+        card.style.animation = 'fadeInUp 0.6s ease forwards';
+    });
+});
+
+// CSS Animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

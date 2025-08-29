@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
+# from .pdf_service import EnhancedPDFService
 import base64
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
@@ -33,6 +34,263 @@ from students.models import Student
 def parent_login_view(request):
     """Parent login page"""
     return render(request, 'parent_dashboard/parent_login.html')
+
+
+@login_required
+def comprehensive_dashboard_view(request):
+    """Comprehensive assessment dashboard with all frameworks and ML insights"""
+    
+    # Get student data
+    students = Student.objects.filter(parent=request.user)
+    
+    # Get recent assessments (placeholder for now)
+    recent_assessments = []
+    
+    # Get ML insights
+    ml_insights = {
+        'academic_predictions': [],
+        'career_recommendations': [],
+        'risk_assessments': [],
+        'recommendations': []
+    }
+    
+    # Framework statistics
+    framework_stats = {
+        'academic_frameworks': 8,  # Number of supported academic frameworks
+        'pe_frameworks': 5,        # Number of PE frameworks
+        'psychological_frameworks': 9,  # Number of psychological frameworks
+        'career_frameworks': 8,    # Number of career frameworks
+        'ml_models': 8            # Number of ML models
+    }
+    
+    context = {
+        'students': students,
+        'recent_assessments': recent_assessments,
+        'ml_insights': ml_insights,
+        'framework_stats': framework_stats,
+        'page_title': 'Comprehensive Assessment Dashboard'
+    }
+    
+    return render(request, 'parent_dashboard/comprehensive_dashboard.html', context)
+
+
+@login_required
+def academic_assessment_view(request):
+    """Academic assessment framework view"""
+    students = Student.objects.filter(parent=request.user)
+    
+    context = {
+        'students': students,
+        'framework_type': 'academic',
+        'page_title': 'Academic Assessment Framework'
+    }
+    
+    return render(request, 'parent_dashboard/framework_assessment.html', context)
+
+
+@login_required
+def physical_assessment_view(request):
+    """Physical education assessment framework view"""
+    students = Student.objects.filter(parent=request.user)
+    
+    context = {
+        'students': students,
+        'framework_type': 'physical',
+        'page_title': 'Physical Education Assessment Framework'
+    }
+    
+    return render(request, 'parent_dashboard/framework_assessment.html', context)
+
+
+@login_required
+def psychological_assessment_view(request):
+    """Psychological assessment framework view"""
+    students = Student.objects.filter(parent=request.user)
+    
+    context = {
+        'students': students,
+        'framework_type': 'psychological',
+        'page_title': 'Psychological Assessment Framework'
+    }
+    
+    return render(request, 'parent_dashboard/framework_assessment.html', context)
+
+
+@login_required
+def career_mapping_view(request):
+    """Career mapping framework view"""
+    students = Student.objects.filter(parent=request.user)
+    
+    context = {
+        'students': students,
+        'framework_type': 'career',
+        'page_title': 'Career Mapping Framework'
+    }
+    
+    return render(request, 'parent_dashboard/framework_assessment.html', context)
+
+
+@login_required
+def ml_insights_view(request):
+    """Machine Learning insights and predictions view"""
+    students = Student.objects.filter(parent=request.user)
+    
+    insights = {}
+    for student in students:
+        insights[student.id] = {
+            'academic_prediction': {'confidence': 0.85, 'trend': 'positive'},
+            'career_matches': [
+                {'career': 'Software Engineer', 'match': 0.87},
+                {'career': 'Data Scientist', 'match': 0.82}
+            ],
+            'risk_level': 'low'
+        }
+    
+    context = {
+        'students': students,
+        'ml_insights': insights,
+        'page_title': 'ML Insights & Predictions'
+    }
+    
+    return render(request, 'parent_dashboard/ml_insights.html', context)
+
+
+@login_required
+def risk_assessment_view(request):
+    """Risk assessment view showing potential academic/behavioral risks"""
+    students = Student.objects.filter(parent=request.user)
+    
+    risk_assessments = {}
+    for student in students:
+        risk_assessments[student.id] = {
+            'academic_risk': 'low',
+            'behavioral_risk': 'low',
+            'social_risk': 'moderate',
+            'overall_risk': 'low'
+        }
+    
+    context = {
+        'students': students,
+        'risk_assessments': risk_assessments,
+        'page_title': 'Risk Assessment Dashboard'
+    }
+    
+    return render(request, 'parent_dashboard/risk_assessment.html', context)
+
+
+@login_required
+def recommendations_view(request):
+    """Personalized recommendations view"""
+    students = Student.objects.filter(parent=request.user)
+    
+    recommendations = {}
+    for student in students:
+        recommendations[student.id] = [
+            {
+                'type': 'academic',
+                'title': 'Advanced Mathematics Program',
+                'description': 'Consider enrolling in advanced mathematics courses',
+                'priority': 'high'
+            },
+            {
+                'type': 'social',
+                'title': 'Social Skills Development',
+                'description': 'Engage in group activities to enhance social skills',
+                'priority': 'medium'
+            }
+        ]
+    
+    context = {
+        'students': students,
+        'recommendations': recommendations,
+        'page_title': 'Personalized Recommendations'
+    }
+    
+    return render(request, 'parent_dashboard/recommendations.html', context)
+
+
+@login_required
+@csrf_exempt
+def api_ml_prediction(request):
+    """API endpoint for ML predictions"""
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            student_id = data.get('student_id')
+            
+            student = get_object_or_404(Student, id=student_id, parent=request.user)
+            
+            # Mock ML predictions for now
+            predictions = {
+                'academic_trajectory': {
+                    'predicted_gpa': 3.7,
+                    'confidence': 0.85,
+                    'risk_level': 'low'
+                },
+                'career_recommendations': [
+                    {'career': 'Software Engineer', 'match_score': 0.87},
+                    {'career': 'Data Scientist', 'match_score': 0.82}
+                ],
+                'behavioral_analysis': {
+                    'risk_score': 0.2,
+                    'intervention_level': 'minimal'
+                }
+            }
+            
+            return JsonResponse({
+                'status': 'success',
+                'predictions': predictions,
+                'student_name': student.user.get_full_name()
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            })
+    
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+
+
+@login_required
+@csrf_exempt
+def api_framework_analysis(request):
+    """API endpoint for framework-based analysis"""
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            student_id = data.get('student_id')
+            framework_type = data.get('framework_type')
+            
+            student = get_object_or_404(Student, id=student_id, parent=request.user)
+            
+            # Mock framework analysis for now
+            analysis_result = {
+                'framework_type': framework_type,
+                'analysis': {
+                    'strengths': ['Mathematics', 'Science'],
+                    'areas_for_improvement': ['Language Arts'],
+                    'recommendations': ['Advanced STEM programs'],
+                    'grade_level_appropriateness': 'Excellent'
+                }
+            }
+            
+            return JsonResponse({
+                'status': 'success',
+                'analysis': analysis_result,
+                'framework_type': framework_type,
+                'student_name': student.user.get_full_name()
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            })
+    
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
 
 
 @login_required
@@ -995,7 +1253,73 @@ def api_generate_report(request, session_id):
 
 
 def generate_pdf_report(upload_session, assessment, prediction, recommendations, career_mapping):
-    """Generate comprehensive PDF report with EduSight branding"""
+    """Generate comprehensive PDF report using Enhanced PDF Service"""
+    try:
+        # Initialize the enhanced PDF service
+        pdf_service = EnhancedPDFService()
+        
+        # Prepare report data
+        report_data = {
+            'student_info': {
+                'name': upload_session.student.user.get_full_name(),
+                'grade': upload_session.student.grade,
+                'curriculum': upload_session.detected_curriculum,
+                'semester': upload_session.detected_semester,
+                'report_date': upload_session.created_at.strftime('%B %d, %Y'),
+                'student_id': upload_session.student.roll_number
+            },
+            'assessment_scores': {
+                'overall_score': assessment.overall_score,
+                'academic_score': assessment.academic_score,
+                'psychological_score': assessment.psychological_score,
+                'physical_score': assessment.physical_score,
+                'strength_areas': assessment.strength_areas[:5],
+                'improvement_areas': assessment.improvement_areas[:5]
+            },
+            'predictions': {
+                'academic_trajectory': prediction.predicted_academic_performance,
+                'psychological_wellbeing': prediction.predicted_psychological_wellbeing,
+                'physical_development': prediction.predicted_physical_development,
+                'risk_factors': prediction.risk_factors[:5] if prediction.risk_factors else []
+            },
+            'recommendations': [
+                {
+                    'title': rec.title,
+                    'type': rec.recommendation_type,
+                    'priority': rec.priority,
+                    'description': rec.description,
+                    'action_steps': rec.actionable_steps[:5] if rec.actionable_steps else [],
+                    'expected_outcome': rec.expected_outcome,
+                    'timeline': rec.timeline
+                }
+                for rec in recommendations[:8]  # Top 8 recommendations
+            ],
+            'career_mapping': {
+                'recommended_careers': career_mapping.recommended_careers[:8] if career_mapping else [],
+                'career_match_scores': career_mapping.career_match_scores if career_mapping else {},
+                'skill_gaps': career_mapping.skill_gaps[:6] if career_mapping else [],
+                'development_path': career_mapping.development_path if career_mapping else {}
+            },
+            'raw_data': upload_session.raw_data
+        }
+        
+        # Generate the PDF report using enhanced service
+        pdf_buffer = pdf_service.generate_comprehensive_report(
+            report_data, 
+            include_ml_insights=True,
+            include_benchmarks=True
+        )
+        
+        return pdf_buffer
+        
+    except Exception as e:
+        print(f"Error generating enhanced PDF report: {e}")
+        # Fallback to basic PDF generation if enhanced service fails
+        return generate_basic_pdf_report(upload_session, assessment, prediction, recommendations, career_mapping)
+
+
+def generate_basic_pdf_report(upload_session, assessment, prediction, recommendations, career_mapping):
+    """Fallback basic PDF generation"""
     from reportlab.lib.pagesizes import letter, A4
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle

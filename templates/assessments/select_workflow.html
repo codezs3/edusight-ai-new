@@ -1,0 +1,842 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Select Assessment Workflow - EduSight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .selection-wizard {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .wizard-header {
+        background: var(--current-gradient);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .wizard-steps {
+        display: flex;
+        justify-content: center;
+        padding: 1rem 0;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .wizard-step {
+        display: flex;
+        align-items: center;
+        margin: 0 1rem;
+        color: #64748b;
+    }
+    
+    .wizard-step.active {
+        color: var(--current-primary);
+        font-weight: 600;
+    }
+    
+    .wizard-step.completed {
+        color: #10b981;
+    }
+    
+    .step-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 8px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .wizard-step.active .step-number {
+        background: var(--current-primary);
+        color: white;
+    }
+    
+    .wizard-step.completed .step-number {
+        background: #10b981;
+        color: white;
+    }
+    
+    .pricing-plan-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .pricing-plan-card:hover {
+        border-color: var(--current-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .pricing-plan-card.selected {
+        border-color: var(--current-primary);
+        background: rgba(37, 99, 235, 0.05);
+    }
+    
+    .pricing-plan-card.recommended::before {
+        content: 'RECOMMENDED';
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        background: var(--current-gradient);
+        color: white;
+        padding: 5px 12px;
+        font-size: 11px;
+        font-weight: bold;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+    
+    .plan-header {
+        text-align: center;
+        padding: 1.5rem 1rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .plan-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--current-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .plan-subtitle {
+        color: #64748b;
+        font-size: 14px;
+    }
+    
+    .plan-features {
+        padding: 1.5rem;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 14px;
+    }
+    
+    .feature-icon {
+        width: 20px;
+        margin-right: 10px;
+        color: #10b981;
+    }
+    
+    .feature-unavailable {
+        opacity: 0.5;
+    }
+    
+    .feature-unavailable .feature-icon {
+        color: #ef4444;
+    }
+    
+    .assessment-type-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-align: center;
+    }
+    
+    .assessment-type-card:hover {
+        border-color: var(--current-primary);
+        background: rgba(37, 99, 235, 0.05);
+    }
+    
+    .assessment-type-card.selected {
+        border-color: var(--current-primary);
+        background: rgba(37, 99, 235, 0.1);
+    }
+    
+    .assessment-type-card.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f8fafc;
+    }
+    
+    .assessment-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--current-primary);
+    }
+    
+    .student-select-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+    
+    .student-select-card:hover {
+        border-color: var(--current-primary);
+        background: rgba(37, 99, 235, 0.05);
+    }
+    
+    .student-select-card.selected {
+        border-color: var(--current-primary);
+        background: rgba(37, 99, 235, 0.1);
+    }
+    
+    .student-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--current-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-right: 1rem;
+    }
+    
+    .wizard-navigation {
+        padding: 2rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+    
+    .form-section {
+        padding: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+    }
+    
+    .error-message {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .success-message {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #059669;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="selection-wizard">
+                <!-- Wizard Header -->
+                <div class="wizard-header">
+                    <h2>Create Assessment Workflow</h2>
+                    <p class="mb-0">Select your assessment plan and configure your comprehensive student evaluation</p>
+                </div>
+                
+                <!-- Wizard Steps -->
+                <div class="wizard-steps">
+                    <div class="wizard-step active">
+                        <div class="step-number">1</div>
+                        <span>Select Student</span>
+                    </div>
+                    <div class="wizard-step">
+                        <div class="step-number">2</div>
+                        <span>Choose Plan</span>
+                    </div>
+                    <div class="wizard-step">
+                        <div class="step-number">3</div>
+                        <span>Assessment Types</span>
+                    </div>
+                    <div class="wizard-step">
+                        <div class="step-number">4</div>
+                        <span>Review & Start</span>
+                    </div>
+                </div>
+                
+                <!-- Form -->
+                <form method="post" id="workflowForm">
+                    {% csrf_token %}
+                    
+                    <!-- Error Messages -->
+                    {% if form.errors %}
+                    <div class="form-section">
+                        <div class="error-message">
+                            <h6>Please correct the following errors:</h6>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <div>{{ field }}: {{ error }}</div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Step 1: Student Selection -->
+                    <div class="form-section" id="step1">
+                        <h3 class="section-title">
+                            <i class="fas fa-user-graduate me-2"></i>Select Student
+                        </h3>
+                        
+                        {% if students %}
+                        <div class="row">
+                            {% for student in students %}
+                            <div class="col-md-6 mb-3">
+                                <div class="student-select-card" data-student-id="{{ student.id }}">
+                                    <div class="student-avatar">
+                                        {{ student.user.first_name|first }}{{ student.user.last_name|first }}
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">{{ student.user.get_full_name }}</h6>
+                                        <small class="text-muted">{{ student.grade }} • {{ student.section }}</small><br>
+                                        <small class="text-muted">Age: {{ student.age|default:"N/A" }} • Roll: {{ student.roll_number }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5>No Students Found</h5>
+                            <p class="text-muted">You need to add students before creating assessments.</p>
+                            <a href="{% url 'students:create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Add Student
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Hidden form field -->
+                        <select name="student" id="id_student" style="display: none;">
+                            <option value="">---------</option>
+                            {% for student in students %}
+                            <option value="{{ student.id }}">{{ student.user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Step 2: Pricing Plan Selection -->
+                    <div class="form-section" id="step2" style="display: none;">
+                        <h3 class="section-title">
+                            <i class="fas fa-credit-card me-2"></i>Choose Assessment Plan
+                        </h3>
+                        
+                        <div class="row">
+                            {% for plan in pricing_plans %}
+                            <div class="col-lg-4 mb-4">
+                                <div class="pricing-plan-card h-100 {% if plan.plan_type == 'premium' %}recommended{% endif %}" 
+                                     data-plan-id="{{ plan.id }}">
+                                    <div class="plan-header">
+                                        <h5>{{ plan.name }}</h5>
+                                        <div class="plan-price">${{ plan.price }}</div>
+                                        <div class="plan-subtitle">per {{ plan.duration_months }} months</div>
+                                    </div>
+                                    
+                                    <div class="plan-features">
+                                        <ul class="feature-list">
+                                            <li class="feature-item {% if not plan.academic_assessments %}feature-unavailable{% endif %}">
+                                                <i class="fas {% if plan.academic_assessments %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                                                Academic Assessment
+                                            </li>
+                                            <li class="feature-item {% if not plan.physical_assessments %}feature-unavailable{% endif %}">
+                                                <i class="fas {% if plan.physical_assessments %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                                                Physical Education
+                                            </li>
+                                            <li class="feature-item {% if not plan.psychological_assessments %}feature-unavailable{% endif %}">
+                                                <i class="fas {% if plan.psychological_assessments %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                                                Psychological Assessment
+                                            </li>
+                                            <li class="feature-item {% if not plan.career_mapping %}feature-unavailable{% endif %}">
+                                                <i class="fas {% if plan.career_mapping %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                                                Career Mapping
+                                            </li>
+                                            <li class="feature-item {% if not plan.ml_predictions %}feature-unavailable{% endif %}">
+                                                <i class="fas {% if plan.ml_predictions %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                                                AI Predictions
+                                            </li>
+                                            <li class="feature-item {% if not plan.advanced_analytics %}feature-unavailable{% endif %}">
+                                                <i class="fas {% if plan.advanced_analytics %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                                                Advanced Analytics
+                                            </li>
+                                        </ul>
+                                        
+                                        <div class="mt-3 pt-3 border-top">
+                                            <small class="text-muted">
+                                                <strong>Includes:</strong><br>
+                                                • Up to {{ plan.max_students }} student{{ plan.max_students|pluralize }}<br>
+                                                • {{ plan.max_assessments_per_month }} assessments/month<br>
+                                                • {{ plan.max_reports_per_month }} reports/month
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Hidden form field -->
+                        <div style="display: none;">
+                            {% for plan in pricing_plans %}
+                            <input type="radio" name="pricing_plan" value="{{ plan.id }}" id="plan_{{ plan.id }}">
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Assessment Types -->
+                    <div class="form-section" id="step3" style="display: none;">
+                        <h3 class="section-title">
+                            <i class="fas fa-clipboard-list me-2"></i>Select Assessment Types
+                        </h3>
+                        
+                        <p class="text-muted mb-4">Choose which assessments to include in your workflow. Available options depend on your selected plan.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="assessment-type-card" data-assessment="academic">
+                                    <div class="assessment-icon">
+                                        <i class="fas fa-book-open"></i>
+                                    </div>
+                                    <h6>Academic Assessment</h6>
+                                    <p class="text-muted small mb-0">
+                                        Comprehensive evaluation of academic performance across core subjects
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <div class="assessment-type-card" data-assessment="physical">
+                                    <div class="assessment-icon">
+                                        <i class="fas fa-running"></i>
+                                    </div>
+                                    <h6>Physical Education</h6>
+                                    <p class="text-muted small mb-0">
+                                        Physical fitness, motor skills, and health assessment
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <div class="assessment-type-card" data-assessment="psychological">
+                                    <div class="assessment-icon">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <h6>Psychological Assessment</h6>
+                                    <p class="text-muted small mb-0">
+                                        Social-emotional learning and behavioral evaluation
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <div class="assessment-type-card" data-assessment="career">
+                                    <div class="assessment-icon">
+                                        <i class="fas fa-compass"></i>
+                                    </div>
+                                    <h6>Career Mapping</h6>
+                                    <p class="text-muted small mb-0">
+                                        Career interests, skills, and future pathway guidance
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden form fields -->
+                        <div style="display: none;">
+                            <input type="checkbox" name="assessment_types" value="academic" id="assessment_academic">
+                            <input type="checkbox" name="assessment_types" value="physical" id="assessment_physical">
+                            <input type="checkbox" name="assessment_types" value="psychological" id="assessment_psychological">
+                            <input type="checkbox" name="assessment_types" value="career" id="assessment_career">
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4: Review -->
+                    <div class="form-section" id="step4" style="display: none;">
+                        <h3 class="section-title">
+                            <i class="fas fa-check-circle me-2"></i>Review & Confirm
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Assessment Summary</h6>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Student:</strong></div>
+                                            <div class="col-sm-8" id="review-student">-</div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Plan:</strong></div>
+                                            <div class="col-sm-8" id="review-plan">-</div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Price:</strong></div>
+                                            <div class="col-sm-8" id="review-price">-</div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Assessments:</strong></div>
+                                            <div class="col-sm-8" id="review-assessments">-</div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-sm-4"><strong>Estimated Time:</strong></div>
+                                            <div class="col-sm-8" id="review-time">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">What's Next?</h6>
+                                        <ul class="list-unstyled small">
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Workflow will be created
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Assessment steps will be prepared
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                You'll be guided through each step
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Comprehensive report will be generated
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="wizard-navigation">
+                        <button type="button" class="btn btn-outline-secondary" id="prevBtn" style="display: none;">
+                            <i class="fas fa-arrow-left me-2"></i>Previous
+                        </button>
+                        
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-primary" id="nextBtn">
+                                Next<i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                            
+                            <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                                <i class="fas fa-rocket me-2"></i>Create Workflow
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentStep = 1;
+const totalSteps = 4;
+let selectedStudent = null;
+let selectedPlan = null;
+let selectedAssessments = [];
+let planData = {};
+
+// Store plan data
+{% for plan in pricing_plans %}
+planData[{{ plan.id }}] = {
+    name: "{{ plan.name }}",
+    price: "{{ plan.price }}",
+    academic: {{ plan.academic_assessments|yesno:"true,false" }},
+    physical: {{ plan.physical_assessments|yesno:"true,false" }},
+    psychological: {{ plan.psychological_assessments|yesno:"true,false" }},
+    career: {{ plan.career_mapping|yesno:"true,false" }}
+};
+{% endfor %}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupEventListeners();
+    updateWizardSteps();
+});
+
+function setupEventListeners() {
+    // Student selection
+    document.querySelectorAll('.student-select-card').forEach(card => {
+        card.addEventListener('click', function() {
+            selectStudent(this.dataset.studentId);
+        });
+    });
+    
+    // Plan selection
+    document.querySelectorAll('.pricing-plan-card').forEach(card => {
+        card.addEventListener('click', function() {
+            selectPlan(this.dataset.planId);
+        });
+    });
+    
+    // Assessment type selection
+    document.querySelectorAll('.assessment-type-card').forEach(card => {
+        card.addEventListener('click', function() {
+            if (!this.classList.contains('disabled')) {
+                toggleAssessment(this.dataset.assessment);
+            }
+        });
+    });
+    
+    // Navigation buttons
+    document.getElementById('nextBtn').addEventListener('click', nextStep);
+    document.getElementById('prevBtn').addEventListener('click', prevStep);
+}
+
+function selectStudent(studentId) {
+    selectedStudent = studentId;
+    
+    // Update UI
+    document.querySelectorAll('.student-select-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    document.querySelector(`[data-student-id="${studentId}"]`).classList.add('selected');
+    
+    // Update form
+    document.getElementById('id_student').value = studentId;
+    
+    updateNextButton();
+}
+
+function selectPlan(planId) {
+    selectedPlan = planId;
+    
+    // Update UI
+    document.querySelectorAll('.pricing-plan-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    document.querySelector(`[data-plan-id="${planId}"]`).classList.add('selected');
+    
+    // Update form
+    document.getElementById(`plan_${planId}`).checked = true;
+    
+    // Update assessment availability
+    updateAssessmentAvailability();
+    
+    updateNextButton();
+}
+
+function toggleAssessment(assessmentType) {
+    const index = selectedAssessments.indexOf(assessmentType);
+    
+    if (index > -1) {
+        selectedAssessments.splice(index, 1);
+        document.querySelector(`[data-assessment="${assessmentType}"]`).classList.remove('selected');
+        document.getElementById(`assessment_${assessmentType}`).checked = false;
+    } else {
+        selectedAssessments.push(assessmentType);
+        document.querySelector(`[data-assessment="${assessmentType}"]`).classList.add('selected');
+        document.getElementById(`assessment_${assessmentType}`).checked = true;
+    }
+    
+    updateNextButton();
+}
+
+function updateAssessmentAvailability() {
+    if (!selectedPlan) return;
+    
+    const plan = planData[selectedPlan];
+    
+    // Reset all assessments
+    document.querySelectorAll('.assessment-type-card').forEach(card => {
+        card.classList.remove('disabled', 'selected');
+    });
+    
+    // Reset checkboxes
+    document.querySelectorAll('input[name="assessment_types"]').forEach(input => {
+        input.checked = false;
+    });
+    
+    selectedAssessments = [];
+    
+    // Enable/disable based on plan
+    const assessmentTypes = ['academic', 'physical', 'psychological', 'career'];
+    
+    assessmentTypes.forEach(type => {
+        const card = document.querySelector(`[data-assessment="${type}"]`);
+        const isAvailable = plan[type] || type === 'academic'; // Academic always available
+        
+        if (!isAvailable) {
+            card.classList.add('disabled');
+        }
+    });
+    
+    // Auto-select academic assessment
+    if (plan.academic) {
+        toggleAssessment('academic');
+    }
+}
+
+function nextStep() {
+    if (currentStep < totalSteps && validateCurrentStep()) {
+        currentStep++;
+        showStep(currentStep);
+        updateWizardSteps();
+        updateNavigationButtons();
+        
+        if (currentStep === 4) {
+            updateReviewSection();
+        }
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+        updateWizardSteps();
+        updateNavigationButtons();
+    }
+}
+
+function validateCurrentStep() {
+    switch (currentStep) {
+        case 1:
+            if (!selectedStudent) {
+                alert('Please select a student');
+                return false;
+            }
+            break;
+        case 2:
+            if (!selectedPlan) {
+                alert('Please select a pricing plan');
+                return false;
+            }
+            break;
+        case 3:
+            if (selectedAssessments.length === 0) {
+                alert('Please select at least one assessment type');
+                return false;
+            }
+            break;
+    }
+    return true;
+}
+
+function showStep(step) {
+    // Hide all steps
+    for (let i = 1; i <= totalSteps; i++) {
+        document.getElementById(`step${i}`).style.display = 'none';
+    }
+    
+    // Show current step
+    document.getElementById(`step${step}`).style.display = 'block';
+}
+
+function updateWizardSteps() {
+    document.querySelectorAll('.wizard-step').forEach((step, index) => {
+        const stepNumber = index + 1;
+        
+        step.classList.remove('active', 'completed');
+        
+        if (stepNumber < currentStep) {
+            step.classList.add('completed');
+        } else if (stepNumber === currentStep) {
+            step.classList.add('active');
+        }
+    });
+}
+
+function updateNavigationButtons() {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+    
+    if (currentStep === totalSteps) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'block';
+    } else {
+        nextBtn.style.display = 'block';
+        submitBtn.style.display = 'none';
+    }
+}
+
+function updateNextButton() {
+    const nextBtn = document.getElementById('nextBtn');
+    const isValid = validateCurrentStep();
+    
+    nextBtn.disabled = !isValid;
+    nextBtn.classList.toggle('btn-primary', isValid);
+    nextBtn.classList.toggle('btn-outline-primary', !isValid);
+}
+
+function updateReviewSection() {
+    // Student info
+    const studentCard = document.querySelector(`[data-student-id="${selectedStudent}"]`);
+    const studentName = studentCard.querySelector('h6').textContent;
+    document.getElementById('review-student').textContent = studentName;
+    
+    // Plan info
+    const plan = planData[selectedPlan];
+    document.getElementById('review-plan').textContent = plan.name;
+    document.getElementById('review-price').textContent = `$${plan.price}`;
+    
+    // Assessments
+    const assessmentNames = {
+        academic: 'Academic Assessment',
+        physical: 'Physical Education',
+        psychological: 'Psychological Assessment',
+        career: 'Career Mapping'
+    };
+    
+    const assessmentList = selectedAssessments.map(type => assessmentNames[type]).join(', ');
+    document.getElementById('review-assessments').textContent = assessmentList;
+    
+    // Estimated time
+    const baseTime = 15; // minutes per assessment
+    const totalTime = selectedAssessments.length * baseTime;
+    document.getElementById('review-time').textContent = `${totalTime} minutes`;
+}
+
+// Initialize
+showStep(currentStep);
+updateNavigationButtons();
+</script>
+{% endblock %}

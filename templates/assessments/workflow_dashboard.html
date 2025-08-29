@@ -1,0 +1,456 @@
+{% extends 'parent_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Assessment Workflows - EduSight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pricing-card {
+        border: 2px solid #e0e6ed;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .pricing-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-color: var(--current-primary);
+    }
+    
+    .pricing-card.recommended {
+        border-color: var(--current-primary);
+        box-shadow: 0 5px 20px rgba(37, 99, 235, 0.2);
+    }
+    
+    .pricing-card.recommended::before {
+        content: 'RECOMMENDED';
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: var(--current-gradient);
+        color: white;
+        padding: 5px 15px;
+        font-size: 12px;
+        font-weight: bold;
+        border-bottom-left-radius: 8px;
+    }
+    
+    .plan-price {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--current-primary);
+    }
+    
+    .plan-features {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .plan-features li {
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .plan-features li:last-child {
+        border-bottom: none;
+    }
+    
+    .feature-icon {
+        color: #10b981;
+        margin-right: 10px;
+        width: 16px;
+    }
+    
+    .feature-unavailable {
+        opacity: 0.5;
+    }
+    
+    .feature-unavailable .feature-icon {
+        color: #dc2626;
+    }
+    
+    .workflow-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .workflow-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .progress-bar-custom {
+        height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, var(--current-primary), var(--current-accent));
+    }
+    
+    .stats-card {
+        background: var(--current-gradient);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .workflow-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-draft { background: #f3f4f6; color: #6b7280; }
+    .status-in_progress { background: #dbeafe; color: #1d4ed8; }
+    .status-completed { background: #d1fae5; color: #059669; }
+    .status-review { background: #fef3c7; color: #d97706; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Assessment Workflows</h1>
+                    <p class="text-muted">Create and manage comprehensive student assessments</p>
+                </div>
+                <div>
+                    <a href="{% url 'assessments:select_workflow' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Start New Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{ stats.total_assessments }}</div>
+                <div>Total Assessments</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{ stats.completed_assessments }}</div>
+                <div>Completed</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{ stats.in_progress }}</div>
+                <div>In Progress</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{ stats.completion_rate|floatformat:1 }}%</div>
+                <div>Completion Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Plans Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h4 class="mb-4">Choose Your Assessment Plan</h4>
+        </div>
+        {% for plan in pricing_plans %}
+        <div class="col-lg-4 mb-4">
+            <div class="pricing-card h-100 {% if plan.plan_type == 'premium' %}recommended{% endif %}">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h5 class="card-title">{{ plan.name }}</h5>
+                        <div class="plan-price">${{ plan.price }}</div>
+                        <small class="text-muted">per {{ plan.duration_months }} months</small>
+                    </div>
+                    
+                    <ul class="plan-features">
+                        <li class="{% if not plan.academic_assessments %}feature-unavailable{% endif %}">
+                            <i class="fas {% if plan.academic_assessments %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                            Academic Assessment
+                        </li>
+                        <li class="{% if not plan.physical_assessments %}feature-unavailable{% endif %}">
+                            <i class="fas {% if plan.physical_assessments %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                            Physical Education Assessment
+                        </li>
+                        <li class="{% if not plan.psychological_assessments %}feature-unavailable{% endif %}">
+                            <i class="fas {% if plan.psychological_assessments %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                            Psychological Assessment
+                        </li>
+                        <li class="{% if not plan.career_mapping %}feature-unavailable{% endif %}">
+                            <i class="fas {% if plan.career_mapping %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                            Career Mapping
+                        </li>
+                        <li class="{% if not plan.ml_predictions %}feature-unavailable{% endif %}">
+                            <i class="fas {% if plan.ml_predictions %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                            AI Predictions
+                        </li>
+                        <li class="{% if not plan.advanced_analytics %}feature-unavailable{% endif %}">
+                            <i class="fas {% if plan.advanced_analytics %}fa-check{% else %}fa-times{% endif %} feature-icon"></i>
+                            Advanced Analytics
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            <strong>Limits:</strong><br>
+                            Up to {{ plan.max_students }} student{{ plan.max_students|pluralize }}<br>
+                            {{ plan.max_assessments_per_month }} assessments/month<br>
+                            {{ plan.max_reports_per_month }} reports/month
+                        </small>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'assessments:select_workflow' %}?plan={{ plan.id }}" 
+                           class="btn btn-outline-primary w-100">
+                            Select {{ plan.name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Recent Workflows -->
+    {% if workflows %}
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Recent Workflows</h4>
+                <a href="{% url 'assessments:workflow_list' %}" class="btn btn-outline-primary">
+                    View All Workflows
+                </a>
+            </div>
+        </div>
+        
+        {% for workflow in workflows %}
+        <div class="col-lg-6 mb-4">
+            <div class="workflow-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="card-title mb-1">{{ workflow.name }}</h6>
+                            <small class="text-muted">{{ workflow.student.user.get_full_name }}</small>
+                        </div>
+                        <span class="workflow-status status-{{ workflow.status }}">
+                            {{ workflow.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Progress</small>
+                            <small class="text-muted">{{ workflow.current_step }}/{{ workflow.total_steps }}</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar progress-bar-custom" 
+                                 style="width: {{ workflow.get_progress_percentage }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <small class="text-muted d-block">Plan</small>
+                            <strong>{{ workflow.pricing_plan.get_plan_type_display }}</strong>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block">Created</small>
+                            <strong>{{ workflow.created_at|date:"M d" }}</strong>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block">Duration</small>
+                            <strong>
+                                {% if workflow.completed_at %}
+                                    {{ workflow.completed_at|timesince:workflow.started_at }}
+                                {% elif workflow.started_at %}
+                                    {{ workflow.started_at|timesince }}
+                                {% else %}
+                                    Not started
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        {% if workflow.status == 'draft' %}
+                            <a href="{% url 'assessments:start_workflow' workflow.id %}" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-play me-1"></i>Start Assessment
+                            </a>
+                        {% elif workflow.status == 'in_progress' %}
+                            <a href="{% url 'assessments:workflow_step' workflow.id workflow.current_step %}" 
+                               class="btn btn-success btn-sm">
+                                <i class="fas fa-arrow-right me-1"></i>Continue
+                            </a>
+                        {% elif workflow.status == 'completed' %}
+                            <a href="{% url 'assessments:workflow_results' workflow.id %}" 
+                               class="btn btn-info btn-sm">
+                                <i class="fas fa-chart-line me-1"></i>View Results
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'assessments:workflow_detail' workflow.id %}" 
+                           class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-eye me-1"></i>Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- No Workflows State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-clipboard-list fa-4x text-muted"></i>
+                </div>
+                <h4>No Assessment Workflows Yet</h4>
+                <p class="text-muted mb-4">
+                    Get started by creating your first comprehensive student assessment
+                </p>
+                <a href="{% url 'assessments:select_workflow' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Create Your First Assessment
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assessment Workflow Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Pricing Plan Comparison</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Basic</th>
+                                <th>Premium</th>
+                                <th>Enterprise</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Academic Assessment</td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Physical Education</td>
+                                <td><i class="fas fa-times text-danger"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Psychological Assessment</td>
+                                <td><i class="fas fa-times text-danger"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Career Mapping</td>
+                                <td><i class="fas fa-times text-danger"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>AI Predictions</td>
+                                <td><i class="fas fa-times text-danger"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Advanced Analytics</td>
+                                <td><i class="fas fa-times text-danger"></i></td>
+                                <td><i class="fas fa-times text-danger"></i></td>
+                                <td><i class="fas fa-check text-success"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h6 class="mt-4">Assessment Process</h6>
+                <ol>
+                    <li><strong>Select Plan:</strong> Choose the plan that best fits your needs</li>
+                    <li><strong>Student Selection:</strong> Select the student for assessment</li>
+                    <li><strong>Assessment Types:</strong> Choose which assessments to include</li>
+                    <li><strong>Complete Steps:</strong> Follow the guided workflow steps</li>
+                    <li><strong>Review Results:</strong> Analyze comprehensive results and insights</li>
+                    <li><strong>Generate Report:</strong> Download detailed PDF report</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add help button to header
+    const helpButton = `
+        <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#helpModal">
+            <i class="fas fa-question-circle"></i> Help
+        </button>
+    `;
+    
+    const headerActions = document.querySelector('.d-flex.justify-content-between .d-flex:last-child');
+    if (headerActions) {
+        headerActions.insertAdjacentHTML('beforeend', helpButton);
+    }
+    
+    // Animate statistics cards
+    const statsCards = document.querySelectorAll('.stats-card');
+    statsCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('animate__animated', 'animate__fadeInUp');
+    });
+    
+    // Add hover effects to workflow cards
+    const workflowCards = document.querySelectorAll('.workflow-card');
+    workflowCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-4px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

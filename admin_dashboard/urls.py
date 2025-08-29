@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import settings_views
 
 app_name = 'admin_dashboard'
 
@@ -16,6 +17,13 @@ urlpatterns = [
     path('settings/', views.settings_management, name='settings'),
     path('backup/', views.backup_system, name='backup'),
     path('workflows/', views.workflow_management, name='workflows'),
+    
+    # Settings Management
+    path('settings/overview/', settings_views.settings_overview, name='settings_overview'),
+    path('settings/database/', settings_views.database_settings, name='database_settings'),
+    path('settings/system/', settings_views.system_settings, name='system_settings'),
+    path('settings/backup/<str:backup_name>/', settings_views.backup_download, name='backup_download'),
+    path('api/backup/', settings_views.backup_api, name='backup_api'),
     
     # New CRUD management pages
     path('students/', views.students_management, name='students'),
