@@ -312,7 +312,7 @@
 <script>
 function activateTheme(themeName) {
     if (confirm('Activate theme "' + themeName + '"? This will change the site appearance.')) {
-        fetch('/admin-panel/appearance/', {
+        fetch('{% url "admin_dashboard:appearance" %}', {
             method: 'POST',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,

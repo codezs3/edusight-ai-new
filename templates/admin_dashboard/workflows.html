@@ -368,7 +368,7 @@
 <script>
 function initializeAirflow() {
     if (confirm('Initialize Airflow database? This will set up the required tables.')) {
-        fetch('/admin-panel/workflows/', {
+        fetch('{% url "admin_dashboard:workflows" %}', {
             method: 'POST',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -426,7 +426,7 @@ function submitCreateUser() {
 
 function startScheduler() {
     if (confirm('Start Airflow scheduler? This will run workflow schedules.')) {
-        fetch('/admin-panel/workflows/', {
+        fetch('{% url "admin_dashboard:workflows" %}', {
             method: 'POST',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -450,7 +450,7 @@ function startScheduler() {
 
 function startWebserver() {
     if (confirm('Start Airflow webserver? This will open the Airflow UI on port 8080.')) {
-        fetch('/admin-panel/workflows/', {
+        fetch('{% url "admin_dashboard:workflows" %}', {
             method: 'POST',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -461,7 +461,7 @@ function startWebserver() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Airflow webserver started! You can access it at http://localhost:8080');
+                alert('Airflow webserver started! You can access it at ' + window.location.protocol + '//' + window.location.hostname + ':8080');
             } else {
                 alert('Failed to start webserver: ' + (data.error || 'Unknown error'));
             }
@@ -479,7 +479,7 @@ function triggerDAG(dagId) {
         formData.append('dag_id', dagId);
         formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
-        fetch('/admin-panel/workflows/', {
+        fetch('{% url "admin_dashboard:workflows" %}', {
             method: 'POST',
             body: formData
         })

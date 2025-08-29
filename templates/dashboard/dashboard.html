@@ -636,7 +636,7 @@
                     </li>
                     
                     <li class="nav-item">
-                        <a href="/ml/" class="nav-link">ML Predictions</a>
+                        <a href="{% url 'ml_predictions:dashboard' %}" class="nav-link">Analytics</a>
                     </li>
                     
                     <li class="nav-item">
@@ -648,15 +648,15 @@
                     </li>
                     
                     <li class="nav-item">
-                        <a href="/admin-panel/overview/" class="nav-link">Admin Panel</a>
+                        <a href="{% url 'admin_dashboard:overview' %}" class="nav-link">Admin Panel</a>
                     </li>
                     
                     <li class="nav-item">
-                        <a href="/admin-panel/workflows/" class="nav-link">Workflows</a>
+                        <a href="{% url 'admin_dashboard:workflows' %}" class="nav-link">Workflows</a>
                     </li>
                     
                     <li class="nav-item">
-                        <a href="/admin-panel/settings/" class="nav-link">Settings</a>
+                        <a href="{% url 'admin_dashboard:settings' %}" class="nav-link">Settings</a>
                     </li>
                 </ul>
                 
@@ -714,7 +714,7 @@
                                     <a href="/students/create/" class="btn btn-success btn-sm">
                                         <i class="fas fa-plus"></i> Add New
                                     </a>
-                                    <a href="/admin-panel/students/" class="btn btn-outline-primary btn-sm">
+                                    <a href="{% url 'admin_dashboard:students' %}" class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-cog"></i> Manage
                                     </a>
                                 </div>
@@ -744,7 +744,7 @@
                                     <a href="/assessments/create/" class="btn btn-success btn-sm">
                                         <i class="fas fa-plus"></i> Create New
                                     </a>
-                                    <a href="/admin-panel/assessments/" class="btn btn-outline-primary btn-sm">
+                                    <a href="{% url 'admin_dashboard:assessments' %}" class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-cog"></i> Manage
                                     </a>
                                 </div>
@@ -801,13 +801,13 @@
                                     </span>
                                 </div>
                                 <div class="module-actions">
-                                    <a href="/ml/" class="btn btn-primary btn-sm">
+                                    <a href="{% url 'ml_predictions:dashboard' %}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-eye"></i> Dashboard
                                     </a>
-                                    <a href="/ml/generate/" class="btn btn-success btn-sm">
+                                    <a href="{% url 'ml_predictions:predictions_list' %}" class="btn btn-success btn-sm">
                                         <i class="fas fa-magic"></i> Generate
                                     </a>
-                                    <a href="/admin-panel/ml-models/" class="btn btn-outline-primary btn-sm">
+                                    <a href="{% url 'admin_dashboard:ml_models' %}" class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-cog"></i> Models
                                     </a>
                                 </div>
@@ -885,11 +885,11 @@
                                 Quick Actions & System Tools
                             </h4>
                             <div class="quick-actions-grid">
-                                <a href="/admin-panel/backup/" class="quick-action-btn">
+                                <a href="{% url 'admin_dashboard:backup' %}" class="quick-action-btn">
                                     <i class="fas fa-database"></i>
                                     <span>Create Backup</span>
                                 </a>
-                                <a href="/admin-panel/system-stats/" class="quick-action-btn">
+                                <a href="{% url 'admin_dashboard:analytics' %}" class="quick-action-btn">
                                     <i class="fas fa-server"></i>
                                     <span>System Stats</span>
                                 </a>
@@ -897,11 +897,11 @@
                                     <i class="fas fa-file-download"></i>
                                     <span>Export Reports</span>
                                 </a>
-                                <a href="/admin-panel/workflows/" class="quick-action-btn">
+                                <a href="{% url 'admin_dashboard:workflows' %}" class="quick-action-btn">
                                     <i class="fas fa-project-diagram"></i>
                                     <span>Workflows</span>
                                 </a>
-                                <a href="/admin-panel/settings/" class="quick-action-btn">
+                                <a href="{% url 'admin_dashboard:settings' %}" class="quick-action-btn">
                                     <i class="fas fa-cog"></i>
                                     <span>Settings</span>
                                 </a>
@@ -909,7 +909,7 @@
                                     <i class="fas fa-tools"></i>
                                     <span>Django Admin</span>
                                 </a>
-                                <a href="/admin-panel/users/" class="quick-action-btn">
+                                <a href="{% url 'admin_dashboard:users' %}" class="quick-action-btn">
                                     <i class="fas fa-users"></i>
                                     <span>User Management</span>
                                 </a>

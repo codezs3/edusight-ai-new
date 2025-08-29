@@ -204,7 +204,7 @@
                         <h6 class="text-muted">No users found</h6>
                         {% if search_query %}
                             <p class="text-muted">No users match your search criteria.</p>
-                            <a href="/admin-panel/users/" class="btn btn-outline-primary">Clear Search</a>
+                            <a href="{% url 'admin_dashboard:users' %}" class="btn btn-outline-primary">Clear Search</a>
                         {% else %}
                             <p class="text-muted">Start by adding your first user.</p>
                         {% endif %}

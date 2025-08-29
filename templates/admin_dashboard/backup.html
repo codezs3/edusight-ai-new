@@ -14,7 +14,7 @@ function createBackup() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Backup...';
     btn.disabled = true;
     
-    fetch('/admin-panel/backup/', {
+    fetch('{% url "admin_dashboard:backup" %}', {
         method: 'POST',
         headers: {
             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
