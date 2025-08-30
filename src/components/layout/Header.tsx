@@ -280,11 +280,11 @@ export function Header() {
         onMouseEnter={() => handleMouseEnter(menuKey)}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-10">
           {/* Header */}
-          <div className="mb-10 text-center">
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">{menuData.title}</h3>
-            <p className="text-slate-600 max-w-2xl mx-auto">{menuData.description}</p>
+          <div className="mb-8 text-center">
+            <h3 className="text-xl font-bold text-slate-900 mb-2">{menuData.title}</h3>
+            <p className="text-sm text-slate-600 max-w-xl mx-auto">{menuData.description}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -303,20 +303,20 @@ export function Header() {
                           <Link
                             key={itemIndex}
                             href={item.href}
-                            className="group block p-4 rounded-xl hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200 hover:shadow-md"
+                            className="group block p-3 rounded-lg hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200 hover:shadow-sm"
                             onClick={() => setActiveDropdown(null)}
                           >
                             <div className="flex items-start">
-                              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                                <IconComponent className="w-5 h-5 text-white" />
+                              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                                <IconComponent className="w-4 h-4 text-white" />
                               </div>
-                              <div className="ml-4 flex-1">
+                              <div className="ml-3 flex-1">
                                 <div className="flex items-center justify-between mb-1">
                                   <h5 className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
                                     {item.name}
                                   </h5>
                                   {item.badge && (
-                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                    <span className={`px-1.5 py-0.5 text-xs font-medium rounded ${
                                       item.badge === 'Popular' ? 'bg-green-100 text-green-700' :
                                       item.badge === 'Featured' ? 'bg-blue-100 text-blue-700' :
                                       item.badge === 'AI-Powered' ? 'bg-purple-100 text-purple-700' :
@@ -345,16 +345,16 @@ export function Header() {
 
             {/* CTA Section */}
             <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-5 border border-blue-100">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <SparklesIcon className="w-8 h-8 text-white" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <SparklesIcon className="w-6 h-6 text-white" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900 mb-2">{menuData.cta.title}</h4>
-                  <p className="text-sm text-slate-600 mb-6">{menuData.cta.description}</p>
+                  <h4 className="text-base font-bold text-slate-900 mb-2">{menuData.cta.title}</h4>
+                  <p className="text-xs text-slate-600 mb-4">{menuData.cta.description}</p>
                   <Link
                     href={menuData.cta.href}
-                    className="inline-flex items-center justify-center w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="inline-flex items-center justify-center w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium text-sm rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
                     onClick={() => setActiveDropdown(null)}
                   >
                     {menuData.cta.buttonText}
@@ -365,30 +365,30 @@ export function Header() {
           </div>
 
           {/* Bottom Section */}
-          <div className="mt-10 pt-8 border-t border-slate-200">
+          <div className="mt-6 pt-5 border-t border-slate-200">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center text-sm text-slate-500">
-                  <StarIcon className="w-4 h-4 text-yellow-500 mr-1" />
-                  <span>Trusted by 500+ schools worldwide</span>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center text-xs text-slate-500">
+                  <StarIcon className="w-3 h-3 text-yellow-500 mr-1" />
+                  <span>Trusted by 500+ schools</span>
                 </div>
-                <div className="flex items-center text-sm text-slate-500">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                  <span>99.9% uptime guarantee</span>
+                <div className="flex items-center text-xs text-slate-500">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></div>
+                  <span>99.9% uptime</span>
                 </div>
               </div>
-              <div className="flex space-x-4">
+              <div className="flex space-x-3">
                 <Link
                   href="/contact"
-                  className="text-sm text-slate-600 hover:text-blue-600 font-medium transition-colors"
+                  className="text-xs text-slate-600 hover:text-blue-600 font-medium transition-colors"
                 >
                   Contact Sales
                 </Link>
                 <Link
                   href="/support"
-                  className="text-sm text-slate-600 hover:text-blue-600 font-medium transition-colors"
+                  className="text-xs text-slate-600 hover:text-blue-600 font-medium transition-colors"
                 >
-                  Get Support
+                  Support
                 </Link>
               </div>
             </div>
@@ -446,14 +446,8 @@ export function Header() {
           <div className="flex items-center space-x-4">
             {/* Demo Button - Top Right */}
             <Link
-              href="/dashboard/parent"
-              className="hidden lg:flex items-center space-x-2 text-slate-700 hover:text-blue-600 px-3 py-2 rounded-lg font-medium transition-colors duration-200 mr-2"
-            >
-              <span>Dashboard</span>
-            </Link>
-            <Link
               href="/demo-users"
-              className="hidden lg:flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+              className="hidden lg:flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-5 py-2.5 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <PlayIcon className="w-4 h-4" />
               <span>Demo</span>
