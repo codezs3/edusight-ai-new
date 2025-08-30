@@ -1,375 +1,341 @@
-# EduSight - Comprehensive Student Assessment Platform
+# EduSight - Educational Analytics Platform
 
-EduSight is an advanced educational assessment platform that provides comprehensive analysis of students across academic, psychological, and physical health domains using the **EPR (Edusight Prism Rating)** system.
+A comprehensive student assessment platform built with modern open-source technologies, evaluating Academic Performance, Psychological Well-being & Physical Health with AI-powered analytics.
 
-## 🌟 Key Features
+## 🚀 Technology Stack
 
-### 🎯 EPR Assessment System
-- **Holistic Student Evaluation**: Academic (40%) + Psychological (30%) + Physical (30%)
-- **Scientific Scoring**: Based on validated instruments (SDQ, DASS-21, PERMA)
-- **Performance Bands**: Thriving, Healthy Progress, Needs Support, At-Risk
-- **Predictive Analytics**: Future performance projections and recommendations
+### Frontend & Framework
+- **Next.js 14** - React framework with App Router
+- **React 18** - UI library with hooks and modern patterns
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first CSS framework
 
-### 🔄 Apache Airflow Workflow Management
-- **Automated Workflows**: Daily EPR calculations, lead processing, system maintenance
-- **Custom Operators**: EduSight-specific automation for assessments and CRM
-- **Professional Scheduling**: Cron-based scheduling with retry logic and monitoring
-- **Real-time Monitoring**: Web interface for workflow management and triggering
+### Authentication & Database
+- **Auth.js (NextAuth.js)** - Authentication with multiple providers
+- **Prisma** - Type-safe database ORM
+- **PostgreSQL** - Primary database
+- **Stripe.js** - Payment processing and subscriptions
 
-### 📊 Advanced Analytics Engine
-- **Benchmarking**: Compare with national, state, and local averages
-- **Trend Analysis**: Performance patterns and improvement tracking
-- **Predictive Modeling**: Algorithm-powered future performance predictions
-- **Interactive Visualizations**: Charts, graphs, and radar plots
+### Data Processing & ML
+- **TensorFlow.js** - Machine learning in the browser
+- **Papaparse** - CSV parsing and processing
+- **PDF.js** - PDF document processing
+- **Tesseract.js** - OCR for image text extraction
 
-### 📁 Intelligent File Processing
-- **Multi-format Support**: CSV, Excel, PDF, Word documents, images
-- **AI-powered OCR**: Extract data from scanned documents and images
-- **Automatic Classification**: Smart detection of academic, psychological, or physical data
-- **Data Validation**: Automatic error detection and correction suggestions
+### Visualization & Analytics
+- **Plotly.js** - Interactive charts and graphs
+- **D3.js** - Custom data visualizations
+- **React Hook Form** - Form handling with validation
+- **Framer Motion** - Smooth animations
 
-### 🎨 Modern Web Interface
-- **Customer Portal**: Complete workflow from data upload to report generation
-- **Admin Dashboard**: Comprehensive management interface with Airflow integration
-- **Responsive Design**: Mobile-first design with Bootstrap 5
-- **Real-time Updates**: AJAX-powered interactions and live status updates
+### Workflow & Analytics
+- **Apache Airflow** - Workflow orchestration
+- **Apache Superset** - Business intelligence and analytics
 
-## 🏗️ Architecture
+### Deployment & Performance
+- **Vercel** - Deployment platform
+- **React Query** - Data fetching and caching
+- **Zod** - Runtime type validation
 
-```
-EduSight Platform
-├── Django Backend (Python 3.9+)
-├── Apache Airflow (Workflow Management)
-├── SQLite Database (Development)
-├── Bootstrap 5 Frontend
-├── ML/AI Processing Engine
-└── PDF Report Generator
-```
+## 📋 Features
 
-## 📦 Installation
+### Core Assessment Areas
+- **Academic Performance** - Grade tracking, subject analysis, study habits
+- **Psychological Wellbeing** - Mood, stress, confidence, social interaction
+- **Physical Health** - BMI, exercise, sleep quality, health conditions
+- **Career Guidance** - Interest mapping, skill development, recommendations
+
+### AI-Powered Insights
+- **Academic Prediction** - Performance forecasting using neural networks
+- **Career Path Recommendation** - ML-based career suggestions
+- **Behavioral Risk Assessment** - Early intervention identification
+- **Personalized Recommendations** - Tailored improvement strategies
+
+### Advanced Features
+- **Interactive Dashboards** - Real-time data visualization
+- **Multi-file Upload** - CSV, Excel, PDF, and image processing
+- **Role-based Access** - Student, Parent, Teacher, Admin, Counselor roles
+- **Subscription Management** - Flexible pricing tiers with Stripe
+- **Mobile Responsive** - Optimized for all devices
+
+## 🛠️ Installation
 
 ### Prerequisites
-- Python 3.9+
+- Node.js 18+ 
+- PostgreSQL 14+
 - Git
-- Virtual Environment
 
-### Setup Instructions
+### Quick Start
 
-1. **Clone the Repository**
-```bash
-git clone <repository-url>
-cd edusight
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-org/edusight.git
+   cd edusight
+   ```
 
-2. **Create Virtual Environment**
-```bash
-python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# Linux/Mac
-source .venv/bin/activate
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-3. **Install Dependencies**
-```bash
-pip install -r requirements.txt
-pip install -r requirements_airflow.txt
-```
+3. **Set up environment variables**
+   ```bash
+   cp env.example .env.local
+   # Edit .env.local with your configuration
+   ```
 
-4. **Database Setup**
-```bash
-python manage.py makemigrations
-python manage.py migrate
-python manage.py createsuperuser
-```
+4. **Set up the database**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   npx prisma db seed
+   ```
 
-5. **Initialize Airflow**
-```bash
-# Set Airflow home
-export AIRFLOW_HOME=$(pwd)/airflow_home  # Linux/Mac
-$env:AIRFLOW_HOME = "$(pwd)/airflow_home"  # Windows PowerShell
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-# Initialize Airflow database
-airflow db init
-
-# Create Airflow admin user
-airflow users create --username admin --password admin123 --firstname Admin --lastname User --role Admin --email admin@edusight.com
-```
-
-6. **Start Services**
-```bash
-# Terminal 1: Django Development Server
-python manage.py runserver
-
-# Terminal 2: Airflow Webserver
-airflow webserver -p 8080
-
-# Terminal 3: Airflow Scheduler
-airflow scheduler
-```
-
-## 🚀 Quick Start
-
-### For Students/Parents (B2C)
-
-1. **Visit the Website**: Navigate to `http://localhost:8000`
-2. **Choose Assessment Plan**: Basic (₹499), Gold (₹899), Platinum (₹1499)
-3. **Complete Payment**: Redirected to student dashboard
-4. **Upload Data**: Academic records, medical reports, assessment results
-5. **Data Validation**: Review and fix any data issues
-6. **Get Analysis**: Comprehensive EPR analysis and insights
-7. **Download Report**: Professional PDF report with recommendations
-
-### For Administrators
-
-1. **Access Admin Panel**: `http://localhost:8000/admin-panel/`
-2. **Manage Workflows**: `http://localhost:8000/admin-panel/workflows/`
-3. **Airflow Interface**: `http://localhost:8080`
-4. **Monitor System**: Real-time dashboards and analytics
-
-## 📋 Workflow Process
-
-### Customer Journey (10-Step Process)
-
-1. **Payment Completion** → Customer Portal Access
-2. **Data Upload** → CSV, Excel, PDF, Images, Documents
-3. **Data Validation** → AI-powered error detection and correction
-4. **Data Analysis** → Comprehensive multi-domain analysis
-5. **Benchmark Comparison** → National/state/local comparisons
-6. **Prediction Analysis** → Future performance projections
-7. **EPR Calculation** → Scientific scoring across all domains
-8. **Advanced Analytics** → Filter-based detailed insights
-9. **Report Generation** → Professional branded PDF reports
-10. **Dashboard Management** → Ongoing data and report access
-
-### Automated Workflows
-
-#### Daily EPR Calculation
-- **Schedule**: Every day at 6:00 AM
-- **Process**: System health → EPR calculation → Alert generation → Reporting
-- **Outputs**: At-risk student alerts, daily summary reports
-
-#### Lead Processing
-- **Schedule**: Every 2 hours
-- **Process**: Lead scoring → Hot/warm/cold categorization → Follow-up scheduling
-- **Outputs**: Sales alerts, CRM integration, automated follow-ups
-
-#### System Maintenance
-- **Schedule**: Daily at 2:00 AM
-- **Process**: Database optimization → Backup creation → Log cleanup → Health monitoring
-- **Outputs**: System health reports, automated backups
-
-## 🧠 EPR Scoring Algorithm
-
-### Academic Domain (40% Weight)
-- Standardized test scores
-- GPA and grade performance
-- Attendance and engagement
-- Teacher evaluations
-- Homework completion rates
-
-### Psychological Domain (30% Weight)
-- **SDQ**: Strengths and Difficulties Questionnaire
-- **DASS-21**: Depression, Anxiety, Stress Scale
-- **PERMA**: Positive Psychology metrics
-- Behavioral observations
-- Social skills assessment
-
-### Physical Domain (30% Weight)
-- Anthropometric data (Height, Weight, BMI)
-- Fitness assessments
-- Health indicators
-- Activity and sleep patterns
-- Nutrition assessments
-
-### Performance Bands
-- **Thriving** (85-100): Excellent across all domains
-- **Healthy Progress** (70-84): Good performance with minor areas for improvement
-- **Needs Support** (50-69): Requires targeted interventions
-- **At-Risk** (<50): Immediate comprehensive support needed
-
-## 🛠️ Technology Stack
-
-### Backend
-- **Django 5.2.5**: Web framework
-- **Django REST Framework**: API development
-- **Apache Airflow 2.8.1**: Workflow orchestration
-- **SQLite/PostgreSQL**: Database
-- **Celery**: Asynchronous task processing
-
-### Analytics & Processing
-- **Scikit-learn**: Advanced algorithms
-- **TensorFlow/Keras**: Deep analytics
-- **Pandas**: Data processing
-- **NumPy**: Numerical computing
-- **OpenCV**: Image processing
-- **Tesseract OCR**: Text extraction
-
-### Frontend
-- **Bootstrap 5**: CSS framework
-- **Chart.js**: Data visualization
-- **jQuery**: JavaScript interactions
-- **Font Awesome**: Icons
-
-### File Processing
-- **Pandas**: CSV/Excel processing
-- **PyPDF2**: PDF text extraction
-- **python-docx**: Word document processing
-- **Pillow**: Image processing
-- **pytesseract**: OCR processing
-
-## 📊 Data Models
-
-### Core Models
-- **StudentDataProfile**: Main student data management
-- **DataUpload**: File upload tracking and processing
-- **AcademicDataEntry**: Academic performance records
-- **PsychologicalDataEntry**: Psychological assessment data
-- **PhysicalDataEntry**: Physical health and fitness data
-- **DataValidationIssue**: Data quality management
-- **YearwiseDataSummary**: Annual summaries and trends
-
-### Workflow Models
-- **WorkflowTemplate**: Airflow DAG templates
-- **WorkflowTrigger**: Event-based triggers
-- **WorkflowExecution**: Execution tracking
-- **WorkflowAuditLog**: Comprehensive audit trails
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 🔧 Configuration
 
 ### Environment Variables
-```bash
-# Django Settings
-DEBUG=True
-SECRET_KEY=your-secret-key
-DATABASE_URL=sqlite:///db.sqlite3
 
-# Airflow Configuration
-AIRFLOW_HOME=/path/to/airflow_home
-AIRFLOW_BASE_URL=http://localhost:8080
+Create a `.env.local` file with the following variables:
 
-# Email Configuration
-EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-email
-EMAIL_HOST_PASSWORD=your-password
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/edusight"
+
+# NextAuth.js
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
+
+# Google OAuth
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+STRIPE_SECRET_KEY="sk_test_..."
+
+# Optional: External Services
+DJANGO_API_URL="http://localhost:8000/api"
+AIRFLOW_BASE_URL="http://localhost:8080"
+SUPERSET_URL="http://localhost:8088"
 ```
 
-### Airflow Configuration
-- **Executor**: LocalExecutor (Development), CeleryExecutor (Production)
-- **Database**: SQLite (Development), PostgreSQL (Production)
-- **Scheduler**: Configured for optimal performance
-- **Web Authentication**: Optional RBAC integration
+### Database Setup
 
-## 📈 API Endpoints
+1. **Install PostgreSQL** and create a database
+2. **Update DATABASE_URL** in your `.env.local`
+3. **Run migrations**:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-### Student Portal APIs
-- `POST /api/upload/` - File upload
-- `GET /api/analysis/` - Get analysis results
-- `POST /api/epr-calculate/` - Trigger EPR calculation
-- `GET /api/reports/` - Download reports
+### Authentication Setup
 
-### Admin APIs
-- `GET /api/admin/workflows/` - List workflows
-- `POST /api/admin/workflows/trigger/` - Trigger workflow
-- `GET /api/admin/analytics/` - System analytics
-- `POST /api/admin/backup/` - Create backup
+1. **Google OAuth**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing
+   - Enable Google+ API
+   - Create OAuth 2.0 credentials
+   - Add authorized redirect URIs: `http://localhost:3000/api/auth/callback/google`
 
-## 🔐 Security Features
+2. **Stripe Setup**:
+   - Create account at [Stripe](https://stripe.com)
+   - Get API keys from dashboard
+   - Set up webhook endpoints for subscription events
 
-- **Authentication**: Django's built-in authentication system
-- **Authorization**: Role-based access control (RBAC)
-- **File Upload Security**: Type validation and size limits
-- **Data Encryption**: Sensitive data encryption
-- **CSRF Protection**: Cross-site request forgery protection
-- **SQL Injection Prevention**: Django ORM protection
+## 📊 Data Processing
+
+### Supported File Types
+- **CSV Files** - Student data, grades, assessments
+- **Excel Files** - Spreadsheet data (.xlsx, .xls)
+- **PDF Documents** - Reports, transcripts, assessments
+- **Images** - Scanned documents with OCR processing
+
+### File Upload Features
+- **Drag & Drop** interface
+- **Progress tracking** with real-time updates
+- **Data validation** and error reporting
+- **Automatic parsing** and normalization
+- **Preview and confirmation** before processing
+
+## 🤖 Machine Learning
+
+### TensorFlow.js Models
+- **Academic Performance Predictor** - Neural network for grade prediction
+- **Career Path Recommender** - Multi-class classification for career suggestions
+- **Behavioral Risk Assessment** - Early warning system for at-risk students
+
+### Model Features
+- **Client-side inference** - Fast, private predictions
+- **Real-time analysis** - Instant feedback and recommendations
+- **Continuous learning** - Models improve with more data
+- **Explainable AI** - Clear reasoning for predictions
+
+## 📈 Analytics & Visualization
+
+### Chart Types
+- **Academic Performance** - Bar charts, line graphs, radar charts
+- **Progress Tracking** - Timeline visualizations
+- **Comparison Charts** - Peer benchmarking
+- **Interactive Dashboards** - Drill-down capabilities
+
+### Visualization Libraries
+- **Plotly.js** - Statistical charts and scientific plots
+- **D3.js** - Custom interactive visualizations
+- **Responsive Design** - Mobile-optimized charts
+
+## 🔐 Security & Privacy
+
+### Data Protection
+- **Encrypted storage** - All sensitive data encrypted at rest
+- **Secure transmission** - HTTPS/TLS for all communications
+- **Access controls** - Role-based permissions
+- **Audit logging** - Complete activity tracking
+
+### Compliance
+- **GDPR compliant** - Data protection and privacy rights
+- **FERPA compliant** - Educational records protection
+- **SOC 2 Type II** - Security and availability standards
+
+## 🚀 Deployment
+
+### Vercel Deployment (Recommended)
+
+1. **Connect your repository** to Vercel
+2. **Set environment variables** in Vercel dashboard
+3. **Deploy automatically** on git push
+
+### Manual Deployment
+
+1. **Build the application**:
+   ```bash
+   npm run build
+   ```
+
+2. **Start production server**:
+   ```bash
+   npm start
+   ```
+
+### Docker Deployment
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+## 📚 API Documentation
+
+### REST Endpoints
+- `GET /api/students` - List students
+- `POST /api/assessments` - Create assessment
+- `GET /api/analytics/:studentId` - Get student analytics
+- `POST /api/ml/predict` - ML predictions
+
+### GraphQL (Optional)
+- Flexible data querying
+- Real-time subscriptions
+- Type-safe operations
 
 ## 🧪 Testing
 
+### Test Suites
 ```bash
-# Run Django tests
-python manage.py test
+# Unit tests
+npm run test
 
-# Run specific app tests
-python manage.py test epr_system
-python manage.py test workflow_system
+# Integration tests
+npm run test:integration
 
-# Test Airflow DAGs
-airflow dags test epr_daily_calculation
+# E2E tests
+npm run test:e2e
+
+# Coverage report
+npm run test:coverage
 ```
 
-## 📚 Documentation
+### Testing Stack
+- **Jest** - Unit testing framework
+- **React Testing Library** - Component testing
+- **Playwright** - End-to-end testing
+- **MSW** - API mocking
 
-### Key Documentation Files
-- `DEVELOPER_DOCUMENTATION.md`: Comprehensive technical documentation
-- `MIGRATION_SUMMARY.md`: Database migration details
-- `airflow_home/dags/`: Workflow documentation and examples
+## 📖 Development
 
-### API Documentation
-- Django Admin Interface: `http://localhost:8000/admin/`
-- Airflow Web UI: `http://localhost:8080`
-- REST API: Available through Django REST Framework
+### Code Quality
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
+- **Husky** - Git hooks
+- **TypeScript** - Type checking
+
+### Development Workflow
+1. Create feature branch
+2. Write tests
+3. Implement feature
+4. Run quality checks
+5. Submit pull request
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Team
+## 🆘 Support
 
-- **Project Lead**: EduSight Development Team
-- **Backend Development**: Django + Python specialists
-- **Workflow Engineering**: Apache Airflow experts
-- **Data Science**: ML/AI and educational assessment specialists
-- **Frontend Development**: Modern web interface designers
+### Documentation
+- [User Guide](docs/user-guide.md)
+- [API Reference](docs/api-reference.md)
+- [Deployment Guide](docs/deployment.md)
 
-## 📞 Support
+### Community
+- [Discord Server](https://discord.gg/edusight)
+- [GitHub Discussions](https://github.com/your-org/edusight/discussions)
+- [Stack Overflow](https://stackoverflow.com/questions/tagged/edusight)
 
-- **Email**: support@edusight.com
-- **Documentation**: [Wiki](https://github.com/your-repo/edusight/wiki)
-- **Issues**: [GitHub Issues](https://github.com/your-repo/edusight/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-repo/edusight/discussions)
+### Professional Support
+- Email: support@edusight.com
+- Enterprise: enterprise@edusight.com
 
-## 🚀 Deployment
+## 🎯 Roadmap
 
-### Production Deployment
-1. **Database**: PostgreSQL recommended
-2. **Web Server**: Nginx + Gunicorn
-3. **Task Queue**: Celery + Redis
-4. **Monitoring**: Prometheus + Grafana
-5. **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
+### Q1 2024
+- [ ] Mobile app development
+- [ ] Advanced ML models
+- [ ] Multi-language support
 
-### Docker Deployment
-```bash
-# Build and run with Docker Compose
-docker-compose up -d
+### Q2 2024
+- [ ] Real-time collaboration
+- [ ] Advanced reporting
+- [ ] Integration marketplace
 
-# Scale services
-docker-compose up --scale worker=3
-```
-
-### Cloud Deployment
-- **AWS**: EC2, RDS, S3, CloudWatch
-- **Google Cloud**: Compute Engine, Cloud SQL, Cloud Storage
-- **Azure**: Virtual Machines, Azure Database, Blob Storage
-
-## 🔄 Version History
-
-- **v1.0.0**: Initial release with EPR system
-- **v1.1.0**: Airflow integration and workflow management
-- **v1.2.0**: Advanced file processing and AI integration
-- **v1.3.0**: Customer portal and complete workflow
-- **v1.4.0**: Advanced analytics and benchmarking
+### Q3 2024
+- [ ] AI-powered tutoring
+- [ ] Predictive analytics
+- [ ] Parent mobile app
 
 ---
 
-**EduSight** - Empowering educational excellence through comprehensive student assessment and data-driven insights. 🎓✨
+**Built with ❤️ by the EduSight Team**
+
+For more information, visit [edusight.com](https://edusight.com)
