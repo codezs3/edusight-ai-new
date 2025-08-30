@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { generateMetadata, generateStructuredData } from '@/lib/seo/utils';
 import { 
   AcademicCapIcon,
   HeartIcon,
@@ -11,10 +12,9 @@ import {
   SparklesIcon
 } from '@heroicons/react/24/outline';
 
-export const metadata: Metadata = {
-  title: 'About EduSight - Transforming Educational Assessment',
-  description: 'Learn about EduSight\'s mission to revolutionize educational assessment through AI-powered insights, comprehensive analytics, and holistic student development.',
-};
+export const metadata: Metadata = generateMetadata({
+  page: 'about'
+});
 
 export default function AboutPage() {
   const features = [

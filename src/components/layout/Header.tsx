@@ -276,14 +276,19 @@ export function Header() {
 
     return (
       <div
-        className="absolute top-full left-0 w-screen bg-white shadow-2xl border-t border-slate-100 z-50"
+        className="absolute top-full left-1/2 transform -translate-x-1/2 w-screen max-w-5xl bg-white shadow-2xl border-t-2 border-blue-200 z-50 overflow-hidden rounded-b-xl"
+        style={{
+          left: '50%',
+          transform: 'translateX(-50%)',
+          marginLeft: '0'
+        }}
         onMouseEnter={() => handleMouseEnter(menuKey)}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-10">
+        <div className="px-6 lg:px-8 py-6">
           {/* Header */}
-          <div className="mb-8 text-center">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">{menuData.title}</h3>
+          <div className="mb-6 text-center">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">{menuData.title}</h3>
             <p className="text-sm text-slate-600 max-w-xl mx-auto">{menuData.description}</p>
           </div>
 
@@ -303,11 +308,11 @@ export function Header() {
                           <Link
                             key={itemIndex}
                             href={item.href}
-                            className="group block p-3 rounded-lg hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200 hover:shadow-sm"
+                            className="group block p-3 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200 hover:shadow-sm"
                             onClick={() => setActiveDropdown(null)}
                           >
                             <div className="flex items-start">
-                              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                                 <IconComponent className="w-4 h-4 text-white" />
                               </div>
                               <div className="ml-3 flex-1">
@@ -345,16 +350,16 @@ export function Header() {
 
             {/* CTA Section */}
             <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-5 border border-blue-100">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-200">
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3">
                     <SparklesIcon className="w-6 h-6 text-white" />
                   </div>
                   <h4 className="text-base font-bold text-slate-900 mb-2">{menuData.cta.title}</h4>
                   <p className="text-xs text-slate-600 mb-4">{menuData.cta.description}</p>
                   <Link
                     href={menuData.cta.href}
-                    className="inline-flex items-center justify-center w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium text-sm rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                    className="inline-flex items-center justify-center w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium text-sm rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
                     onClick={() => setActiveDropdown(null)}
                   >
                     {menuData.cta.buttonText}
@@ -365,14 +370,14 @@ export function Header() {
           </div>
 
           {/* Bottom Section */}
-          <div className="mt-6 pt-5 border-t border-slate-200">
+          <div className="mt-4 pt-4 border-t border-slate-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="flex items-center text-xs text-slate-500">
+                <div className="flex items-center text-xs text-slate-600">
                   <StarIcon className="w-3 h-3 text-yellow-500 mr-1" />
                   <span>Trusted by 500+ schools</span>
                 </div>
-                <div className="flex items-center text-xs text-slate-500">
+                <div className="flex items-center text-xs text-slate-600">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></div>
                   <span>99.9% uptime</span>
                 </div>
@@ -401,7 +406,7 @@ export function Header() {
   return (
     <header className="bg-white/95 backdrop-blur-lg shadow-sm border-b border-slate-200/50 sticky top-0 z-40">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
@@ -444,14 +449,6 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
-            {/* Demo Button - Top Right */}
-            <Link
-              href="/demo-users"
-              className="hidden lg:flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-5 py-2.5 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              <PlayIcon className="w-4 h-4" />
-              <span>Demo</span>
-            </Link>
 
             {session ? (
               <div className="flex items-center space-x-4">
@@ -508,12 +505,6 @@ export function Header() {
                 >
                   Sign In
                 </Link>
-                <Link
-                  href="/auth/signin"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  Start Free Trial
-                </Link>
               </div>
             )}
 
@@ -561,10 +552,10 @@ export function Header() {
                 {!session && (
                   <Link
                     href="/auth/signin"
-                    className="block w-full text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                    className="block w-full text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Start Free Trial
+                    Sign In
                   </Link>
                 )}
               </div>

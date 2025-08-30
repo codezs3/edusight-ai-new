@@ -98,19 +98,22 @@ export default function SignInPage() {
         if (session?.user?.role) {
           switch (session.user.role) {
             case 'ADMIN':
-              router.push('/admin/dashboard');
+              router.push('/dashboard/admin');
               break;
             case 'TEACHER':
-              router.push('/teacher/dashboard');
+              router.push('/dashboard/teacher');
               break;
             case 'PARENT':
-              router.push('/parent/dashboard');
+              router.push('/dashboard/parent');
               break;
             case 'COUNSELOR':
-              router.push('/counselor/dashboard');
+              router.push('/dashboard/counselor');
+              break;
+            case 'STUDENT':
+              router.push('/dashboard/student');
               break;
             default:
-              router.push('/student/dashboard');
+              router.push('/dashboard');
           }
         } else {
           router.push(callbackUrl);
@@ -127,7 +130,7 @@ export default function SignInPage() {
     setValue('email', email);
     setValue('password', 'password123');
     setShowDemoUsers(false);
-    toast.info(`Demo user selected: ${email}`);
+    toast.success(`Demo user selected: ${email}`);
   };
 
   const handleGoogleSignIn = async () => {

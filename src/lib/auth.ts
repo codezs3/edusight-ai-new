@@ -2,8 +2,8 @@ import { NextAuthOptions } from 'next-auth';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import { prisma } from '@/lib/prisma';
-import { compare } from 'bcryptjs';
+import { prisma } from '@/lib/database';
+import { getUserPassword, verifyPassword } from '@/lib/auth/password';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -56,8 +56,15 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Check password - for migrated users, use default password
-        const isPasswordValid = credentials.password === 'password123' || 
-                               await compare(credentials.password, user.password || '');
+        let isPasswordValid = credentials.password === 'password123';
+        
+        if (!isPasswordValid) {
+          // Check stored password hash
+          const storedPassword = await getUserPassword(user.id);
+          if (storedPassword) {
+            isPasswordValid = await verifyPassword(credentials.password, storedPassword);
+          }
+        }
 
         if (!isPasswordValid) {
           throw new Error('Invalid password');
@@ -136,6 +143,14 @@ export const authOptions: NextAuthOptions = {
       }
 
       return true;
+    },
+    async redirect({ url, baseUrl }) {
+      // If it's a callback URL, return it
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      // If it's on the same origin, return it
+      if (new URL(url).origin === baseUrl) return url
+      // Otherwise return the base URL
+      return baseUrl
     },
   },
   events: {

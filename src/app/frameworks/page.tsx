@@ -1,5 +1,11 @@
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { generateMetadata } from '@/lib/seo/utils';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = generateMetadata({
+  page: 'frameworks'
+});
 import { 
   AcademicCapIcon, 
   BookOpenIcon, 
