@@ -23,40 +23,14 @@ const signInSchema = z.object({
 
 type SignInFormData = z.infer<typeof signInSchema>;
 
-// Demo users organized by category
+// Demo users - 5 specific users only
 const demoUsers = {
-  admin: [
+  primary: [
     { email: 'admin@edusight.com', name: 'System Administrator', role: 'ADMIN' },
-    { email: 'superadmin@edusight.com', name: 'Super Admin', role: 'ADMIN' },
-    { email: 'principal@edusight.com', name: 'Dr. Principal Smith', role: 'ADMIN' },
-  ],
-  business: [
-    { email: 'crm@edusight.com', name: 'CRM Manager', role: 'ADMIN' },
-    { email: 'sales1@edusight.com', name: 'Jennifer Sales', role: 'ADMIN' },
-    { email: 'accounts@edusight.com', name: 'Finance Manager', role: 'ADMIN' },
-    { email: 'accountant1@edusight.com', name: 'Patricia Accountant', role: 'ADMIN' },
-  ],
-  education: [
-    { email: 'teacher1@edusight.com', name: 'Sarah Johnson', role: 'TEACHER' },
-    { email: 'teacher2@edusight.com', name: 'Michael Chen', role: 'TEACHER' },
-    { email: 'teacher3@edusight.com', name: 'Emily Rodriguez', role: 'TEACHER' },
-  ],
-  students: [
-    { email: 'student1@edusight.com', name: 'Alex Thompson', role: 'STUDENT' },
-    { email: 'student2@edusight.com', name: 'Emma Wilson', role: 'STUDENT' },
-    { email: 'student3@edusight.com', name: 'James Davis', role: 'STUDENT' },
-    { email: 'student4@edusight.com', name: 'Sophia Martinez', role: 'STUDENT' },
-  ],
-  parents: [
     { email: 'parent1@edusight.com', name: 'Robert Thompson', role: 'PARENT' },
-    { email: 'parent2@edusight.com', name: 'Lisa Wilson', role: 'PARENT' },
-    { email: 'parent3@edusight.com', name: 'David Martinez', role: 'PARENT' },
-  ],
-  support: [
-    { email: 'counselor1@edusight.com', name: 'Dr. Amanda Foster', role: 'COUNSELOR' },
-    { email: 'counselor2@edusight.com', name: 'Dr. Mark Stevens', role: 'COUNSELOR' },
-    { email: 'customer1@edusight.com', name: 'Customer Service Rep', role: 'ADMIN' },
-    { email: 'support@edusight.com', name: 'Technical Support', role: 'ADMIN' },
+    { email: 'schooladmin@edusight.com', name: 'Dr. School Admin', role: 'ADMIN' },
+    { email: 'crm@edusight.com', name: 'CRM Manager', role: 'ADMIN' },
+    { email: 'accounts@edusight.com', name: 'Accounts Manager', role: 'ADMIN' },
   ],
 };
 

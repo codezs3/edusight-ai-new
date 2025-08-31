@@ -9,8 +9,59 @@ import {
   ChartBarIcon,
   CogIcon,
   AcademicCapIcon,
-  DocumentChartBarIcon
+  DocumentChartBarIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  UserGroupIcon,
+  BookOpenIcon,
+  ServerIcon,
+  ShieldCheckIcon,
+  BellIcon,
+  ExclamationTriangleIcon,
+  ClockIcon,
+  DocumentTextIcon,
+  CurrencyDollarIcon,
+  GlobeAltIcon,
+  PresentationChartLineIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  CircleStackIcon,
+  CloudIcon,
+  LockClosedIcon,
+  EyeIcon,
+  ComputerDesktopIcon,
+  DevicePhoneMobileIcon,
+  WifiIcon,
+  BugAntIcon,
+  LifebuoyIcon,
+  ChatBubbleLeftRightIcon,
+  MegaphoneIcon,
+  NewspaperIcon,
+  CalendarIcon,
+  FolderIcon,
+  ArchiveBoxIcon,
+  KeyIcon,
+  FingerPrintIcon,
+  BanknotesIcon,
+  CreditCardIcon,
+  ChartPieIcon,
+  TrophyIcon,
+  StarIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  ArrowDownTrayIcon,
+  ArrowUpTrayIcon,
+  MagnifyingGlassIcon,
+  AdjustmentsHorizontalIcon,
+  HomeIcon,
+  BeakerIcon,
+  CheckCircleIcon
 } from '@heroicons/react/24/outline'
+import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout'
+import StatCard from '@/components/dashboard/StatCard'
+import DashboardCard from '@/components/dashboard/DashboardCard'
+import ModernChart from '@/components/dashboard/ModernChart'
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession()
@@ -42,219 +93,308 @@ export default function AdminDashboard() {
     return null
   }
 
-  const adminModules = [
+  // Sidebar Menu Items
+  const menuItems = [
     {
-      title: 'School Management',
-      description: 'Manage school settings, grades, and academic structure',
+      title: 'Dashboard',
+      href: '/dashboard/admin',
+      icon: HomeIcon
+    },
+    {
+      title: 'System Management',
+      href: '/dashboard/admin/system',
+      icon: ServerIcon,
+      children: [
+        { title: 'System Health', href: '/dashboard/admin/system-health', icon: ServerIcon, badge: 'Live' },
+        { title: 'Security Center', href: '/dashboard/admin/security', icon: ShieldCheckIcon, badge: 'Secure' },
+        { title: 'Database', href: '/dashboard/admin/database', icon: CircleStackIcon },
+        { title: 'API Management', href: '/dashboard/admin/api', icon: GlobeAltIcon },
+        { title: 'User Sessions', href: '/dashboard/admin/sessions', icon: EyeIcon },
+        { title: 'Error Logs', href: '/dashboard/admin/logs', icon: BugAntIcon, badge: '3' }
+      ]
+    },
+    {
+      title: 'Institution',
+      href: '/dashboard/admin/institution',
       icon: BuildingOfficeIcon,
-      color: 'blue',
-      href: '/dashboard/admin/school',
-      stats: 'Configure academic framework'
+      children: [
+        { title: 'School Management', href: '/dashboard/admin/school', icon: BuildingOfficeIcon },
+        { title: 'User Management', href: '/dashboard/admin/users', icon: UsersIcon },
+        { title: 'Assessments', href: '/dashboard/admin/assessments', icon: AcademicCapIcon },
+        { title: 'Financial', href: '/dashboard/admin/finance', icon: CurrencyDollarIcon },
+        { title: 'Communications', href: '/dashboard/admin/communications', icon: MegaphoneIcon },
+        { title: 'Content', href: '/dashboard/admin/content', icon: FolderIcon }
+      ]
     },
     {
-      title: 'User Management',
-      description: 'Manage teachers, students, parents, and staff accounts',
-      icon: UsersIcon,
-      color: 'green',
-      href: '/dashboard/admin/users',
-      stats: 'Add & manage users'
-    },
-    {
-      title: 'Assessment Overview',
-      description: 'Monitor all assessments and EduSight 360° scores',
-      icon: AcademicCapIcon,
-      color: 'purple',
-      href: '/dashboard/admin/assessments',
-      stats: 'Track student progress'
-    },
-    {
-      title: 'Analytics & Reports',
-      description: 'School-wide performance analytics and detailed reports',
-      icon: DocumentChartBarIcon,
-      color: 'orange',
+      title: 'Analytics',
       href: '/dashboard/admin/analytics',
-      stats: 'Generate insights'
-    },
-    {
-      title: 'Performance Dashboard',
-      description: 'Real-time school performance metrics and KPIs',
       icon: ChartBarIcon,
-      color: 'red',
-      href: '/dashboard/admin/performance',
-      stats: 'Monitor KPIs'
+      children: [
+        { title: 'Performance', href: '/dashboard/admin/performance', icon: ChartPieIcon },
+        { title: 'User Analytics', href: '/dashboard/admin/user-analytics', icon: UsersIcon },
+        { title: 'Revenue Reports', href: '/dashboard/admin/revenue', icon: BanknotesIcon },
+        { title: 'System Metrics', href: '/dashboard/admin/metrics', icon: PresentationChartLineIcon }
+      ]
     },
     {
-      title: 'System Settings',
-      description: 'Configure system preferences and administrative settings',
+      title: 'Financial Management',
+      href: '/dashboard/admin/accounting',
+      icon: CurrencyDollarIcon,
+      children: [
+        { title: 'Accounting Dashboard', href: '/dashboard/admin/accounting', icon: CurrencyDollarIcon },
+        { title: 'Income Management', href: '/dashboard/admin/accounting/income', icon: ArrowTrendingUpIcon },
+        { title: 'Expense Management', href: '/dashboard/admin/accounting/expenses', icon: ArrowTrendingDownIcon },
+        { title: 'Financial Reports', href: '/dashboard/admin/accounting/reports', icon: ChartBarIcon },
+        { title: 'Invoicing', href: '/dashboard/admin/accounting/invoicing', icon: DocumentTextIcon }
+      ]
+    },
+    {
+      title: 'Operations',
+      href: '/dashboard/admin/operations',
       icon: CogIcon,
-      color: 'gray',
-      href: '/dashboard/admin/settings',
-      stats: 'System configuration'
+      children: [
+        { title: 'Support Tickets', href: '/dashboard/admin/support', icon: LifebuoyIcon, badge: '12' },
+        { title: 'Backup & Recovery', href: '/dashboard/admin/backup', icon: CloudIcon },
+        { title: 'Task Scheduler', href: '/dashboard/admin/scheduler', icon: CalendarIcon },
+        { title: 'Audit & Compliance', href: '/dashboard/admin/audit', icon: DocumentTextIcon },
+        { title: 'Settings', href: '/dashboard/admin/settings', icon: CogIcon },
+        { title: 'Payment Settings', href: '/dashboard/admin/settings/payment', icon: CreditCardIcon, badge: 'Config' }
+      ]
     }
-  ]
+  ];
 
-  const getColorClasses = (color: string) => {
-    const colors = {
-      blue: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
-      green: 'bg-green-50 border-green-200 hover:bg-green-100',
-      purple: 'bg-purple-50 border-purple-200 hover:bg-purple-100',
-      orange: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
-      red: 'bg-red-50 border-red-200 hover:bg-red-100',
-      gray: 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+  const quickStats = [
+    {
+      title: 'System Uptime',
+      value: '99.9%',
+      change: '0.1',
+      changeType: 'positive' as const,
+      icon: ServerIcon,
+      color: 'green',
+      description: 'Platform availability'
+    },
+    {
+      title: 'Active Users',
+      value: '2,847',
+      change: '127',
+      changeType: 'positive' as const,
+      icon: UsersIcon,
+      color: 'blue',
+      description: 'Currently online'
+    },
+    {
+      title: 'Revenue (MTD)',
+      value: '$67,230',
+      change: '12.5',
+      changeType: 'positive' as const,
+      icon: CurrencyDollarIcon,
+      color: 'emerald',
+      description: 'Month to date'
+    },
+    {
+      title: 'Security Score',
+      value: '98/100',
+      change: '2',
+      changeType: 'positive' as const,
+      icon: ShieldCheckIcon,
+      color: 'purple',
+      description: 'Security rating'
     }
-    return colors[color as keyof typeof colors] || colors.blue
-  }
-
-  const getIconColorClasses = (color: string) => {
-    const colors = {
-      blue: 'text-blue-600',
-      green: 'text-green-600',
-      purple: 'text-purple-600',
-      orange: 'text-orange-600',
-      red: 'text-red-600',
-      gray: 'text-gray-600'
-    }
-    return colors[color as keyof typeof colors] || colors.blue
-  }
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                School Administration Dashboard
-              </h1>
-              <p className="mt-2 text-lg text-gray-600">
-                Welcome back, {session.user.name}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Role: School Administrator</p>
-              <p className="text-sm text-gray-500">EduSight AI Analytics Platform</p>
-            </div>
-          </div>
+    <VerticalDashboardLayout
+      title="System Administration"
+      subtitle={`Welcome back, ${session.user.name} - Managing EduSight Platform`}
+      menuItems={menuItems}
+      activeItem="/dashboard/admin"
+    >
+      <div className="space-y-6">
+        {/* Key Performance Indicators */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {quickStats.map((stat, index) => (
+            <StatCard
+              key={index}
+              title={stat.title}
+              value={stat.value}
+              change={stat.change}
+              changeType={stat.changeType}
+              icon={stat.icon}
+              color={stat.color}
+              description={stat.description}
+            />
+          ))}
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <UsersIcon className="h-6 w-6 text-blue-600" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Users</dt>
-                    <dd className="text-lg font-medium text-gray-900">Loading...</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Main Analytics Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* System Health */}
+          <DashboardCard title="System Health Overview" value="" subtitle="">
+            <ModernChart
+              title="Resource Usage"
+              data={[
+                { label: 'CPU Usage', value: 45 },
+                { label: 'Memory', value: 67 },
+                { label: 'Storage', value: 32 },
+                { label: 'Network', value: 78 }
+              ]}
+              type="bar"
+              height={250}
+            />
+          </DashboardCard>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <AcademicCapIcon className="h-6 w-6 text-green-600" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Active Students</dt>
-                    <dd className="text-lg font-medium text-gray-900">Loading...</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <DocumentChartBarIcon className="h-6 w-6 text-purple-600" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Assessments</dt>
-                    <dd className="text-lg font-medium text-gray-900">Loading...</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <ChartBarIcon className="h-6 w-6 text-orange-600" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Avg E360 Score</dt>
-                    <dd className="text-lg font-medium text-gray-900">Loading...</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* User Activity Trends */}
+          <DashboardCard title="User Activity Trends" value="" subtitle="">
+            <ModernChart
+              title="Monthly Active Users"
+              data={[
+                { label: 'Jan', value: 1200 },
+                { label: 'Feb', value: 1350 },
+                { label: 'Mar', value: 1100 },
+                { label: 'Apr', value: 1800 },
+                { label: 'May', value: 2100 },
+                { label: 'Jun', value: 2450 }
+              ]}
+              type="line"
+              height={250}
+            />
+          </DashboardCard>
         </div>
 
-        {/* Admin Modules */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {adminModules.map((module) => {
-            const IconComponent = module.icon
-            return (
-              <div
-                key={module.title}
-                className={`p-6 border-2 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-lg ${getColorClasses(module.color)}`}
-                onClick={() => router.push(module.href)}
-              >
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <IconComponent className={`h-8 w-8 ${getIconColorClasses(module.color)}`} />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {module.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-3">
-                      {module.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">{module.stats}</span>
-                      <span className="text-xs font-medium text-blue-600">
-                        Coming Soon →
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+        {/* Revenue and School Analytics */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Revenue Chart */}
+          <div className="lg:col-span-2">
+            <DashboardCard title="Revenue Analytics" value="" subtitle="">
+              <ModernChart
+                title="Quarterly Revenue"
+                data={[
+                  { label: 'Q1', value: 45000 },
+                  { label: 'Q2', value: 52000 },
+                  { label: 'Q3', value: 48000 },
+                  { label: 'Q4', value: 67000 }
+                ]}
+                type="bar"
+                height={300}
+              />
+            </DashboardCard>
+          </div>
+
+          {/* School Distribution */}
+          <DashboardCard title="School Distribution" value="" subtitle="">
+            <ModernChart
+              title="School Types"
+              data={[
+                { label: 'Primary', value: 45 },
+                { label: 'Secondary', value: 30 },
+                { label: 'Higher Secondary', value: 25 }
+              ]}
+              type="donut"
+              height={300}
+            />
+          </DashboardCard>
         </div>
 
-        {/* Recent Activity */}
-        <div className="mt-8 bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-          </div>
-          <div className="p-6">
-            <div className="text-center py-8">
-              <BuildingOfficeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">Activity tracking will be available soon</p>
-              <p className="text-sm text-gray-400 mt-2">
-                Monitor user registrations, assessments, and system events
-              </p>
+        {/* Real-time System Status */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* System Status */}
+          <DashboardCard
+            title="Live System Status"
+            value=""
+            subtitle=""
+            className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200"
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">Database</span>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span className="text-sm text-green-600">Healthy</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">API Services</span>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span className="text-sm text-green-600">Operational</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">Authentication</span>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span className="text-sm text-green-600">Active</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">File Storage</span>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+                  <span className="text-sm text-yellow-600">85% Full</span>
+                </div>
+              </div>
+            </div>
+          </DashboardCard>
+
+          {/* Recent Activities */}
+          <DashboardCard title="Recent Activities" value="" subtitle="" className="lg:col-span-2">
+            <div className="space-y-3">
+              <div className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <UsersIcon className="h-4 w-4 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">New school registered</p>
+                  <p className="text-xs text-gray-500">Greenwood High School joined the platform</p>
+                  <span className="text-xs text-gray-400">5 minutes ago</span>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">System backup completed</p>
+                  <p className="text-xs text-gray-500">Daily backup finished successfully</p>
+                  <span className="text-xs text-gray-400">2 hours ago</span>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <BellIcon className="h-4 w-4 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Performance alert cleared</p>
+                  <p className="text-xs text-gray-500">CPU usage returned to normal levels</p>
+                  <span className="text-xs text-gray-400">4 hours ago</span>
+                </div>
+              </div>
+            </div>
+          </DashboardCard>
+        </div>
+
+        {/* Quick Actions Panel */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-2xl p-6 text-white">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
+            <div className="mb-4 lg:mb-0">
+              <h3 className="text-xl font-bold mb-2">System Administration Tools</h3>
+              <p className="text-blue-100">Quick access to critical system management functions</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button className="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium text-sm">
+                System Health Check
+              </button>
+              <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors font-medium text-sm border border-blue-400">
+                User Management
+              </button>
+              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors font-medium text-sm border border-purple-400">
+                Generate Reports
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </VerticalDashboardLayout>
   )
 }

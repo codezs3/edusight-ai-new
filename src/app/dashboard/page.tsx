@@ -19,32 +19,47 @@ export default function DashboardRedirect() {
     }
 
     if (session?.user?.role) {
-      // Redirect to role-specific dashboard
-      switch (session.user.role) {
-        case 'ADMIN':
-          router.push('/dashboard/admin')
-          toast.success(`Welcome back, ${session.user.name}! (School Administrator)`)
-          break
-        case 'TEACHER':
-          router.push('/dashboard/teacher')
-          toast.success(`Welcome back, ${session.user.name}! (Physical Education Expert)`)
-          break
-        case 'PARENT':
-          router.push('/dashboard/parent')
-          toast.success(`Welcome back, ${session.user.name}! (Parent Dashboard)`)
-          break
-        case 'COUNSELOR':
-          router.push('/dashboard/counselor')
-          toast.success(`Welcome back, ${session.user.name}! (Psychologist Dashboard)`)
-          break
-        case 'STUDENT':
-          router.push('/dashboard/student')
-          toast.success(`Welcome back, ${session.user.name}! (Student Dashboard)`)
-          break
-        default:
-          // Fallback for unknown roles
-          router.push('/dashboard/general')
-          toast.success(`Welcome back, ${session.user.name}!`)
+      // Redirect to role-specific dashboard based on email and role
+      const userEmail = session.user.email || ''
+      
+      // Check for specific user types based on email
+      if (userEmail === 'crm@edusight.com') {
+        router.push('/dashboard/crm')
+        toast.success(`Welcome back, ${session.user.name}! (CRM Manager)`)
+      } else if (userEmail === 'schooladmin@edusight.com') {
+        router.push('/dashboard/school-admin')
+        toast.success(`Welcome back, ${session.user.name}! (School Administrator)`)
+      } else if (userEmail === 'accounts@edusight.com') {
+        router.push('/dashboard/admin')
+        toast.success(`Welcome back, ${session.user.name}! (Accounts Manager)`)
+      } else {
+        // Default role-based routing
+        switch (session.user.role) {
+          case 'ADMIN':
+            router.push('/dashboard/admin')
+            toast.success(`Welcome back, ${session.user.name}! (System Administrator)`)
+            break
+          case 'TEACHER':
+            router.push('/dashboard/teacher')
+            toast.success(`Welcome back, ${session.user.name}! (Physical Education Expert)`)
+            break
+          case 'PARENT':
+            router.push('/dashboard/parent')
+            toast.success(`Welcome back, ${session.user.name}! (Parent Dashboard)`)
+            break
+          case 'COUNSELOR':
+            router.push('/dashboard/counselor')
+            toast.success(`Welcome back, ${session.user.name}! (Psychologist Dashboard)`)
+            break
+          case 'STUDENT':
+            router.push('/dashboard/student')
+            toast.success(`Welcome back, ${session.user.name}! (Student Dashboard)`)
+            break
+          default:
+            // Fallback for unknown roles
+            router.push('/dashboard/admin')
+            toast.success(`Welcome back, ${session.user.name}!`)
+        }
       }
     } else {
       // No role assigned, redirect to profile setup

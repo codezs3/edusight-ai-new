@@ -1,47 +1,20 @@
 # 🎯 EduSight Demo Users Guide
 
 ## 🚀 **Application Access**
-**URL**: http://localhost:3000  
+**URL**: http://localhost:3001  
 **Universal Password**: `password123` (for all demo users)
 
 ---
 
-## 👥 **Demo User Categories**
+## 👥 **Demo Users (5 Total)**
 
-### 📊 **ADMIN USERS** (Full System Access)
-| Email | Name | Role | Access Level |
-|-------|------|------|--------------|
+| Email | Name | Role | Department/Function |
+|-------|------|------|-------------------|
 | `admin@edusight.com` | System Administrator | ADMIN | Complete system management |
-| `superadmin@edusight.com` | Super Admin | ADMIN | Highest level access |
-| `principal@edusight.com` | Dr. Principal Smith | ADMIN | School administration |
-| `vp@edusight.com` | Vice Principal Jones | ADMIN | Assistant administration |
-
-### 💼 **CRM/SALES USERS** (Customer Management)
-| Email | Name | Role | Department |
-|-------|------|------|------------|
-| `crm@edusight.com` | CRM Manager | ADMIN | Customer Relationship Management |
-| `sales1@edusight.com` | Jennifer Sales | ADMIN | Sales & Revenue |
-
-### 💰 **ACCOUNTS/FINANCE USERS** (Financial Management)
-| Email | Name | Role | Department |
-|-------|------|------|------------|
-| `accounts@edusight.com` | Finance Manager | ADMIN | Financial Operations |
-| `accountant1@edusight.com` | Patricia Accountant | ADMIN | Accounting & Budgets |
-
-### 🎓 **SCHOOL USERS** (Educational Staff)
-| Email | Name | Role | Subjects |
-|-------|------|------|----------|
-| `teacher1@edusight.com` | Sarah Johnson | TEACHER | Mathematics, Physics |
-| `teacher2@edusight.com` | Michael Chen | TEACHER | English, Literature |
-| `teacher3@edusight.com` | Emily Rodriguez | TEACHER | Science, Chemistry |
-
-### 👨‍🎓 **STUDENT USERS** (Learners)
-| Email | Name | Role | Grade | Section |
-|-------|------|------|-------|---------|
-| `student1@edusight.com` | Alex Thompson | STUDENT | Grade 8 | A |
-| `student2@edusight.com` | Emma Wilson | STUDENT | Grade 9 | B |
-| `student3@edusight.com` | James Davis | STUDENT | Grade 10 | C |
-| `student4@edusight.com` | Sophia Martinez | STUDENT | Grade 11 | D |
+| `parent1@edusight.com` | Robert Thompson | PARENT | Parent dashboard access |
+| `schooladmin@edusight.com` | Dr. School Admin | ADMIN | School administration |
+| `crm@edusight.com` | CRM Manager | ADMIN | Customer relationship management |
+| `accounts@edusight.com` | Accounts Manager | ADMIN | Financial operations |
 
 ### 👨‍👩‍👧‍👦 **PARENT USERS** (Guardians)
 | Email | Name | Role | Child |

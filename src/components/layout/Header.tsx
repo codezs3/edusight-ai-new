@@ -58,6 +58,96 @@ export function Header() {
   }, []);
 
   const megaMenuItems = {
+    about: {
+      title: 'About EduSight',
+      description: 'Discover our mission, vision, and the team behind the future of education',
+      sections: [
+        {
+          title: 'Our Story',
+          items: [
+            { 
+              name: 'Mission & Vision', 
+              href: '/about#mission', 
+              icon: LightBulbIcon, 
+              description: 'Transforming education through AI-powered insights',
+              badge: 'Core Values'
+            },
+            { 
+              name: 'Our Team', 
+              href: '/about#team', 
+              icon: UserGroupIcon, 
+              description: 'Meet the experts behind EduSight',
+              badge: null
+            },
+            { 
+              name: 'Company History', 
+              href: '/about#history', 
+              icon: ClipboardDocumentCheckIcon, 
+              description: 'Our journey in educational technology',
+              badge: null
+            }
+          ]
+        },
+        {
+          title: 'Technology',
+          items: [
+            { 
+              name: 'AI & Machine Learning', 
+              href: '/about#technology', 
+              icon: SparklesIcon, 
+              description: 'Advanced algorithms for educational assessment',
+              badge: 'AI-Powered'
+            },
+            { 
+              name: 'Data Security', 
+              href: '/about#security', 
+              icon: CogIcon, 
+              description: 'Enterprise-grade security and privacy',
+              badge: 'Secure'
+            },
+            { 
+              name: 'Research & Development', 
+              href: '/about#research', 
+              icon: BeakerIcon, 
+              description: 'Continuous innovation in EdTech',
+              badge: null
+            }
+          ]
+        },
+        {
+          title: 'Impact',
+          items: [
+            { 
+              name: 'Success Stories', 
+              href: '/about#success', 
+              icon: TrophyIcon, 
+              description: 'Real impact on students and schools',
+              badge: 'Results'
+            },
+            { 
+              name: 'Global Reach', 
+              href: '/about#global', 
+              icon: GlobeAltIcon, 
+              description: 'Serving educational institutions worldwide',
+              badge: 'International'
+            },
+            { 
+              name: 'Awards & Recognition', 
+              href: '/about#awards', 
+              icon: StarIcon, 
+              description: 'Industry recognition and achievements',
+              badge: null
+            }
+          ]
+        }
+      ],
+      cta: {
+        title: 'Join Our Mission',
+        description: 'Be part of the educational transformation',
+        href: '/careers',
+        buttonText: 'View Careers'
+      }
+    },
     frameworks: {
       title: 'Educational Frameworks',
       description: 'Comprehensive support for major educational systems worldwide',

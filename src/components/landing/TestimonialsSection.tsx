@@ -37,13 +37,7 @@ export function TestimonialsSection() {
   return (
     <div className="bg-gray-50 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="mx-auto max-w-xl text-center"
-        >
+        <div className="mx-auto max-w-xl text-center animate-fade-in-up">
           <h2 className="text-lg font-semibold leading-8 tracking-tight text-primary-600">
             Testimonials
           </h2>
