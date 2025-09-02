@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useCurrentTime } from '@/hooks/useClientOnly'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import {
@@ -40,6 +41,7 @@ export default function VerticalDashboardLayout({
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set())
+  const currentTime = useCurrentTime()
 
   const toggleMenu = (menuTitle: string) => {
     const newExpanded = new Set(expandedMenus)
@@ -221,7 +223,7 @@ export default function VerticalDashboardLayout({
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <span>Last updated:</span>
-                <span className="font-medium">{new Date().toLocaleTimeString()}</span>
+                <span className="font-medium">{currentTime}</span>
               </div>
             </div>
           </div>

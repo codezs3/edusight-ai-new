@@ -46,6 +46,7 @@ interface WorkflowProgressProps {
 }
 
 export function WorkflowProgress({ studentId, onStepClick }: WorkflowProgressProps) {
+  const [mounted, setMounted] = useState(false);
   const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([
     {
       id: 'signup',
@@ -154,6 +155,17 @@ export function WorkflowProgress({ studentId, onStepClick }: WorkflowProgressPro
 
   // Simulate workflow progress
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const getTimeString = () => {
+    if (typeof window === 'undefined' || !mounted) {
+      return 'Just now';
+    }
+    return new Date().toLocaleString();
+  };
+
+  useEffect(() => {
     if (!isAutoProgress) return;
 
     const timer = setInterval(() => {
@@ -164,11 +176,11 @@ export function WorkflowProgress({ studentId, onStepClick }: WorkflowProgressPro
         if (currentStepIndex !== -1) {
           const currentStep = updated[currentStepIndex];
           if (currentStep.progress < 100) {
-            currentStep.progress += Math.random() * 10;
+            currentStep.progress += 10; // Fixed increment instead of random
             if (currentStep.progress >= 100) {
               currentStep.progress = 100;
               currentStep.status = 'completed';
-              currentStep.completedAt = new Date().toLocaleString();
+              currentStep.completedAt = getTimeString();
               
               // Start next step
               if (currentStepIndex + 1 < updated.length) {
@@ -249,7 +261,7 @@ export function WorkflowProgress({ studentId, onStepClick }: WorkflowProgressPro
       ...step,
       status: index === 0 ? 'completed' : index === 1 ? 'completed' : index === 2 ? 'in_progress' : 'pending',
       progress: index === 0 ? 100 : index === 1 ? 100 : index === 2 ? 65 : 0,
-      completedAt: index <= 1 ? new Date().toLocaleString() : undefined,
+      completedAt: index <= 1 ? 'Just now' : undefined,
       errorMessage: undefined
     })));
   };

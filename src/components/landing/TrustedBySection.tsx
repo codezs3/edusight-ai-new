@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 
 export function TrustedBySection() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   const partners = [
     { name: 'Delhi Public School', logo: '🏫', type: 'School Chain' },
@@ -24,12 +25,18 @@ export function TrustedBySection() {
   ];
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 4) % partners.length);
     }, 3000);
 
     return () => clearInterval(timer);
-  }, [partners.length]);
+  }, [mounted, partners.length]);
 
   return (
     <section className="py-16 bg-white border-b border-gray-100">
@@ -62,7 +69,7 @@ export function TrustedBySection() {
         <div className="relative overflow-hidden">
           <div className="flex items-center justify-center">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-4xl">
-              {partners.slice(currentIndex, currentIndex + 4).map((partner, index) => (
+              {partners.slice(mounted ? currentIndex : 0, (mounted ? currentIndex : 0) + 4).map((partner, index) => (
                 <div 
                   key={`${currentIndex}-${index}`}
                   className="group flex flex-col items-center p-6 bg-gray-50 rounded-xl hover:bg-primary-50 transition-all duration-300 transform hover:scale-105 animate-fade-in"
@@ -88,7 +95,7 @@ export function TrustedBySection() {
                 key={index}
                 onClick={() => setCurrentIndex(index * 4)}
                 className={`w-3 h-3 rounded-full transition-colors ${
-                  Math.floor(currentIndex / 4) === index 
+                  Math.floor((mounted ? currentIndex : 0) / 4) === index 
                     ? 'bg-primary-600' 
                     : 'bg-gray-300 hover:bg-gray-400'
                 }`}

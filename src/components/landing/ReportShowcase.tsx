@@ -20,6 +20,7 @@ export function ReportShowcase() {
   const [reportProgress, setReportProgress] = useState(0);
   const [currentSection, setCurrentSection] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const reportSections = [
     {
@@ -81,11 +82,17 @@ export function ReportShowcase() {
   };
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     const timer = setInterval(() => {
       setCurrentSection((prev) => (prev + 1) % reportSections.length);
     }, 3000);
     return () => clearInterval(timer);
-  }, [reportSections.length]);
+  }, [mounted, reportSections.length]);
 
   const generateReport = () => {
     setIsGenerating(true);
@@ -226,13 +233,13 @@ export function ReportShowcase() {
                 <div className="mb-6">
                   <div className="bg-slate-50 rounded-xl p-4">
                     <div className="flex items-center mb-2">
-                      {React.createElement(reportSections[currentSection].icon, {
+                      {React.createElement(reportSections[mounted ? currentSection : 0].icon, {
                         className: "w-5 h-5 text-blue-600 mr-2"
                       })}
-                      <h5 className="font-bold text-slate-900">{reportSections[currentSection].title}</h5>
+                      <h5 className="font-bold text-slate-900">{reportSections[mounted ? currentSection : 0].title}</h5>
                     </div>
-                    <p className="text-sm text-slate-600 mb-2">{reportSections[currentSection].description}</p>
-                    <p className="text-xs text-slate-500">{reportSections[currentSection].content}</p>
+                    <p className="text-sm text-slate-600 mb-2">{reportSections[mounted ? currentSection : 0].description}</p>
+                    <p className="text-xs text-slate-500">{reportSections[mounted ? currentSection : 0].content}</p>
                   </div>
                 </div>
 

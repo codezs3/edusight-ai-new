@@ -190,3 +190,182 @@ model Payment {
 
   @@map("payments")
 }
+
+// Assessment Framework Management
+model AssessmentFramework {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique // IGCSE, IB, ICSE, CBSE, STREAM
+  description String?
+  isCustom    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdBy   String   // admin user ID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subjects    FrameworkSubject[]
+  templates   AssessmentTemplate[]
+
+  @@map("assessment_frameworks")
+}
+
+model FrameworkSubject {
+  id          String   @id @default(cuid())
+  frameworkId String
+  name        String
+  code        String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  framework         AssessmentFramework @relation(fields: [frameworkId], references: [id], onDelete: Cascade)
+  assessmentTypes   SubjectAssessmentType[]
+  skills           SubjectSkill[]
+
+  @@unique([frameworkId, name])
+  @@map("framework_subjects")
+}
+
+model SubjectSkill {
+  id          String   @id @default(cuid())
+  subjectId   String
+  name        String
+  code        String?
+  description String?
+  category    String?  // cognitive, psychomotor, affective, etc.
+  level       String?  // beginner, intermediate, advanced
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subject           FrameworkSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  skillAssessments  SkillAssessmentType[]
+
+  @@unique([subjectId, name])
+  @@map("subject_skills")
+}
+
+model SkillAssessmentType {
+  id              String   @id @default(cuid())
+  skillId         String
+  assessmentTypeId String
+  config          String?  // JSON configuration for skill-specific assessment
+  weightage       Float?   // weightage of this assessment type for the skill
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  skill          SubjectSkill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  assessmentType AssessmentType @relation(fields: [assessmentTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([skillId, assessmentTypeId])
+  @@map("skill_assessment_types")
+}
+
+model AssessmentType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique // marks, rubrics, other
+  description String?
+  config      String?  // JSON configuration for the type
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subjectTypes  SubjectAssessmentType[]
+  skillTypes    SkillAssessmentType[]
+
+  @@map("assessment_types")
+}
+
+model AssessmentCycle {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique // monthly, quarterly, six_monthly, yearly
+  description String?
+  duration    Int?     // duration in months
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  templates   AssessmentTemplate[]
+
+  @@map("assessment_cycles")
+}
+
+model SubjectAssessmentType {
+  id              String   @id @default(cuid())
+  subjectId       String
+  assessmentTypeId String
+  config          String?  // JSON configuration specific to this subject-type combination
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subject        FrameworkSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  assessmentType AssessmentType   @relation(fields: [assessmentTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([subjectId, assessmentTypeId])
+  @@map("subject_assessment_types")
+}
+
+model AssessmentTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  frameworkId String
+  cycleId     String
+  config      String   // JSON configuration for the template
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdBy   String   // admin user ID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  framework AssessmentFramework @relation(fields: [frameworkId], references: [id], onDelete: Cascade)
+  cycle     AssessmentCycle     @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+
+  @@map("assessment_templates")
+}
+
+// Maintenance and Backup Models
+model MaintenanceLog {
+  id            String   @id @default(cuid())
+  type          String   // backup, restore, cleanup, update
+  status        String   // pending, running, completed, failed
+  description   String?
+  startTime     DateTime @default(now())
+  endTime       DateTime?
+  duration      Int?     // in seconds
+  fileSize      String?  // backup file size
+  fileName      String?  // backup file name
+  googleDriveId String?  // Google Drive file ID
+  errorMessage  String?
+  userId        String   // admin who initiated
+  metadata      String?  // JSON string for additional data
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("maintenance_logs")
+}
+
+model BackupConfiguration {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  description       String?
+  scheduleEnabled   Boolean  @default(false)
+  schedulePattern   String?  // cron pattern
+  retentionDays     Int      @default(30)
+  includePrismaDb   Boolean  @default(true)
+  includeUploads    Boolean  @default(true)
+  includeConfig     Boolean  @default(true)
+  googleDriveFolder String?  // Google Drive folder ID
+  isActive          Boolean  @default(true)
+  lastBackupAt      DateTime?
+  createdBy         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("backup_configurations")
+}

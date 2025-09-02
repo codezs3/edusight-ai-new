@@ -17,6 +17,7 @@ import {
 export function HeroSection() {
   const [currentFeature, setCurrentFeature] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const dynamicFeatures = [
     {
@@ -60,6 +61,7 @@ export function HeroSection() {
   ];
 
   useEffect(() => {
+    setMounted(true);
     setIsVisible(true);
     const timer = setInterval(() => {
       setCurrentFeature((prev) => (prev + 1) % dynamicFeatures.length);
@@ -67,7 +69,7 @@ export function HeroSection() {
     return () => clearInterval(timer);
   }, [dynamicFeatures.length]);
 
-  const currentFeatureData = dynamicFeatures[currentFeature];
+  const currentFeatureData = dynamicFeatures[mounted ? currentFeature : 0];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">

@@ -8,6 +8,7 @@ import {
   UsersIcon,
   ChartBarIcon,
   CogIcon,
+  WrenchScrewdriverIcon,
   AcademicCapIcon,
   DocumentChartBarIcon,
   ArrowTrendingUpIcon,
@@ -19,7 +20,6 @@ import {
   BellIcon,
   ExclamationTriangleIcon,
   ClockIcon,
-  DocumentTextIcon,
   CurrencyDollarIcon,
   GlobeAltIcon,
   PresentationChartLineIcon,
@@ -56,7 +56,10 @@ import {
   AdjustmentsHorizontalIcon,
   HomeIcon,
   BeakerIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  ClipboardDocumentListIcon,
+  CalendarDaysIcon,
+  PencilSquareIcon
 } from '@heroicons/react/24/outline'
 import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout'
 import StatCard from '@/components/dashboard/StatCard'
@@ -114,16 +117,32 @@ export default function AdminDashboard() {
       ]
     },
     {
+      title: 'Academic Management',
+      href: '/dashboard/admin/academic',
+      icon: AcademicCapIcon,
+      children: [
+        { title: 'Assessment Systems', href: '/dashboard/admin/assessments', icon: ClipboardDocumentListIcon, badge: 'Enhanced' },
+        { title: 'Curriculum Mapper', href: '/dashboard/admin/curriculum-mapper', icon: BookOpenIcon, badge: 'New' },
+        { title: 'Curriculum Frameworks', href: '/dashboard/admin/assessments/frameworks', icon: BookOpenIcon },
+        { title: 'Subject Management', href: '/dashboard/admin/subjects', icon: BeakerIcon },
+        { title: 'Skills Management', href: '/dashboard/admin/skills', icon: BeakerIcon, badge: 'New' },
+        { title: 'Grade Books', href: '/dashboard/admin/gradebooks', icon: DocumentChartBarIcon },
+        { title: 'Academic Calendar', href: '/dashboard/admin/calendar', icon: CalendarDaysIcon },
+        { title: 'Examinations', href: '/dashboard/admin/exams', icon: PencilSquareIcon },
+        { title: 'Progress Reports', href: '/dashboard/admin/progress', icon: TrophyIcon },
+        { title: 'Academic Templates', href: '/dashboard/admin/templates', icon: FolderIcon, badge: 'Enhanced' }
+      ]
+    },
+    {
       title: 'Institution',
       href: '/dashboard/admin/institution',
       icon: BuildingOfficeIcon,
       children: [
         { title: 'School Management', href: '/dashboard/admin/school', icon: BuildingOfficeIcon },
         { title: 'User Management', href: '/dashboard/admin/users', icon: UsersIcon },
-        { title: 'Assessments', href: '/dashboard/admin/assessments', icon: AcademicCapIcon },
         { title: 'Financial', href: '/dashboard/admin/finance', icon: CurrencyDollarIcon },
         { title: 'Communications', href: '/dashboard/admin/communications', icon: MegaphoneIcon },
-        { title: 'Content', href: '/dashboard/admin/content', icon: FolderIcon }
+        { title: 'Content Management', href: '/dashboard/admin/content', icon: FolderIcon }
       ]
     },
     {
@@ -146,7 +165,7 @@ export default function AdminDashboard() {
         { title: 'Income Management', href: '/dashboard/admin/accounting/income', icon: ArrowTrendingUpIcon },
         { title: 'Expense Management', href: '/dashboard/admin/accounting/expenses', icon: ArrowTrendingDownIcon },
         { title: 'Financial Reports', href: '/dashboard/admin/accounting/reports', icon: ChartBarIcon },
-        { title: 'Invoicing', href: '/dashboard/admin/accounting/invoicing', icon: DocumentTextIcon }
+        { title: 'Invoicing', href: '/dashboard/admin/accounting/invoicing', icon: CurrencyDollarIcon }
       ]
     },
     {
@@ -157,8 +176,10 @@ export default function AdminDashboard() {
         { title: 'Support Tickets', href: '/dashboard/admin/support', icon: LifebuoyIcon, badge: '12' },
         { title: 'Backup & Recovery', href: '/dashboard/admin/backup', icon: CloudIcon },
         { title: 'Task Scheduler', href: '/dashboard/admin/scheduler', icon: CalendarIcon },
-        { title: 'Audit & Compliance', href: '/dashboard/admin/audit', icon: DocumentTextIcon },
+        { title: 'Audit & Compliance', href: '/dashboard/admin/audit', icon: ShieldCheckIcon },
+
         { title: 'Settings', href: '/dashboard/admin/settings', icon: CogIcon },
+        { title: 'System Maintenance', href: '/dashboard/admin/maintenance', icon: WrenchScrewdriverIcon, badge: 'New' },
         { title: 'Payment Settings', href: '/dashboard/admin/settings/payment', icon: CreditCardIcon, badge: 'Config' }
       ]
     }
@@ -211,6 +232,57 @@ export default function AdminDashboard() {
       activeItem="/dashboard/admin"
     >
       <div className="space-y-6">
+        {/* Quick Action Icons */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/assessments')}>
+              <AcademicCapIcon className="h-8 w-8 text-blue-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Assessments</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/subjects')}>
+              <BeakerIcon className="h-8 w-8 text-green-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Subjects</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/calendar')}>
+              <CalendarDaysIcon className="h-8 w-8 text-purple-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Calendar</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/exams')}>
+              <PencilSquareIcon className="h-8 w-8 text-red-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Exams</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/progress')}>
+              <TrophyIcon className="h-8 w-8 text-yellow-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Progress</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/users')}>
+              <UsersIcon className="h-8 w-8 text-indigo-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Users</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/school')}>
+              <BuildingOfficeIcon className="h-8 w-8 text-pink-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Schools</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/curriculum-mapper')}>
+              <BookOpenIcon className="h-8 w-8 text-indigo-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Curriculum</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/skills')}>
+              <BeakerIcon className="h-8 w-8 text-emerald-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Skills</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/templates')}>
+              <FolderIcon className="h-8 w-8 text-blue-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Templates</span>
+            </div>
+            <div className="flex flex-col items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onClick={() => router.push('/dashboard/admin/maintenance')}>
+              <WrenchScrewdriverIcon className="h-8 w-8 text-orange-600 mb-2" />
+              <span className="text-xs text-gray-700 text-center">Maintenance</span>
+            </div>
+          </div>
+        </div>
+
         {/* Key Performance Indicators */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickStats.map((stat, index) => (

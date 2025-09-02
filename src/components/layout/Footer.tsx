@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { AcademicCapIcon } from '@heroicons/react/24/outline';
+import { useCurrentYear } from '@/hooks/useClientOnly';
 
 export function Footer() {
+  const currentYear = useCurrentYear();
   const navigation = {
     product: [
       { name: 'Features', href: '/#features' },
@@ -169,7 +171,7 @@ export function Footer() {
               </p>
             </div>
             <p className="mt-8 text-xs leading-5 text-gray-400 md:order-1 md:mt-0">
-              &copy; {new Date().getFullYear()} EduSight. All rights reserved.
+              &copy; 2024 EduSight. All rights reserved.
             </p>
           </div>
         </div>

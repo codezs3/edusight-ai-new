@@ -23,6 +23,7 @@ export function AnalyticsShowcase() {
   const [activeStep, setActiveStep] = useState(0);
   const [animationProgress, setAnimationProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   // Sample data for animations
@@ -158,17 +159,22 @@ export function AnalyticsShowcase() {
 
   // Animate workflow steps
   useEffect(() => {
-    if (isVisible) {
+    if (isVisible && mounted) {
       const timer = setInterval(() => {
         setActiveStep((prev) => (prev + 1) % workflowSteps.length);
       }, 3000);
       return () => clearInterval(timer);
     }
-  }, [isVisible, workflowSteps.length]);
+  }, [isVisible, mounted, workflowSteps.length]);
+
+  // Set mounted state
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Animate scores
   useEffect(() => {
-    if (isVisible) {
+    if (isVisible && mounted) {
       const timer = setInterval(() => {
         setAnimationProgress((prev) => {
           const newProgress = prev + 1;
@@ -195,7 +201,7 @@ export function AnalyticsShowcase() {
 
       return () => clearInterval(timer);
     }
-  }, [isVisible]);
+  }, [isVisible, mounted]);
 
   return (
     <section ref={sectionRef} className="py-24 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
