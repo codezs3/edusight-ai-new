@@ -41,14 +41,13 @@
     "@tanstack/react-query-devtools": "^5.85.6",
     "@tensorflow/tfjs": "^4.15.0",
     "@tremor/react": "^3.17.4",
-
     "@types/papaparse": "^5.3.14",
+    "@types/react-window": "^1.8.8",
     "@types/uuid": "^10.0.0",
     "archiver": "^7.0.1",
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
-
     "date-fns": "^2.30.0",
     "framer-motion": "^12.23.12",
     "googleapis": "^159.0.0",
@@ -62,16 +61,15 @@
     "node-cron": "^4.2.1",
     "papaparse": "^5.4.1",
     "pdfjs-dist": "^5.4.149",
-
     "postcss": "^8.4.32",
     "react": "^18.3.1",
-
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.48.2",
     "react-hot-toast": "^2.6.0",
     "react-loading-skeleton": "^3.3.1",
-
+    "react-window": "^2.0.2",
+    "react-window-infinite-loader": "^1.0.10",
     "recharts": "^2.8.0",
     "sqlite3": "^5.1.7",
     "stripe": "^18.5.0",
@@ -83,10 +81,8 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^24.3.0",
-
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
-
     "eslint": "^8.56.0",
     "eslint-config-next": "^15.5.2",
     "prisma": "^6.15.0",
