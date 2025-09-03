@@ -86,7 +86,7 @@ function detectAcademicFramework(extractedData: any): any {
     },
     'IGCSE': {
       keywords: ['igcse', 'cambridge', 'international general certificate', 'cambridge international'],
-      gradePattern: /[A*-U]\*?|[9-1]\/9/i,
+      gradePattern: /[A*-U]\*?|[1-9]\/9/i,
       subjects: ['first language', 'second language', 'foreign language'],
       confidence: 0.85
     },
@@ -110,7 +110,7 @@ function detectAcademicFramework(extractedData: any): any {
     },
     'GCSE': {
       keywords: ['gcse', 'general certificate', 'secondary education'],
-      gradePattern: /[9-1]|[A*-G]\*?/i,
+      gradePattern: /[1-9]|[A*-G]\*?/i,
       subjects: ['english language', 'english literature', 'mathematics'],
       confidence: 0.8
     }

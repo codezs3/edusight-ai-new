@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckCircleIcon, 
@@ -159,7 +159,7 @@ const initialSteps: WorkflowStep[] = [
   }
 ];
 
-export default function UploadWorkflow({ documentId, studentId, onComplete, onError }: UploadWorkflowProps) {
+const UploadWorkflow = memo(function UploadWorkflow({ documentId, studentId, onComplete, onError }: UploadWorkflowProps) {
   const [steps, setSteps] = useState<WorkflowStep[]>(initialSteps);
   const [currentStep, setCurrentStep] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -170,7 +170,7 @@ export default function UploadWorkflow({ documentId, studentId, onComplete, onEr
   const [multipleFrameworks, setMultipleFrameworks] = useState<any[]>([]);
   const [missingFrameworks, setMissingFrameworks] = useState<string[]>([]);
 
-  const updateStepStatus = (stepId: string, status: WorkflowStep['status'], progress?: number, error?: string, details?: string[]) => {
+  const updateStepStatus = useCallback((stepId: string, status: WorkflowStep['status'], progress?: number, error?: string, details?: string[]) => {
     setSteps(prev => prev.map(step => {
       if (step.id === stepId) {
         return { ...step, status, progress, error, details };
@@ -184,9 +184,9 @@ export default function UploadWorkflow({ documentId, studentId, onComplete, onEr
       }
       return step;
     }));
-  };
+  }, []);
 
-  const updateSubStepStatus = (parentId: string, subStepId: string, status: WorkflowStep['status'], progress?: number) => {
+  const updateSubStepStatus = useCallback((parentId: string, subStepId: string, status: WorkflowStep['status'], progress?: number) => {
     setSteps(prev => prev.map(step => {
       if (step.id === parentId && step.subSteps) {
         const updatedSubSteps = step.subSteps.map(subStep => 
@@ -196,7 +196,7 @@ export default function UploadWorkflow({ documentId, studentId, onComplete, onEr
       }
       return step;
     }));
-  };
+  }, []);
 
   const processStep = async (stepIndex: number) => {
     const step = steps[stepIndex];
@@ -893,4 +893,6 @@ export default function UploadWorkflow({ documentId, studentId, onComplete, onEr
       </div>
     </div>
   );
-}
+});
+
+export default UploadWorkflow;

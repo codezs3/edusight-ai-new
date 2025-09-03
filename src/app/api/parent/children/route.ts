@@ -42,6 +42,19 @@ async function getChildren(request: NextRequest, { user }: { user: any }) {
                 name: true,
                 board: true,
               }
+            },
+            // Add analytics with limit to prevent large data load
+            assessments: {
+              select: {
+                id: true,
+                createdAt: true,
+                score: true,
+                subject: true,
+              },
+              orderBy: {
+                createdAt: 'desc'
+              },
+              take: 3 // Only latest 3 assessments
             }
           },
           orderBy: {
@@ -95,23 +108,12 @@ async function createChild(request: NextRequest, { user }: { user: any }) {
       emailCounter++;
     }
 
-    // Determine school association
-    let targetSchoolId = validatedData.schoolId || parent.schoolId;
-    
-    // For B2C parents, they can choose any school or none
-    // For B2B parents, they must use their assigned school
-    if (parent.schoolId && user.accountType === 'B2B') {
-      targetSchoolId = parent.schoolId;
-    }
-
     // Create user account for the child
     const childUser = await prisma.user.create({
       data: {
         name: validatedData.name,
         email: childEmail,
         role: 'STUDENT',
-        accountType: targetSchoolId ? 'B2B' : 'B2C',
-        schoolId: targetSchoolId,
       }
     });
 
@@ -120,7 +122,7 @@ async function createChild(request: NextRequest, { user }: { user: any }) {
       data: {
         userId: childUser.id,
         parentId: parent.id,
-        schoolId: targetSchoolId,
+        schoolId: validatedData.schoolId,
         grade: validatedData.grade,
         section: validatedData.section,
         rollNumber: validatedData.rollNumber,
@@ -173,9 +175,13 @@ async function createChild(request: NextRequest, { user }: { user: any }) {
 
 // Export route handlers with middleware
 export const GET = withAuth(getChildren, {
-  permissions: ['MANAGE_OWN_CHILDREN']
+  resource: 'STUDENT',
+  action: 'READ',
+  scope: 'OWN'
 });
 
 export const POST = withAuth(createChild, {
-  permissions: ['MANAGE_OWN_CHILDREN']
+  resource: 'STUDENT',
+  action: 'CREATE',
+  scope: 'OWN'
 });

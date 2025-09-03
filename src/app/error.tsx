@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ExclamationTriangleIcon, ArrowPathIcon, HomeIcon, BugIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon, ArrowPathIcon, HomeIcon, WrenchIcon } from '@heroicons/react/24/outline';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -77,7 +77,7 @@ export default function Error({ error, reset }: ErrorProps) {
             href="/support"
             className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow group"
           >
-            <BugIcon className="w-8 h-8 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
+            <WrenchIcon className="w-8 h-8 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
             <span className="font-medium text-gray-900">Support</span>
             <span className="text-sm text-gray-500">Get help from our team</span>
           </Link>

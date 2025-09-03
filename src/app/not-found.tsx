@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { HomeIcon, ArrowLeftIcon, SearchIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, ArrowLeftIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
 export default function NotFound() {
   return (
@@ -26,7 +26,7 @@ export default function NotFound() {
         {/* Search Suggestion */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <SearchIcon className="w-6 h-6 text-gray-400" />
+            <MagnifyingGlassIcon className="w-6 h-6 text-gray-400" />
             <h3 className="text-lg font-medium text-gray-900">Looking for something specific?</h3>
           </div>
           <p className="text-gray-600 mb-4">
@@ -37,7 +37,7 @@ export default function NotFound() {
               href="/dashboard"
               className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
-              <SearchIcon className="w-5 h-5 mr-2" />
+              <MagnifyingGlassIcon className="w-5 h-5 mr-2" />
               Go to Dashboard
             </Link>
           </div>

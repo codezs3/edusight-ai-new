@@ -286,8 +286,8 @@ function normalizeIGCSEGrade(grade: string): number {
     return igcseGrades[gradeStr];
   }
 
-  // IGCSE 9-1 grades
-  const numberMatch = gradeStr.match(/([9-1])/);
+      // IGCSE 9-1 grades
+    const numberMatch = gradeStr.match(/([1-9])/);
   if (numberMatch) {
     const numGrade = parseInt(numberMatch[1]);
     const conversion = [0, 40, 50, 60, 65, 70, 75, 82, 88, 95]; // Index 0 for grade 1
@@ -342,7 +342,7 @@ function normalizeGCSEGrade(grade: string): number {
   const gradeStr = grade.trim().toUpperCase();
   
   // GCSE 9-1 grades
-  const numberMatch = gradeStr.match(/([9-1])/);
+      const numberMatch = gradeStr.match(/([1-9])/);
   if (numberMatch) {
     const numGrade = parseInt(numberMatch[1]);
     const conversion = [0, 40, 50, 60, 65, 70, 75, 82, 88, 95];

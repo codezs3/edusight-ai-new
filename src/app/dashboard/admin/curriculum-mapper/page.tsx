@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
+import { z } from 'zod'
 import { 
   AcademicCapIcon, 
   BookOpenIcon, 
@@ -16,6 +18,15 @@ import {
   ArrowRightIcon
 } from '@heroicons/react/24/outline'
 import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout'
+
+// Default cycle ID - should be configurable in production
+const DEFAULT_CYCLE_ID = process.env.NEXT_PUBLIC_DEFAULT_CYCLE_ID || 'cmf0oc16r0004exfg8r9l2bq3'
+
+// Validation schema for template creation
+const templateSchema = z.object({
+  name: z.string().min(1, 'Template name is required').max(100, 'Template name must be less than 100 characters'),
+  description: z.string().min(1, 'Description is required').max(500, 'Description must be less than 500 characters'),
+})
 
 interface Framework {
   id: string
@@ -32,14 +43,6 @@ interface Subject {
   description?: string
 }
 
-interface Skill {
-  id: string
-  name: string
-  category: string
-  level: string
-  description?: string
-}
-
 interface AssessmentType {
   id: string
   name: string
@@ -53,16 +56,48 @@ export default function CurriculumMapper() {
   const [currentStep, setCurrentStep] = useState(1)
   const [frameworks, setFrameworks] = useState<Framework[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
-  const [skills, setSkills] = useState<Skill[]>([])
   const [assessmentTypes, setAssessmentTypes] = useState<AssessmentType[]>([])
   
   // Form state
   const [selectedFramework, setSelectedFramework] = useState<Framework | null>(null)
   const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([])
-  const [selectedSkills, setSelectedSkills] = useState<Skill[]>([])
   const [selectedAssessmentTypes, setSelectedAssessmentTypes] = useState<AssessmentType[]>([])
   const [templateName, setTemplateName] = useState('')
   const [templateDescription, setTemplateDescription] = useState('')
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({})
+
+  const loadFrameworks = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/assessments/frameworks')
+      if (!response.ok) throw new Error('Failed to fetch frameworks')
+      const data = await response.json()
+      setFrameworks(data)
+    } catch (error) {
+      console.error('Failed to load frameworks:', error)
+    }
+  }, [])
+
+  const loadSubjects = useCallback(async (frameworkId: string) => {
+    try {
+      const response = await fetch(`/api/admin/assessments/frameworks/${frameworkId}/subjects`)
+      if (!response.ok) throw new Error('Failed to fetch subjects')
+      const data = await response.json()
+      setSubjects(data)
+    } catch (error) {
+      console.error('Failed to load subjects:', error)
+    }
+  }, [])
+
+  const loadAssessmentTypes = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/assessments/types')
+      if (!response.ok) throw new Error('Failed to fetch assessment types')
+      const data = await response.json()
+      setAssessmentTypes(data)
+    } catch (error) {
+      console.error('Failed to load assessment types:', error)
+    }
+  }, [])
 
   useEffect(() => {
     if (status === 'loading') return
@@ -78,43 +113,12 @@ export default function CurriculumMapper() {
     // Load initial data
     loadFrameworks()
     loadAssessmentTypes()
-  }, [session, status, router])
-
-  const loadFrameworks = async () => {
-    try {
-      const response = await fetch('/api/admin/assessments/frameworks')
-      const data = await response.json()
-      setFrameworks(data)
-    } catch (error) {
-      console.error('Failed to load frameworks:', error)
-    }
-  }
-
-  const loadSubjects = async (frameworkId: string) => {
-    try {
-      const response = await fetch(`/api/admin/assessments/frameworks/${frameworkId}/subjects`)
-      const data = await response.json()
-      setSubjects(data)
-    } catch (error) {
-      console.error('Failed to load subjects:', error)
-    }
-  }
-
-  const loadAssessmentTypes = async () => {
-    try {
-      const response = await fetch('/api/admin/assessments/types')
-      const data = await response.json()
-      setAssessmentTypes(data)
-    } catch (error) {
-      console.error('Failed to load assessment types:', error)
-    }
-  }
+  }, [session, status, router, loadFrameworks, loadAssessmentTypes])
 
   const handleFrameworkSelect = (framework: Framework) => {
     setSelectedFramework(framework)
     loadSubjects(framework.id)
     setSelectedSubjects([])
-    setSelectedSkills([])
     setCurrentStep(2)
   }
 
@@ -135,41 +139,13 @@ export default function CurriculumMapper() {
     }
   }
 
-  const handleCreateTemplate = async () => {
-    try {
-      const templateData = {
-        name: templateName,
-        description: templateDescription,
-        frameworkId: selectedFramework?.id,
-        cycleId: 'cmf0oc16r0004exfg8r9l2bq3', // Default to quarterly cycle - you can make this selectable
-        subjectIds: selectedSubjects.map(s => s.id),
-        assessmentTypeIds: selectedAssessmentTypes.map(t => t.id),
-        skillMappings: generateSkillMappings()
-      }
-
-      const response = await fetch('/api/admin/curriculum-templates', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(templateData),
-      })
-
-      if (response.ok) {
-        const template = await response.json()
-        alert(`Template "${template.name}" created successfully!`)
-        router.push('/dashboard/admin/assessments/templates')
-      } else {
-        const error = await response.json()
-        alert(`Error creating template: ${error.error}`)
-      }
-    } catch (error) {
-      console.error('Error creating template:', error)
-      alert('Failed to create template')
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
     }
   }
 
-  const generateSkillMappings = () => {
+  const generateSkillMappings = useMemo(() => {
     const mappings: any = {}
     selectedSubjects.forEach(subject => {
       mappings[subject.id] = {
@@ -183,11 +159,53 @@ export default function CurriculumMapper() {
       }
     })
     return mappings
-  }
+  }, [selectedSubjects, selectedAssessmentTypes])
 
-  const handlePrevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+  const handleCreateTemplate = async () => {
+    // Validate form data
+    const result = templateSchema.safeParse({ name: templateName, description: templateDescription })
+    if (!result.success) {
+      const errors: {[key: string]: string} = {}
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          errors[err.path[0] as string] = err.message
+        }
+      })
+      setFormErrors(errors)
+      return
+    }
+    setFormErrors({}) // Clear previous errors
+
+    try {
+      const templateData = {
+        name: templateName,
+        description: templateDescription,
+        frameworkId: selectedFramework?.id,
+        cycleId: DEFAULT_CYCLE_ID,
+        subjectIds: selectedSubjects.map(s => s.id),
+        assessmentTypeIds: selectedAssessmentTypes.map(t => t.id),
+        skillMappings: generateSkillMappings
+      }
+
+      const response = await fetch('/api/admin/curriculum-templates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(templateData),
+      })
+
+      if (response.ok) {
+        const template = await response.json()
+        toast.success(`Template "${template.name}" created successfully!`)
+        router.push('/dashboard/admin/assessments/templates')
+      } else {
+        const error = await response.json().catch(() => ({ error: 'Unknown error occurred' }))
+        toast.error(`Error creating template: ${error.error || 'Failed to create template'}`)
+      }
+    } catch (error) {
+      console.error('Error creating template:', error)
+      toast.error('Failed to create template')
     }
   }
 
@@ -281,6 +299,15 @@ export default function CurriculumMapper() {
                         : 'border-gray-200 hover:border-blue-300'
                     }`}
                     onClick={() => handleFrameworkSelect(framework)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Select ${framework.name} framework`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleFrameworkSelect(framework)
+                      }
+                    }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-gray-900">{framework.name}</h3>
@@ -294,7 +321,23 @@ export default function CurriculumMapper() {
                 ))}
                 
                 {/* Create New Framework Option */}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-blue-400 transition-colors">
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-blue-400 transition-colors"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Create new framework"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      // TODO: Implement create framework modal
+                      toast.info('Create framework feature coming soon!')
+                    }
+                  }}
+                  onClick={() => {
+                    // TODO: Implement create framework modal
+                    toast.info('Create framework feature coming soon!')
+                  }}
+                >
                   <div className="text-center">
                     <PlusIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <div className="text-sm font-medium text-gray-700">Create New Framework</div>
@@ -321,6 +364,15 @@ export default function CurriculumMapper() {
                         : 'border-gray-200 hover:border-green-300'
                     }`}
                     onClick={() => handleSubjectToggle(subject)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${selectedSubjects.find(s => s.id === subject.id) ? 'Deselect' : 'Select'} ${subject.name} subject`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleSubjectToggle(subject)
+                      }
+                    }}
                   >
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">{subject.name}</h3>
@@ -421,6 +473,8 @@ export default function CurriculumMapper() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
 
           {/* Step 4: Assessment Types */}
           {currentStep === 4 && (
@@ -444,6 +498,22 @@ export default function CurriculumMapper() {
                           return [...prev, type]
                         }
                       })
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${selectedAssessmentTypes.find(t => t.id === type.id) ? 'Deselect' : 'Select'} ${type.name} assessment type`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setSelectedAssessmentTypes(prev => {
+                          const exists = prev.find(t => t.id === type.id)
+                          if (exists) {
+                            return prev.filter(t => t.id !== type.id)
+                          } else {
+                            return [...prev, type]
+                          }
+                        })
+                      }
                     }}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -473,9 +543,19 @@ export default function CurriculumMapper() {
                     type="text"
                     value={templateName}
                     onChange={(e) => setTemplateName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                      formErrors.name 
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
                     placeholder="Enter template name"
+                    aria-describedby={formErrors.name ? 'name-error' : undefined}
                   />
+                  {formErrors.name && (
+                    <p id="name-error" className="mt-1 text-sm text-red-600">
+                      {formErrors.name}
+                    </p>
+                  )}
                 </div>
                 
                 <div>
@@ -486,9 +566,19 @@ export default function CurriculumMapper() {
                     value={templateDescription}
                     onChange={(e) => setTemplateDescription(e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                      formErrors.description 
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
                     placeholder="Enter template description"
+                    aria-describedby={formErrors.description ? 'description-error' : undefined}
                   />
+                  {formErrors.description && (
+                    <p id="description-error" className="mt-1 text-sm text-red-600">
+                      {formErrors.description}
+                    </p>
+                  )}
                 </div>
 
                 {/* Summary */}
