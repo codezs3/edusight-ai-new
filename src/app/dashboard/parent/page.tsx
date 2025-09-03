@@ -113,6 +113,17 @@ export default function ParentDashboard() {
       ]
     },
     {
+      title: 'AI Analytics',
+      href: '/dashboard/parent/analytics',
+      icon: ChartBarIcon,
+      children: [
+        { title: 'Career Mapping', href: '/dashboard/parent/career-mapping', icon: MapPinIcon },
+        { title: 'Projections', href: '/dashboard/parent/projections', icon: ArrowTrendingUpIcon },
+        { title: 'Predictions', href: '/dashboard/parent/predictions', icon: LightBulbIcon },
+        { title: 'Performance Analytics', href: '/dashboard/parent/analytics', icon: ChartBarIcon }
+      ]
+    },
+    {
       title: 'Upload Documents',
       href: '/dashboard/parent/upload',
       icon: CloudArrowUpIcon

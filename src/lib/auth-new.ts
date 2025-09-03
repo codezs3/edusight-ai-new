@@ -78,6 +78,7 @@ export const authConfig: NextAuthConfig = {
             student: true,
             teacher: true,
             parent: true,
+            school: true,
           },
         });
 

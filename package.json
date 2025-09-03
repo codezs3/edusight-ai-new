@@ -59,6 +59,7 @@
     "next": "^15.5.2",
     "next-auth": "^5.0.0-beta.29",
     "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2",
     "papaparse": "^5.4.1",
     "pdfjs-dist": "^5.4.149",
     "postcss": "^8.4.32",

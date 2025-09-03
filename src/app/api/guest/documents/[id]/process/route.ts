@@ -3,11 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 // Mock processing for guest documents
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { guestSessionId, step } = await request.json();
-    const documentId = params.id;
+    const resolvedParams = await params;
+    const documentId = resolvedParams.id;
 
     if (!guestSessionId) {
       return NextResponse.json({ error: 'Guest session ID required' }, { status: 400 });
