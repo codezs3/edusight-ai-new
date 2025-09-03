@@ -1,309 +1,233 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-import prisma from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { AuditLogger } from '@/lib/audit';
+import { config } from '@/lib/config';
 
-// User roles enum
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  SCHOOL_ADMIN = 'SCHOOL_ADMIN',
-  TEACHER = 'TEACHER',
-  PARENT = 'PARENT',
-  STUDENT = 'STUDENT'
+export type PermissionType = 'READ' | 'WRITE' | 'DELETE' | 'ADMIN';
+export type UserRole = 'ADMIN' | 'SCHOOL_ADMIN' | 'TEACHER' | 'PARENT' | 'STUDENT';
+export type Resource = 'USER' | 'SCHOOL' | 'STUDENT' | 'DOCUMENT' | 'REPORT' | 'ANALYTICS' | 'SYSTEM';
+export type Action = 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'MANAGE';
+export type Scope = 'OWN' | 'SCHOOL' | 'ALL';
+
+export interface Permission {
+  resource: Resource;
+  actions: Action[];
+  scope: Scope;
 }
 
-// Permission types
-export type Permission = 
-  | 'CREATE_SCHOOL'
-  | 'MANAGE_SCHOOLS'
-  | 'MANAGE_ALL_USERS'
-  | 'MANAGE_SCHOOL_USERS'
-  | 'MANAGE_SCHOOL_STUDENTS'
-  | 'MANAGE_OWN_CHILDREN'
-  | 'VIEW_SCHOOL_ANALYTICS'
-  | 'VIEW_CHILD_ANALYTICS'
-  | 'UPLOAD_DOCUMENTS'
-  | 'GENERATE_REPORTS'
-  | 'ACCESS_ML_ANALYTICS'
-  | 'SYSTEM_CONFIGURATION';
+export interface PermissionMap {
+  [key in UserRole]: Permission[];
+}
 
-// Role-based permissions mapping
-const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  [UserRole.ADMIN]: [
-    'CREATE_SCHOOL',
-    'MANAGE_SCHOOLS',
-    'MANAGE_ALL_USERS',
-    'VIEW_SCHOOL_ANALYTICS',
-    'ACCESS_ML_ANALYTICS',
-    'SYSTEM_CONFIGURATION',
-    'GENERATE_REPORTS'
+// Define permissions for each role
+const PERMISSIONS: PermissionMap = {
+  ADMIN: [
+    { resource: 'USER', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'MANAGE'], scope: 'ALL' },
+    { resource: 'SCHOOL', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'MANAGE'], scope: 'ALL' },
+    { resource: 'STUDENT', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'MANAGE'], scope: 'ALL' },
+    { resource: 'DOCUMENT', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'MANAGE'], scope: 'ALL' },
+    { resource: 'REPORT', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'MANAGE'], scope: 'ALL' },
+    { resource: 'ANALYTICS', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'MANAGE'], scope: 'ALL' },
+    { resource: 'SYSTEM', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'MANAGE'], scope: 'ALL' },
   ],
-  [UserRole.SCHOOL_ADMIN]: [
-    'MANAGE_SCHOOL_USERS',
-    'MANAGE_SCHOOL_STUDENTS',
-    'VIEW_SCHOOL_ANALYTICS',
-    'GENERATE_REPORTS'
+  SCHOOL_ADMIN: [
+    { resource: 'USER', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE'], scope: 'SCHOOL' },
+    { resource: 'SCHOOL', actions: ['READ', 'UPDATE'], scope: 'OWN' },
+    { resource: 'STUDENT', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE'], scope: 'SCHOOL' },
+    { resource: 'DOCUMENT', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE'], scope: 'SCHOOL' },
+    { resource: 'REPORT', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE'], scope: 'SCHOOL' },
+    { resource: 'ANALYTICS', actions: ['READ'], scope: 'SCHOOL' },
+    { resource: 'SYSTEM', actions: ['READ'], scope: 'SCHOOL' },
   ],
-  [UserRole.TEACHER]: [
-    'VIEW_SCHOOL_ANALYTICS',
-    'GENERATE_REPORTS'
+  TEACHER: [
+    { resource: 'USER', actions: ['READ'], scope: 'SCHOOL' },
+    { resource: 'SCHOOL', actions: ['READ'], scope: 'OWN' },
+    { resource: 'STUDENT', actions: ['READ', 'UPDATE'], scope: 'SCHOOL' },
+    { resource: 'DOCUMENT', actions: ['CREATE', 'READ', 'UPDATE'], scope: 'SCHOOL' },
+    { resource: 'REPORT', actions: ['CREATE', 'READ', 'UPDATE'], scope: 'SCHOOL' },
+    { resource: 'ANALYTICS', actions: ['READ'], scope: 'SCHOOL' },
+    { resource: 'SYSTEM', actions: ['READ'], scope: 'SCHOOL' },
   ],
-  [UserRole.PARENT]: [
-    'MANAGE_OWN_CHILDREN',
-    'VIEW_CHILD_ANALYTICS',
-    'UPLOAD_DOCUMENTS',
-    'GENERATE_REPORTS'
+  PARENT: [
+    { resource: 'USER', actions: ['READ', 'UPDATE'], scope: 'OWN' },
+    { resource: 'SCHOOL', actions: ['READ'], scope: 'OWN' },
+    { resource: 'STUDENT', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE'], scope: 'OWN' },
+    { resource: 'DOCUMENT', actions: ['CREATE', 'READ', 'UPDATE', 'DELETE'], scope: 'OWN' },
+    { resource: 'REPORT', actions: ['CREATE', 'READ'], scope: 'OWN' },
+    { resource: 'ANALYTICS', actions: ['READ'], scope: 'OWN' },
+    { resource: 'SYSTEM', actions: ['READ'], scope: 'OWN' },
   ],
-  [UserRole.STUDENT]: []
+  STUDENT: [
+    { resource: 'USER', actions: ['READ', 'UPDATE'], scope: 'OWN' },
+    { resource: 'SCHOOL', actions: ['READ'], scope: 'OWN' },
+    { resource: 'STUDENT', actions: ['READ'], scope: 'OWN' },
+    { resource: 'DOCUMENT', actions: ['READ'], scope: 'OWN' },
+    { resource: 'REPORT', actions: ['READ'], scope: 'OWN' },
+    { resource: 'ANALYTICS', actions: ['READ'], scope: 'OWN' },
+    { resource: 'SYSTEM', actions: ['READ'], scope: 'OWN' },
+  ],
 };
 
-// Authentication middleware
-export async function authenticateRequest(request: NextRequest) {
-  const token = await getToken({ req: request });
-  
-  if (!token || !token.sub) {
-    return NextResponse.json(
-      { error: 'Authentication required' },
-      { status: 401 }
-    );
-  }
+export function hasPermission(
+  userRole: UserRole,
+  resource: Resource,
+  action: Action,
+  scope: Scope = 'OWN'
+): boolean {
+  const rolePermissions = PERMISSIONS[userRole];
+  if (!rolePermissions) return false;
 
-  // Fetch user details from database
-  const user = await prisma.user.findUnique({
-    where: { id: token.sub },
-    include: {
-      parent: true,
-      school: true
-    }
-  });
+  const permission = rolePermissions.find(p => p.resource === resource);
+  if (!permission) return false;
 
-  if (!user) {
-    return NextResponse.json(
-      { error: 'User not found' },
-      { status: 401 }
-    );
-  }
-
-  return { user, token };
+  return permission.actions.includes(action) && permission.scope === scope;
 }
 
-// Permission checking middleware
-export function requirePermission(permission: Permission) {
-  return async (request: NextRequest, context: { user: any }) => {
-    const { user } = context;
-    const userRole = user.role as UserRole;
-    
-    if (!ROLE_PERMISSIONS[userRole]?.includes(permission)) {
-      return NextResponse.json(
-        { error: 'Insufficient permissions' },
-        { status: 403 }
-      );
-    }
+export function canAccess(
+  userRole: UserRole,
+  resource: Resource,
+  action: Action,
+  userSchoolId?: string,
+  resourceSchoolId?: string,
+  userId?: string,
+  resourceUserId?: string
+): boolean {
+  const rolePermissions = PERMISSIONS[userRole];
+  if (!rolePermissions) return false;
 
-    return null; // Permission granted
-  };
+  const permission = rolePermissions.find(p => p.resource === resource);
+  if (!permission) return false;
+
+  if (!permission.actions.includes(action)) return false;
+
+  switch (permission.scope) {
+    case 'ALL':
+      return true;
+    case 'SCHOOL':
+      return userSchoolId && resourceSchoolId && userSchoolId === resourceSchoolId;
+    case 'OWN':
+      return userId && resourceUserId && userId === resourceUserId;
+    default:
+      return false;
+  }
 }
 
-// School-scoped access middleware
-export async function requireSchoolAccess(request: NextRequest, context: { user: any }, targetSchoolId?: string) {
-  const { user } = context;
-  
-  // Admin has access to all schools
-  if (user.role === UserRole.ADMIN) {
-    return null;
+export function withAuth(
+  handler: Function,
+  requiredPermissions?: {
+    resource: Resource;
+    action: Action;
+    scope?: Scope;
   }
-
-  // For school-specific roles, ensure they belong to the target school
-  if (user.role === UserRole.SCHOOL_ADMIN || user.role === UserRole.TEACHER) {
-    if (!user.schoolId) {
-      return NextResponse.json(
-        { error: 'User not associated with any school' },
-        { status: 403 }
-      );
-    }
-
-    if (targetSchoolId && user.schoolId !== targetSchoolId) {
-      return NextResponse.json(
-        { error: 'Access denied: Not authorized for this school' },
-        { status: 403 }
-      );
-    }
-  }
-
-  return null;
-}
-
-// Parent-child access middleware
-export async function requireParentChildAccess(request: NextRequest, context: { user: any }, childId: string) {
-  const { user } = context;
-  
-  // Admin has access to all children
-  if (user.role === UserRole.ADMIN) {
-    return null;
-  }
-
-  // School admin has access to children in their school
-  if (user.role === UserRole.SCHOOL_ADMIN) {
-    const child = await prisma.student.findUnique({
-      where: { id: childId },
-      select: { schoolId: true }
-    });
-
-    if (!child || child.schoolId !== user.schoolId) {
-      return NextResponse.json(
-        { error: 'Access denied: Child not in your school' },
-        { status: 403 }
-      );
-    }
-    return null;
-  }
-
-  // Parent can only access their own children
-  if (user.role === UserRole.PARENT) {
-    const child = await prisma.student.findUnique({
-      where: { id: childId },
-      select: { parentId: true }
-    });
-
-    if (!child || child.parentId !== user.parent?.id) {
-      return NextResponse.json(
-        { error: 'Access denied: Not your child' },
-        { status: 403 }
-      );
-    }
-    return null;
-  }
-
-  return NextResponse.json(
-    { error: 'Access denied' },
-    { status: 403 }
-  );
-}
-
-// Resource ownership middleware
-export async function requireResourceOwnership(
-  request: NextRequest, 
-  context: { user: any }, 
-  resourceType: 'student' | 'parent' | 'document' | 'report',
-  resourceId: string
 ) {
-  const { user } = context;
-  
-  // Admin has access to all resources
-  if (user.role === UserRole.ADMIN) {
-    return null;
-  }
+  return async (request: NextRequest, ...args: any[]) => {
+    try {
+      // Get session
+      const session = await getServerSession(authOptions);
+      
+      if (!session?.user) {
+        // Log unauthorized access attempt
+        const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+        const userAgent = request.headers.get('user-agent') || 'unknown';
+        
+        await AuditLogger.logSecurityEvent({
+          eventType: 'PERMISSION_VIOLATION',
+          ipAddress,
+          userAgent,
+          details: {
+            attemptedAction: 'AUTHENTICATION',
+            resource: request.nextUrl.pathname,
+            reason: 'No session found'
+          },
+          severity: 'MEDIUM'
+        });
 
-  switch (resourceType) {
-    case 'student':
-      return await requireParentChildAccess(request, context, resourceId);
-    
-    case 'parent':
-      if (user.role === UserRole.PARENT && user.parent?.id === resourceId) {
-        return null;
+        return NextResponse.redirect(new URL('/unauthorized', request.url));
       }
-      break;
-    
-    case 'document':
-    case 'report':
-      // Check if document/report belongs to user's child or school
-      const document = await prisma.documentUpload.findUnique({
-        where: { id: resourceId },
-        include: { 
-          student: { 
-            include: { 
-              parent: true,
-              school: true 
-            } 
-          } 
+
+      const user = session.user as any;
+      const userRole = user.role as UserRole;
+      const userSchoolId = user.schoolId;
+      const userId = user.id;
+
+      // Check permissions if required
+      if (requiredPermissions) {
+        const hasRequiredPermission = hasPermission(
+          userRole,
+          requiredPermissions.resource,
+          requiredPermissions.action,
+          requiredPermissions.scope
+        );
+
+        if (!hasRequiredPermission) {
+          // Log permission violation
+          await AuditLogger.logPermissionViolation(
+            userId,
+            user.email,
+            `${requiredPermissions.action}_${requiredPermissions.resource}`,
+            request.nextUrl.pathname,
+            request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+            request.headers.get('user-agent') || 'unknown'
+          );
+
+          return NextResponse.redirect(new URL('/forbidden', request.url));
         }
+      }
+
+      // Log successful access
+      await AuditLogger.log({
+        userId,
+        userEmail: user.email,
+        userRole,
+        action: 'API_ACCESS',
+        resource: request.nextUrl.pathname,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        userAgent: request.headers.get('user-agent') || 'unknown',
+        status: 'SUCCESS'
       });
 
-      if (!document) {
-        return NextResponse.json(
-          { error: 'Resource not found' },
-          { status: 404 }
-        );
-      }
+      // Call the original handler
+      return handler(request, ...args);
+    } catch (error) {
+      // Log authentication errors
+      const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+      
+      await AuditLogger.logSecurityEvent({
+        eventType: 'SUSPICIOUS_ACTIVITY',
+        ipAddress,
+        userAgent,
+        details: {
+          activity: 'AUTHENTICATION_ERROR',
+          error: error instanceof Error ? error.message : 'Unknown error',
+          path: request.nextUrl.pathname,
+          method: request.method
+        },
+        severity: 'HIGH'
+      });
 
-      // Parent can access their child's documents
-      if (user.role === UserRole.PARENT && document.student.parentId === user.parent?.id) {
-        return null;
-      }
-
-      // School admin can access documents from their school
-      if (user.role === UserRole.SCHOOL_ADMIN && document.student.schoolId === user.schoolId) {
-        return null;
-      }
-      break;
-  }
-
-  return NextResponse.json(
-    { error: 'Access denied: Resource not owned by user' },
-    { status: 403 }
-  );
-}
-
-// Combined middleware wrapper
-export function withAuth(
-  handler: (request: NextRequest, context: { user: any; params?: any }) => Promise<NextResponse>,
-  options?: {
-    permissions?: Permission[];
-    requireSchool?: boolean;
-    resourceType?: 'student' | 'parent' | 'document' | 'report';
-  }
-) {
-  return async (request: NextRequest, { params }: { params?: any }) => {
-    // Authenticate user
-    const authResult = await authenticateRequest(request);
-    if (authResult instanceof NextResponse) {
-      return authResult;
+      return NextResponse.redirect(new URL('/server-error', request.url));
     }
-
-    const { user } = authResult;
-    const context = { user, params };
-
-    // Check permissions
-    if (options?.permissions) {
-      for (const permission of options.permissions) {
-        const permissionResult = await requirePermission(permission)(request, context);
-        if (permissionResult instanceof NextResponse) {
-          return permissionResult;
-        }
-      }
-    }
-
-    // Check school access
-    if (options?.requireSchool) {
-      const schoolResult = await requireSchoolAccess(request, context);
-      if (schoolResult instanceof NextResponse) {
-        return schoolResult;
-      }
-    }
-
-    // Check resource ownership
-    if (options?.resourceType && params?.id) {
-      const ownershipResult = await requireResourceOwnership(
-        request, 
-        context, 
-        options.resourceType, 
-        params.id
-      );
-      if (ownershipResult instanceof NextResponse) {
-        return ownershipResult;
-      }
-    }
-
-    // All checks passed, execute handler
-    return handler(request, context);
   };
 }
 
-// Helper function to check if user has permission
-export function hasPermission(userRole: UserRole, permission: Permission): boolean {
-  return ROLE_PERMISSIONS[userRole]?.includes(permission) || false;
-}
+// Helper function to check if user can access a specific resource
+export function checkResourceAccess(
+  userRole: UserRole,
+  resource: Resource,
+  action: Action,
+  userSchoolId?: string,
+  resourceSchoolId?: string,
+  userId?: string,
+  resourceUserId?: string
+): { allowed: boolean; reason?: string } {
+  if (!canAccess(userRole, resource, action, userSchoolId, resourceSchoolId, userId, resourceUserId)) {
+    return {
+      allowed: false,
+      reason: `User role ${userRole} cannot ${action} ${resource}`
+    };
+  }
 
-// Helper function to get user permissions
-export function getUserPermissions(userRole: UserRole): Permission[] {
-  return ROLE_PERMISSIONS[userRole] || [];
+  return { allowed: true };
 }

@@ -921,3 +921,45 @@ model DataProcessingJob {
   @@index([jobType])
   @@index([priority])
 }
+
+// Audit and Security Models
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  userEmail   String?
+  userRole    String?
+  action      String
+  resource    String
+  resourceId  String?
+  details     String?  // JSON string
+  ipAddress   String?
+  userAgent   String?
+  status      String   // SUCCESS, FAILURE, WARNING
+  timestamp   DateTime @default(now())
+
+  @@index([userId])
+  @@index([userEmail])
+  @@index([action])
+  @@index([resource])
+  @@index([timestamp])
+  @@index([status])
+}
+
+model SecurityEvent {
+  id          String   @id @default(cuid())
+  eventType   String   // LOGIN_ATTEMPT, PERMISSION_VIOLATION, RATE_LIMIT_EXCEEDED, SUSPICIOUS_ACTIVITY, FILE_UPLOAD, DATA_ACCESS
+  userId      String?
+  userEmail   String?
+  ipAddress   String?
+  userAgent   String?
+  details     String?  // JSON string
+  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
+  timestamp   DateTime @default(now())
+
+  @@index([eventType])
+  @@index([userId])
+  @@index([userEmail])
+  @@index([severity])
+  @@index([timestamp])
+  @@index([ipAddress])
+}
