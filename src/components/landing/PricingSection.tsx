@@ -14,8 +14,35 @@ export function PricingSection() {
 
   const plans = [
     {
-      name: 'Gold',
-      description: 'Ideal for families and small schools',
+      name: 'Basic',
+      description: 'Perfect for individual families (Nursery to Grade 12)',
+      price: {
+        monthly: 599,
+        yearly: 5990 // ~17% discount
+      },
+      icon: StarIcon,
+      color: 'blue',
+      popular: false,
+      features: [
+        'Age Coverage: Nursery to Grade 12',
+        'Up to 100 students',
+        'Basic assessment tools',
+        'Framework detection (CBSE, ICSE, IB, IGCSE)',
+        'Email support',
+        'Basic reporting',
+        'Parent portal access',
+        'Student progress tracking',
+        'Basic analytics dashboard'
+      ],
+      limitations: [
+        'No PDF downloads',
+        'Basic analytics only',
+        'Limited career recommendations'
+      ]
+    },
+    {
+      name: 'Professional',
+      description: 'For small to medium schools and coaching centers',
       price: {
         monthly: 899,
         yearly: 8990 // ~17% discount
@@ -24,18 +51,16 @@ export function PricingSection() {
       color: 'yellow',
       popular: true,
       features: [
-        'Up to 15 students',
-        'Unlimited assessments',
-        'EduSight 360° Score system',
-        'Advanced AI-powered insights',
-        'Career guidance & recommendations',
-        'Psychological assessments',
+        'Age Coverage: Nursery to Grade 12',
+        'Up to 500 students',
+        'Advanced AI assessments & ML predictions',
+        'PDF report downloads',
+        'Framework-specific analysis',
         'Priority email & chat support',
-        'Teacher collaboration tools',
-        'Detailed analytics & reports',
-        'Custom assessment creation',
-        'Progress comparison tools',
-        'DMIT integration'
+        'Parent & teacher portals',
+        'Skills development tracking',
+        'Career recommendations (Grade 9-12)',
+        'Comprehensive analytics dashboard'
       ],
       limitations: [
         'No white-label options',
@@ -43,8 +68,8 @@ export function PricingSection() {
       ]
     },
     {
-      name: 'Platinum',
-      description: 'For educational institutions and coaching centers',
+      name: 'Premium',
+      description: 'For large educational institutions',
       price: {
         monthly: 1499,
         yearly: 14990 // ~17% discount
@@ -53,19 +78,17 @@ export function PricingSection() {
       color: 'purple',
       popular: false,
       features: [
-        'Up to 50 students',
-        'Unlimited assessments',
-        'Complete EduSight 360° Score suite',
-        'Full AI suite & predictions',
-        'Advanced career counseling',
-        'Complete psychological testing',
-        'Priority phone & chat support',
-        'Multi-teacher collaboration',
-        'Advanced reporting suite',
-        'Custom integrations',
-        'Bulk user management',
-        'Performance benchmarking',
-        'Custom workflows'
+        'Age Coverage: Nursery to Grade 12',
+        'Up to 2,000 students',
+        'Full ML analytics suite',
+        'Real-time predictive insights',
+        'Advanced reporting & visualizations',
+        'Multi-framework comparison',
+        '24/7 priority support',
+        'Complete dashboard access (Admin, Teacher, Parent)',
+        'Physical & psychological assessments',
+        'Comprehensive EduSight 360° scoring',
+        'Custom career path analysis'
       ],
       limitations: [
         'No white-label options'
@@ -73,31 +96,29 @@ export function PricingSection() {
     },
     {
       name: 'Enterprise',
-      description: 'For large schools and educational networks',
+      description: 'For educational networks and large institutions',
       price: {
-        monthly: 50000,
-        yearly: 500000 // ~17% discount
+        monthly: null, // Custom pricing
+        yearly: null
       },
       icon: SparklesIcon,
       color: 'indigo',
       popular: false,
       enterprise: true,
       features: [
-        'Unlimited students (50+ users)',
-        'Unlimited assessments',
-        'Full EduSight 360° Score system',
-        'Complete AI suite & predictions',
-        'Advanced career counseling',
-        'Full psychological testing suite',
+        'Age Coverage: Nursery to Grade 12',
+        'Unlimited students & schools',
+        'White-label solutions',
+        'Custom AI model training',
+        'API access & integrations',
         'Dedicated account manager',
-        '24/7 phone & chat support',
-        'White-label options',
-        'Custom integrations & API',
-        'Advanced reporting & analytics',
+        'On-premise deployment options',
+        'Custom framework development',
+        'Advanced analytics & reporting',
         'Multi-school management',
-        'Custom workflows & automation',
-        'Bulk user management',
-        'Advanced security features',
+        'Regional analytics dashboard',
+        'Custom branding & UI',
+        'SLA guarantees',
         'Custom training & onboarding'
       ],
       limitations: []

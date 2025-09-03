@@ -1,442 +1,463 @@
-'use client'
+'use client';
 
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import { 
-  BuildingOfficeIcon,
-  AcademicCapIcon,
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { toast } from 'react-hot-toast';
+import Link from 'next/link';
+import {
   UserGroupIcon,
-  UsersIcon,
-  ChartBarIcon,
-  CalendarIcon,
-  ClockIcon,
+  AcademicCapIcon,
   BookOpenIcon,
-  DocumentTextIcon,
-  CurrencyDollarIcon,
-  TrophyIcon,
-  BellIcon,
-  MegaphoneIcon,
-  NewspaperIcon,
-  ChatBubbleLeftRightIcon,
-  MapPinIcon,
-  BuildingLibraryIcon,
-  ShieldCheckIcon,
-  HeartIcon,
-  ArrowTrendingUpIcon,
-  HomeIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
+  ChartBarIcon,
+  PlusIcon,
   CogIcon,
-  ArchiveBoxIcon,
-  WifiIcon,
-  PrinterIcon
-} from '@heroicons/react/24/outline'
-import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout'
-import StatCard from '@/components/dashboard/StatCard'
-import DashboardCard from '@/components/dashboard/DashboardCard'
-import ModernChart from '@/components/dashboard/ModernChart'
+  BuildingOfficeIcon,
+  CalendarIcon,
+  DocumentIcon,
+  UsersIcon
+} from '@heroicons/react/24/outline';
+import MiniChart from '@/components/charts/MiniChart';
+import CompactMetricCard from '@/components/dashboard/CompactMetricCard';
+import MiniWidget from '@/components/dashboard/MiniWidget';
+
+interface DashboardStats {
+  totalStudents: number;
+  totalTeachers: number;
+  totalParents: number;
+  activeUsers: number;
+  recentUploads: number;
+  pendingApprovals: number;
+}
+
+interface School {
+  id: string;
+  name: string;
+  type: string;
+  board: string;
+  city: string;
+  state: string;
+  subscriptionType: string;
+  maxStudents: number;
+  maxTeachers: number;
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'user_created' | 'document_uploaded' | 'assessment_completed';
+  description: string;
+  user: string;
+  timestamp: string;
+}
 
 export default function SchoolAdminDashboard() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  const { data: session } = useSession();
+  const [stats, setStats] = useState<DashboardStats>({
+    totalStudents: 0,
+    totalTeachers: 0,
+    totalParents: 0,
+    activeUsers: 0,
+    recentUploads: 0,
+    pendingApprovals: 0
+  });
+  const [school, setSchool] = useState<School | null>(null);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === 'loading') return
+    fetchDashboardData();
+  }, []);
 
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin?callbackUrl=/dashboard/school-admin')
-      return
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch users statistics
+      const usersResponse = await fetch('/api/school-admin/users?limit=1');
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json();
+        if (usersData.success) {
+          const { stats: userStats } = usersData.data;
+          setStats(prev => ({
+            ...prev,
+            totalStudents: userStats.roles?.STUDENT || 0,
+            totalTeachers: userStats.roles?.TEACHER || 0,
+            totalParents: userStats.roles?.PARENT || 0,
+            activeUsers: userStats.active || 0
+          }));
+        }
+      }
+
+      // For now, we'll set mock data for other stats
+      // In a real implementation, you'd fetch these from appropriate APIs
+      setStats(prev => ({
+        ...prev,
+        recentUploads: 12,
+        pendingApprovals: 3
+      }));
+
+      // Mock school data - in real implementation, fetch from user's school
+      setSchool({
+        id: 'school-1',
+        name: 'Modern Public School',
+        type: 'Private',
+        board: 'CBSE',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        subscriptionType: 'Premium',
+        maxStudents: 500,
+        maxTeachers: 50
+      });
+
+      // Mock recent activity
+      setRecentActivity([
+        {
+          id: '1',
+          type: 'user_created',
+          description: 'New parent John Doe registered',
+          user: 'John Doe',
+          timestamp: '2 hours ago'
+        },
+        {
+          id: '2',
+          type: 'document_uploaded',
+          description: 'Report card uploaded for Student A',
+          user: 'Parent A',
+          timestamp: '4 hours ago'
+        },
+        {
+          id: '3',
+          type: 'assessment_completed',
+          description: 'Math assessment completed by Class 10A',
+          user: 'Teacher B',
+          timestamp: '1 day ago'
+        }
+      ]);
+
+    } catch (error) {
+      toast.error('Error fetching dashboard data');
+      console.error('Dashboard data error:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (session?.user?.role !== 'ADMIN') {
-      router.push('/dashboard')
-      return
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'user_created':
+        return <UsersIcon className="w-4 h-4 text-green-600" />;
+      case 'document_uploaded':
+        return <DocumentIcon className="w-4 h-4 text-blue-600" />;
+      case 'assessment_completed':
+        return <AcademicCapIcon className="w-4 h-4 text-purple-600" />;
+      default:
+        return <CalendarIcon className="w-4 h-4 text-gray-600" />;
     }
-  }, [session, status, router])
+  };
 
-  if (status === 'loading') {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
-
-  if (!session || session.user.role !== 'ADMIN') {
-    return null
-  }
-
-  // Sidebar Menu Items for School Admin
-  const menuItems = [
-    {
-      title: 'Dashboard',
-      href: '/dashboard/school-admin',
-      icon: HomeIcon
-    },
-    {
-      title: 'Academic Management',
-      href: '/dashboard/school-admin/academic',
-      icon: AcademicCapIcon,
-      children: [
-        { title: 'Student Information', href: '/dashboard/school-admin/students', icon: AcademicCapIcon, badge: '892' },
-        { title: 'Teacher Management', href: '/dashboard/school-admin/teachers', icon: UserGroupIcon },
-        { title: 'Class Management', href: '/dashboard/school-admin/classes', icon: BuildingLibraryIcon },
-        { title: 'Curriculum Planning', href: '/dashboard/school-admin/curriculum', icon: BookOpenIcon },
-        { title: 'Exam Management', href: '/dashboard/school-admin/exams', icon: DocumentTextIcon },
-        { title: 'Academic Calendar', href: '/dashboard/school-admin/calendar', icon: CalendarIcon }
-      ]
-    },
-    {
-      title: 'Operations',
-      href: '/dashboard/school-admin/operations',
-      icon: CogIcon,
-      children: [
-        { title: 'Attendance', href: '/dashboard/school-admin/attendance', icon: CheckCircleIcon },
-        { title: 'Fee Management', href: '/dashboard/school-admin/fees', icon: CurrencyDollarIcon },
-        { title: 'Transport', href: '/dashboard/school-admin/transport', icon: MapPinIcon },
-        { title: 'Facilities', href: '/dashboard/school-admin/facilities', icon: BuildingOfficeIcon },
-        { title: 'Library', href: '/dashboard/school-admin/library', icon: BookOpenIcon },
-        { title: 'Security', href: '/dashboard/school-admin/security', icon: ShieldCheckIcon }
-      ]
-    },
-    {
-      title: 'Communication',
-      href: '/dashboard/school-admin/communication',
-      icon: ChatBubbleLeftRightIcon,
-      children: [
-        { title: 'Parent Communication', href: '/dashboard/school-admin/parent-comm', icon: ChatBubbleLeftRightIcon },
-        { title: 'Notice Board', href: '/dashboard/school-admin/notices', icon: MegaphoneIcon, badge: '8' },
-        { title: 'Event Management', href: '/dashboard/school-admin/events', icon: CalendarIcon },
-        { title: 'Newsletter', href: '/dashboard/school-admin/newsletter', icon: NewspaperIcon },
-        { title: 'Alumni Network', href: '/dashboard/school-admin/alumni', icon: UsersIcon },
-        { title: 'Emergency Alerts', href: '/dashboard/school-admin/emergency', icon: ExclamationTriangleIcon }
-      ]
-    },
-    {
-      title: 'Analytics & Reports',
-      href: '/dashboard/school-admin/analytics',
-      icon: ChartBarIcon,
-      children: [
-        { title: 'Performance Analytics', href: '/dashboard/school-admin/performance', icon: ChartBarIcon },
-        { title: 'Enrollment Reports', href: '/dashboard/school-admin/enrollment', icon: UsersIcon },
-        { title: 'Financial Reports', href: '/dashboard/school-admin/financial', icon: CurrencyDollarIcon },
-        { title: 'Academic Reports', href: '/dashboard/school-admin/academic-reports', icon: TrophyIcon }
-      ]
-    }
-  ];
-
-  const quickStats = [
-    {
-      title: 'Total Students',
-      value: '892',
-      change: '45',
-      changeType: 'positive' as const,
-      icon: AcademicCapIcon,
-      color: 'blue',
-      description: 'Currently enrolled students'
-    },
-    {
-      title: 'Teaching Staff',
-      value: '67',
-      change: '3',
-      changeType: 'positive' as const,
-      icon: UserGroupIcon,
-      color: 'green',
-      description: 'Active faculty members'
-    },
-    {
-      title: 'Academic Performance',
-      value: '91.2%',
-      change: '2.3',
-      changeType: 'positive' as const,
-      icon: TrophyIcon,
-      color: 'purple',
-      description: 'Average student grade'
-    },
-    {
-      title: 'Fee Collection',
-      value: '89.5%',
-      change: '5.2',
-      changeType: 'positive' as const,
-      icon: CurrencyDollarIcon,
-      color: 'emerald',
-      description: 'Current term collection'
-    }
-  ];
 
   return (
-    <VerticalDashboardLayout
-      title="School Administration"
-      subtitle={`Welcome back, ${session.user.name} - Educational Institution Management`}
-      menuItems={menuItems}
-      activeItem="/dashboard/school-admin"
-    >
-      <div className="space-y-6">
-        {/* School Performance Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {quickStats.map((stat, index) => (
-            <StatCard
-              key={index}
-              title={stat.title}
-              value={stat.value}
-              change={stat.change}
-              changeType={stat.changeType}
-              icon={stat.icon}
-              color={stat.color}
-              description={stat.description}
-            />
-          ))}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">School Dashboard</h1>
+          <p className="text-gray-600">
+            Welcome back, {session?.user?.name || 'School Admin'}
+          </p>
+          {school && (
+            <p className="text-sm text-gray-500">
+              {school.name} • {school.city}, {school.state}
+            </p>
+          )}
         </div>
-
-        {/* School Analytics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Student Performance Chart */}
-          <DashboardCard title="Grade-wise Performance" value="" subtitle="">
-            <ModernChart
-              title="Academic Performance by Grade"
-              data={[
-                { label: 'Grade 1', value: 95 },
-                { label: 'Grade 2', value: 92 },
-                { label: 'Grade 3', value: 89 },
-                { label: 'Grade 4', value: 91 },
-                { label: 'Grade 5', value: 88 },
-                { label: 'Grade 6', value: 93 }
-              ]}
-              type="bar"
-              height={300}
-            />
-          </DashboardCard>
-          
-          {/* Enrollment Trends */}
-          <DashboardCard title="Enrollment Trends" value="" subtitle="">
-            <ModernChart
-              title="Student Enrollment Over Years"
-              data={[
-                { label: '2019', value: 650 },
-                { label: '2020', value: 720 },
-                { label: '2021', value: 780 },
-                { label: '2022', value: 845 },
-                { label: '2023', value: 892 },
-                { label: '2024', value: 950 }
-              ]}
-              type="line"
-              height={300}
-            />
-          </DashboardCard>
+        <div className="flex space-x-3">
+          <Link
+            href="/dashboard/school-admin/users/create"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <PlusIcon className="w-5 h-5" />
+            <span>Add User</span>
+          </Link>
+          <Link
+            href="/dashboard/school-admin/settings"
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 flex items-center space-x-2"
+          >
+            <CogIcon className="w-5 h-5" />
+            <span>Settings</span>
+          </Link>
         </div>
+      </div>
 
-        {/* Department Performance and Attendance */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Department Performance */}
-          <div className="lg:col-span-2">
-            <DashboardCard title="Department Performance Overview" value="" subtitle="">
-              <ModernChart
-                title="Subject-wise Performance"
-                data={[
-                  { label: 'Mathematics', value: 94 },
-                  { label: 'Science', value: 91 },
-                  { label: 'English', value: 89 },
-                  { label: 'Social Studies', value: 87 },
-                  { label: 'Arts', value: 93 },
-                  { label: 'Physical Education', value: 96 }
-                ]}
-                type="bar"
-                height={300}
-              />
-            </DashboardCard>
+      {/* School Info Card */}
+      {school && (
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <BuildingOfficeIcon className="w-12 h-12" />
+              <div>
+                <h2 className="text-xl font-bold">{school.name}</h2>
+                <p className="opacity-90">{school.type} School • {school.board} Board</p>
+                <p className="opacity-75">{school.city}, {school.state}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+                {school.subscriptionType} Plan
+              </div>
+              <p className="text-sm opacity-75 mt-2">
+                Capacity: {stats.totalStudents}/{school.maxStudents} Students
+              </p>
+            </div>
           </div>
+        </div>
+      )}
 
-          {/* Attendance Overview */}
-          <DashboardCard title="Attendance Overview" value="" subtitle="">
-            <ModernChart
-              title="Monthly Attendance Rate"
-              data={[
-                { label: 'Students', value: 94 },
-                { label: 'Teachers', value: 97 },
-                { label: 'Staff', value: 92 }
-              ]}
-              type="donut"
-              height={300}
-            />
-          </DashboardCard>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <CompactMetricCard
+          title="Students"
+          value={stats.totalStudents.toString()}
+          icon={AcademicCapIcon}
+          color="blue"
+          trend={{
+            value: "8.5%",
+            direction: "up"
+          }}
+        />
+
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Teachers</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalTeachers}</p>
+              <p className="text-sm text-green-600">Fully staffed</p>
+            </div>
+            <div className="w-16 h-12">
+              <MiniChart
+                type="line"
+                data={{
+                  labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
+                  datasets: [{
+                    data: [38, 40, 41, 42, 42, stats.totalTeachers],
+                    tension: 0.4
+                  }]
+                }}
+                color="#10B981"
+                height={48}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* School Activities and Important Notifications */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent School Activities */}
-          <DashboardCard title="Recent School Activities" value="" subtitle="">
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <AcademicCapIcon className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">New student admission</p>
-                  <p className="text-xs text-gray-500">5 new students enrolled in Grade 8</p>
-                  <span className="text-xs text-gray-400">2 hours ago</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <TrophyIcon className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Academic achievement</p>
-                  <p className="text-xs text-gray-500">Grade 10 students won science fair</p>
-                  <span className="text-xs text-gray-400">1 day ago</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CalendarIcon className="h-4 w-4 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Parent-teacher meeting</p>
-                  <p className="text-xs text-gray-500">Scheduled for this weekend</p>
-                  <span className="text-xs text-gray-400">2 days ago</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <BuildingOfficeIcon className="h-4 w-4 text-orange-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Facility maintenance</p>
-                  <p className="text-xs text-gray-500">Library renovation completed</p>
-                  <span className="text-xs text-gray-400">3 days ago</span>
-                </div>
-              </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Parents</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalParents}</p>
+              <p className="text-sm text-purple-600">Active engagement</p>
             </div>
-          </DashboardCard>
-
-          {/* Important Notifications */}
-          <DashboardCard title="Important Notifications" value="" subtitle="">
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <ExclamationTriangleIcon className="h-4 w-4 text-red-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Fee payment reminder</p>
-                  <p className="text-xs text-gray-500">Term fee due date approaching</p>
-                  <span className="text-xs text-red-400">Urgent</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CalendarIcon className="h-4 w-4 text-yellow-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Upcoming exam schedule</p>
-                  <p className="text-xs text-gray-500">Mid-term exams start next week</p>
-                  <span className="text-xs text-yellow-400">Important</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <BellIcon className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">System maintenance</p>
-                  <p className="text-xs text-gray-500">Server maintenance scheduled for weekend</p>
-                  <span className="text-xs text-blue-400">Notice</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <InformationCircleIcon className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">New policy update</p>
-                  <p className="text-xs text-gray-500">Updated attendance policy effective immediately</p>
-                  <span className="text-xs text-green-400">Update</span>
-                </div>
-              </div>
+            <div className="w-16 h-12">
+              <MiniChart
+                type="doughnut"
+                data={{
+                  labels: ['Engaged', 'Moderate', 'Low'],
+                  datasets: [{
+                    data: [Math.floor(stats.totalParents * 0.7), Math.floor(stats.totalParents * 0.2), Math.floor(stats.totalParents * 0.1)]
+                  }]
+                }}
+                color="#8B5CF6"
+                height={48}
+              />
             </div>
-          </DashboardCard>
+          </div>
         </div>
 
-        {/* Quick Actions Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <DashboardCard title="Quick Actions" value="" subtitle="" className="h-fit">
-            <div className="space-y-3">
-              <button className="w-full flex items-center p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
-                <AcademicCapIcon className="h-5 w-5 text-blue-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-blue-900">Add Student</p>
-                  <p className="text-xs text-blue-600">New enrollment</p>
-                </div>
-              </button>
-              <button className="w-full flex items-center p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
-                <UserGroupIcon className="h-5 w-5 text-green-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-green-900">Manage Teachers</p>
-                  <p className="text-xs text-green-600">Faculty administration</p>
-                </div>
-              </button>
-              <button className="w-full flex items-center p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
-                <DocumentTextIcon className="h-5 w-5 text-purple-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-purple-900">Generate Report</p>
-                  <p className="text-xs text-purple-600">Academic reports</p>
-                </div>
-              </button>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Performance</p>
+              <p className="text-2xl font-bold text-gray-900">87.3%</p>
+              <p className="text-sm text-orange-600">Above target</p>
             </div>
-          </DashboardCard>
-
-          {/* School Performance Insights */}
-          <DashboardCard title="Performance Insights" value="" subtitle="" className="lg:col-span-2 p-0">
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <TrophyIcon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-slate-900 mb-2">Academic Excellence</h3>
-                  <p className="text-sm text-slate-600">91.2% average student performance across all grades</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <ArrowTrendingUpIcon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-slate-900 mb-2">Growth Trend</h3>
-                  <p className="text-sm text-slate-600">6.5% increase in student enrollment this year</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <HeartIcon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-slate-900 mb-2">Parent Satisfaction</h3>
-                  <p className="text-sm text-slate-600">4.7/5 rating from parent feedback surveys</p>
-                </div>
-              </div>
-            </div>
-          </DashboardCard>
-        </div>
-
-        {/* Call to Action Panel */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-700 rounded-2xl p-6 text-white">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
-            <div className="mb-4 lg:mb-0">
-              <h3 className="text-xl font-bold mb-2">Excellence in Education Management</h3>
-              <p className="text-purple-100">Streamline school operations and enhance educational outcomes with comprehensive management tools</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button className="px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition-colors font-medium text-sm">
-                Add Student
-              </button>
-              <button className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-400 transition-colors font-medium text-sm border border-purple-400">
-                Generate Report
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors font-medium text-sm border border-blue-400">
-                View Analytics
-              </button>
+            <div className="w-16 h-12">
+              <MiniChart
+                type="line"
+                data={{
+                  labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
+                  datasets: [{
+                    data: [82.1, 83.5, 84.8, 85.9, 86.7, 87.3],
+                    tension: 0.4
+                  }]
+                }}
+                color="#F59E0B"
+                height={48}
+              />
             </div>
           </div>
         </div>
       </div>
-    </VerticalDashboardLayout>
-  )
+
+      {/* Analytics Dashboard Link */}
+      <div className="bg-gradient-to-r from-green-500 to-blue-600 text-white p-6 rounded-xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">School Analytics Dashboard</h3>
+            <p className="text-green-100 mb-4">
+              Comprehensive insights into student performance, attendance trends, and academic progress
+            </p>
+            <Link
+              href="/dashboard/school-admin/analytics"
+              className="bg-white text-green-600 px-4 py-2 rounded-lg font-medium hover:bg-green-50 transition-colors inline-flex items-center space-x-2"
+            >
+              <ChartBarIcon className="w-5 h-5" />
+              <span>View Detailed Analytics</span>
+            </Link>
+          </div>
+          <div className="w-32 h-20 opacity-80">
+            <MiniChart
+              type="bar"
+              data={{
+                labels: ['Math', 'Eng', 'Sci', 'Soc', 'CS'],
+                datasets: [{
+                  data: [87, 82, 89, 79, 91],
+                  backgroundColor: ['#ffffff60', '#ffffff80', '#ffffff60', '#ffffff40', '#ffffffa0']
+                }]
+              }}
+              height={80}
+              showTooltip={false}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link href="/dashboard/school-admin/users" className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+          <div className="flex items-center space-x-4">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <UserGroupIcon className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">Manage Users</h3>
+              <p className="text-sm text-gray-600">Add, edit, and manage school users</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link href="/dashboard/school-admin/reports" className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+          <div className="flex items-center space-x-4">
+            <div className="bg-green-100 p-3 rounded-lg">
+              <ChartBarIcon className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">View Reports</h3>
+              <p className="text-sm text-gray-600">Academic and performance reports</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link href="/dashboard/school-admin/uploads" className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+          <div className="flex items-center space-x-4">
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <DocumentIcon className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">Document Uploads</h3>
+              <p className="text-sm text-gray-600">Manage document uploads and reviews</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Recent Activity and Pending Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-3">
+                  <div className="flex-shrink-0">
+                    {getActivityIcon(activity.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900">{activity.description}</p>
+                    <p className="text-xs text-gray-500">{activity.timestamp}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4">
+              <Link
+                href="/dashboard/school-admin/activity"
+                className="text-sm text-blue-600 hover:text-blue-500"
+              >
+                View all activity →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Quick Stats</h3>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Recent Uploads</span>
+                <span className="text-sm font-medium text-gray-900">{stats.recentUploads}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Pending Approvals</span>
+                <span className="text-sm font-medium text-orange-600">{stats.pendingApprovals}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Active This Week</span>
+                <span className="text-sm font-medium text-green-600">{Math.floor(stats.activeUsers * 0.7)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Capacity Utilization</span>
+                <span className="text-sm font-medium text-blue-600">
+                  {school ? Math.round((stats.totalStudents / school.maxStudents) * 100) : 0}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <CalendarIcon className="w-5 h-5 text-yellow-600" />
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-yellow-800">
+              Upcoming Tasks
+            </h3>
+            <div className="mt-2 text-sm text-yellow-700">
+              <ul className="list-disc list-inside space-y-1">
+                <li>Review 3 pending document uploads</li>
+                <li>Monthly progress reports due in 5 days</li>
+                <li>Parent-teacher meeting scheduled for next week</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -23,14 +23,13 @@ const signInSchema = z.object({
 
 type SignInFormData = z.infer<typeof signInSchema>;
 
-// Demo users - 5 specific users only
+// Demo users - Available for development testing
 const demoUsers = {
   primary: [
-    { email: 'admin@edusight.com', name: 'System Administrator', role: 'ADMIN' },
-    { email: 'parent1@edusight.com', name: 'Robert Thompson', role: 'PARENT' },
-    { email: 'schooladmin@edusight.com', name: 'Dr. School Admin', role: 'ADMIN' },
-    { email: 'crm@edusight.com', name: 'CRM Manager', role: 'ADMIN' },
-    { email: 'accounts@edusight.com', name: 'Accounts Manager', role: 'ADMIN' },
+    { email: 'admin@edusight.com', name: 'Admin Demo', role: 'ADMIN', password: 'admin123' },
+    { email: 'teacher@edusight.com', name: 'Teacher Demo', role: 'TEACHER', password: 'teacher123' },
+    { email: 'parent@edusight.com', name: 'Parent Demo', role: 'PARENT', password: 'parent123' },
+    { email: 'student@edusight.com', name: 'Student Demo', role: 'STUDENT', password: 'student123' },
   ],
 };
 
@@ -100,9 +99,9 @@ export default function SignInPage() {
     }
   };
 
-  const handleDemoUserSelect = (email: string) => {
+  const handleDemoUserSelect = (email: string, password: string) => {
     setValue('email', email);
-    setValue('password', 'password123');
+    setValue('password', password);
     setShowDemoUsers(false);
     toast.success(`Demo user selected: ${email}`);
   };
@@ -306,9 +305,9 @@ export default function SignInPage() {
           {showDemoUsers && (
             <div className="space-y-4 max-h-96 overflow-y-auto">
               <div className="text-sm text-gray-600 mb-4 p-3 bg-blue-50 rounded-lg">
-                <p className="font-medium text-blue-800">🔑 Quick Access</p>
+                <p className="font-medium text-blue-800">🔑 Development Quick Access</p>
                 <p>Click any user below to auto-fill credentials</p>
-                <p className="text-xs mt-1">Password: <code className="bg-blue-100 px-1 rounded">password123</code></p>
+                <p className="text-xs mt-1 text-blue-700">Each user has their own secure password</p>
               </div>
 
               {Object.entries(demoUsers).map(([category, users]) => (
@@ -334,7 +333,7 @@ export default function SignInPage() {
                       {users.map((user) => (
                         <button
                           key={user.email}
-                          onClick={() => handleDemoUserSelect(user.email)}
+                          onClick={() => handleDemoUserSelect(user.email, user.password)}
                           className="w-full px-4 py-3 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
                         >
                           <div className="flex items-center justify-between">
@@ -388,7 +387,7 @@ export default function SignInPage() {
             </div>
             
             <div className="text-sm text-gray-600 mb-4 p-3 bg-blue-50 rounded-lg">
-              <p className="font-medium text-blue-800">🔑 Quick Access</p>
+              <p className="font-medium text-blue-800">🔑 Development Quick Access</p>
               <p>Tap any user to auto-fill credentials</p>
             </div>
 
@@ -402,7 +401,7 @@ export default function SignInPage() {
                   {users.map((user) => (
                     <button
                       key={user.email}
-                      onClick={() => handleDemoUserSelect(user.email)}
+                      onClick={() => handleDemoUserSelect(user.email, user.password)}
                       className="w-full px-3 py-2 text-left hover:bg-blue-50 rounded border border-gray-200 mb-1"
                     >
                       <p className="text-sm font-medium text-gray-900">{user.name}</p>

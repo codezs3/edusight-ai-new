@@ -2,10 +2,16 @@
 
 ## 📋 Project Overview
 
-EduSight is a comprehensive AI-powered educational assessment platform designed to transform how educational institutions understand, evaluate, and develop student potential. The platform combines advanced artificial intelligence with educational expertise to provide personalized insights, comprehensive assessments, and data-driven recommendations.
+EduSight is a comprehensive AI-powered educational assessment platform designed to transform how educational institutions understand, evaluate, and develop student potential across **Nursery to Grade 12**. The platform combines advanced artificial intelligence with educational expertise to provide personalized insights, comprehensive assessments, and data-driven recommendations for early childhood through secondary education.
 
 ### 🎯 Mission Statement
-To revolutionize educational assessment through AI-powered analytics, enabling educators to unlock every student's true potential with personalized, data-driven insights.
+To revolutionize educational assessment through AI-powered analytics, enabling educators to unlock every student's true potential with personalized, data-driven insights from early childhood development through high school graduation.
+
+### 🎓 Educational Coverage
+- **Early Years (Nursery - KG2)**: Ages 3-6 - Foundation development tracking
+- **Primary Education (Grade 1-5)**: Ages 6-11 - Core skill development 
+- **Middle School (Grade 6-8)**: Ages 11-14 - Comprehensive skill assessment
+- **High School (Grade 9-12)**: Ages 14-18 - Career readiness & advanced analytics
 
 ---
 
@@ -34,6 +40,9 @@ To revolutionize educational assessment through AI-powered analytics, enabling e
 - **TensorFlow.js** - Browser-based machine learning
 - **Apache Airflow** - Workflow orchestration
 - **Custom AI Models** - Educational assessment algorithms
+- **ML Master Database** - Comprehensive analytics data warehouse
+- **Real-time ML Pipeline** - Automated model updates and predictions
+- **Predictive Analytics Engine** - School, region, subject, and skill predictions
 
 #### **Analytics & Visualization**
 - **Apache Superset** - Business intelligence platform
@@ -216,26 +225,55 @@ edu-gray: Neutral (#6b7280) - Text/Backgrounds
 
 ### **Subscription Plans (INR)**
 
-#### **Basic Plan - ₹499 + GST/month**
+#### **Basic Plan - ₹599 + GST/month**
+- **Age Coverage**: Nursery to Grade 12
 - Student assessment tools
 - Basic analytics dashboard
+- Framework detection (CBSE, ICSE, IB, IGCSE)
 - Email support
-- Up to 50 students
-
-#### **Professional Plan - ₹899 + GST/month**
-- Advanced AI assessments
-- Comprehensive analytics
-- Priority support
-- Up to 200 students
+- Up to 100 students
+- Basic reporting
 - Parent portal access
 
-#### **Enterprise Plan - ₹1,499 + GST/month**
-- Full platform access
-- Custom integrations
-- Dedicated support
-- Unlimited students
-- Advanced reporting
-- API access
+#### **Professional Plan - ₹899 + GST/month**
+- **Age Coverage**: Nursery to Grade 12
+- Advanced AI assessments & ML predictions
+- Comprehensive analytics dashboard
+- PDF report downloads
+- Framework-specific analysis
+- Priority email & chat support
+- Up to 500 students
+- Parent & teacher portals
+- Skills development tracking
+- Career recommendations (Grade 9-12)
+
+#### **Premium Plan - ₹1,499 + GST/month**
+- **Age Coverage**: Nursery to Grade 12
+- Full ML analytics suite
+- Real-time predictive insights
+- Advanced reporting & visualizations
+- Multi-framework comparison
+- 24/7 priority support
+- Up to 2,000 students
+- Complete dashboard access (Admin, Teacher, Parent)
+- Physical & psychological assessments
+- Comprehensive EduSight 360° scoring
+- Custom career path analysis
+
+#### **Enterprise Plan - Custom Pricing**
+- **Age Coverage**: Nursery to Grade 12
+- Unlimited students & schools
+- White-label solutions
+- Custom AI model training
+- API access & integrations
+- Dedicated account manager
+- On-premise deployment options
+- Custom framework development
+- Advanced analytics & reporting
+- Multi-school management
+- Regional analytics dashboard
+- Custom branding & UI
+- SLA guarantees
 
 ### **Specialized Testing**
 
@@ -250,32 +288,390 @@ edu-gray: Neutral (#6b7280) - Text/Backgrounds
 
 ## 🔐 User Roles & Permissions
 
-### **Role-Based Access Control**
+### **Hierarchical Relationship Model**
 
-#### **Admin**
-- **Permissions**: Full system access, user management, analytics
-- **Dashboard**: System overview, user statistics, platform management
-- **Features**: User creation, role assignment, system configuration
+EduSight implements a comprehensive hierarchical relationship model with three distinct user management approaches:
 
-#### **Teacher**
-- **Permissions**: Class management, student assessments, progress tracking
-- **Dashboard**: Class analytics, assignment management, student progress
-- **Features**: Assessment creation, grading, parent communication
+#### **1. B2C Model (Direct Parent Users)**
+- **Direct Enrollment**: Parents sign up directly to the platform
+- **Independent Management**: Parents manage their children's profiles independently
+- **Subscription Based**: Individual subscription plans
+- **School Agnostic**: Not tied to any specific educational institution
 
-#### **Student**
-- **Permissions**: Personal assessments, progress viewing, resource access
-- **Dashboard**: Personal analytics, assignment status, learning path
-- **Features**: Test taking, progress tracking, goal setting
+#### **2. B2B Model (Enterprise School Management)**
+- **Institutional Hierarchy**: Admin → School Admin → Teachers/Parents → Students
+- **Centralized Control**: School admins manage all users within their school
+- **Bulk Management**: Institutional-level user and student management
+- **Custom Branding**: School-specific customization and branding options
 
-#### **Parent**
-- **Permissions**: Child progress viewing, communication with teachers
-- **Dashboard**: Child analytics, academic progress, recommendations
-- **Features**: Progress monitoring, teacher communication, report access
+#### **3. Guest Assessment Flow**
+- **Anonymous Access**: Users can upload documents without signup
+- **Experience-First**: Complete assessment workflow before subscription
+- **Conversion Funnel**: Signup/subscription required for report access
+- **Customer Acquisition**: Demonstrate value before commitment
 
-#### **Counselor**
-- **Permissions**: Student guidance, assessment analysis, recommendations
-- **Dashboard**: Student insights, counseling analytics, intervention tracking
-- **Features**: Career guidance, psychological assessment, support planning
+### **Role-Based Access Control (RBAC)**
+
+#### **Admin (System Super User)**
+```typescript
+Permissions: Full system control and management
+Scope: Global platform access across all schools and users
+```
+
+**Core Responsibilities:**
+- **Universal Access**: Complete control over all platform functions
+- **School Management**: Create, edit, delete schools and assign school admins
+- **User Management**: Manage all user types across the entire platform
+- **System Configuration**: Platform settings, feature toggles, and configurations
+- **Analytics Access**: Global analytics across all schools, regions, and users
+- **Billing Management**: Subscription management and financial oversight
+- **Data Management**: Access to ML master database and predictive analytics
+- **Security Oversight**: User permissions, security settings, and compliance
+
+**Dashboard Features:**
+- Global platform statistics and performance metrics
+- School management interface with creation and assignment tools
+- Comprehensive user management across all roles and schools
+- System-wide analytics and reporting capabilities
+- Financial dashboards and subscription management
+- ML model performance and master database insights
+
+#### **School Admin (Institutional Manager)**
+```typescript
+Permissions: Full control within assigned school boundaries
+Scope: School-specific management with limited cross-school visibility
+```
+
+**Core Responsibilities:**
+- **Student Management**: Create, edit, and manage students within their school
+- **Staff Management**: Manage teachers and support staff for their institution
+- **Parent Management**: Oversee parent accounts linked to their school students
+- **Academic Oversight**: Monitor academic performance and institutional metrics
+- **Report Access**: View and download reports for students in their school
+- **Class Management**: Organize students into classes and manage academic structure
+- **School Analytics**: Access detailed analytics for their institution only
+
+**Dashboard Features:**
+- School-specific student enrollment and management tools
+- Teacher and staff management interfaces
+- Parent-school communication oversight
+- Institutional performance analytics and reporting
+- Class organization and academic structure management
+- School-level assessment and progress tracking
+
+#### **Teacher (Academic Facilitator)**
+```typescript
+Permissions: Classroom and student-specific access within their school
+Scope: Limited to assigned classes and students
+```
+
+**Core Responsibilities:**
+- **Class Management**: Manage students assigned to their classes
+- **Assessment Creation**: Create and manage assessments for their subjects
+- **Progress Tracking**: Monitor academic progress of their students
+- **Report Generation**: Generate progress reports for their classes
+- **Parent Communication**: Communicate with parents regarding student progress
+- **Grading**: Assess and grade student work and assignments
+
+**Dashboard Features:**
+- Class roster and student management tools
+- Assessment creation and grading interfaces
+- Student progress tracking and analytics for assigned classes
+- Parent communication portal for their students
+- Subject-specific performance insights and recommendations
+
+#### **Parent (Student Guardian)**
+```typescript
+Permissions: Full management of their children's profiles and data
+Scope: Limited to their own children and related academic information
+```
+
+**Core Responsibilities:**
+- **Children Management**: Add, edit, and manage their children's profiles
+- **Document Upload**: Upload academic documents for assessment processing
+- **Progress Monitoring**: Track their children's academic and developmental progress
+- **Report Access**: Download and view comprehensive assessment reports
+- **Assessment Scheduling**: Schedule and manage assessment appointments
+- **Communication**: Communicate with teachers and school administrators
+- **Profile Management**: Maintain accurate children's personal and academic information
+
+**Dashboard Features:**
+- Children profile management with CRUD operations
+- Document upload center with workflow progress tracking
+- Comprehensive analytics dashboard for each child
+- Assessment history and progress visualization
+- Teacher communication portal and meeting scheduling
+- Report download center with PDF generation
+
+#### **Student (Learner)**
+```typescript
+Permissions: View and limited update access to their own data
+Scope: Personal academic information and assessment results only
+```
+
+**Core Responsibilities:**
+- **Profile Viewing**: Access their personal academic profile and information
+- **Assessment Participation**: Complete online assessments and evaluations
+- **Progress Tracking**: View their academic progress and achievement metrics
+- **Goal Setting**: Set and track personal academic and developmental goals
+- **Resource Access**: Access educational resources and learning materials
+
+**Dashboard Features:**
+- Personal academic profile with progress visualization
+- Assessment completion interface with real-time feedback
+- Goal tracking and achievement milestone celebrations
+- Learning resource library and recommended materials
+- Progress timeline with historical performance data
+
+### **Permission Hierarchy & Enforcement**
+
+#### **Access Control Matrix**
+```typescript
+Resources           | Admin | School_Admin | Teacher | Parent | Student
+-------------------|-------|--------------|---------|--------|--------
+All Schools        |  ✓    |      ✗       |    ✗    |   ✗    |   ✗
+Own School         |  ✓    |      ✓       |    ✓    |   ✓    |   ✓
+All Students       |  ✓    |      ✗       |    ✗    |   ✗    |   ✗
+School Students    |  ✓    |      ✓       |    ✓    |   ✗    |   ✗
+Own Children       |  ✓    |      ✓       |    ✗    |   ✓    |   ✗
+Own Profile        |  ✓    |      ✓       |    ✓    |   ✓    |   ✓
+System Settings    |  ✓    |      ✗       |    ✗    |   ✗    |   ✗
+School Settings    |  ✓    |      ✓       |    ✗    |   ✗    |   ✗
+ML Analytics       |  ✓    |   Limited    | Limited |Limited |   ✗
+```
+
+#### **Security Implementation**
+- **JWT Token-Based**: Secure authentication with role-based token claims
+- **API Route Protection**: Middleware enforcement on all protected endpoints
+- **Database Queries**: Role-scoped database queries with automatic filtering
+- **Frontend Guards**: Component-level permission checks and conditional rendering
+- **Audit Logging**: Comprehensive action logging for security and compliance
+
+#### **Cross-School Data Isolation**
+- **School Boundaries**: Strict data isolation between different schools
+- **User Context**: All operations performed within user's school context
+- **Query Filtering**: Automatic school-based filtering on all database operations
+- **Report Access**: School-specific report generation and access controls
+
+---
+
+## 🏗️ API Architecture & Relationship Management
+
+### **RESTful API Design**
+
+The EduSight platform implements a comprehensive RESTful API architecture with role-based endpoints that enforce the hierarchical relationship model.
+
+#### **Admin API Routes**
+```typescript
+// School Management
+POST   /api/admin/schools              // Create new school
+GET    /api/admin/schools              // List all schools  
+GET    /api/admin/schools/[id]         // Get school details
+PUT    /api/admin/schools/[id]         // Update school
+DELETE /api/admin/schools/[id]         // Delete school
+
+// Global User Management
+GET    /api/admin/users                // List all users across platform
+POST   /api/admin/users                // Create user (any role)
+PUT    /api/admin/users/[id]           // Update any user
+DELETE /api/admin/users/[id]           // Delete any user
+
+// System Analytics
+GET    /api/admin/analytics/global     // Platform-wide analytics
+GET    /api/admin/analytics/schools    // Cross-school comparisons
+GET    /api/admin/analytics/ml-models  // ML model performance
+```
+
+#### **School Admin API Routes**
+```typescript
+// Student Management (School-Scoped)
+GET    /api/school-admin/students      // List students in school
+POST   /api/school-admin/students      // Create student in school
+PUT    /api/school-admin/students/[id] // Update school student
+DELETE /api/school-admin/students/[id] // Delete school student
+
+// Staff Management
+GET    /api/school-admin/teachers      // List school teachers
+POST   /api/school-admin/teachers      // Add teacher to school
+GET    /api/school-admin/parents       // List school parents
+
+// School Analytics
+GET    /api/school-admin/analytics     // School-specific analytics
+GET    /api/school-admin/reports       // School performance reports
+```
+
+#### **Parent API Routes**
+```typescript
+// Children Management (Parent-Scoped)
+GET    /api/parent/children            // List parent's children
+POST   /api/parent/children            // Add child to parent
+PUT    /api/parent/children/[id]       // Update child profile
+DELETE /api/parent/children/[id]       // Remove child
+
+// Document & Assessment Management
+POST   /api/parent/documents/upload    // Upload child documents
+GET    /api/parent/reports/[childId]   // Get child reports
+GET    /api/parent/analytics/[childId] // Child-specific analytics
+```
+
+#### **Guest API Routes**
+```typescript
+// Anonymous Assessment Flow
+POST   /api/guest/upload               // Anonymous document upload
+GET    /api/guest/workflow/[id]        // Track assessment progress
+GET    /api/guest/report/[id]          // Preview report (signup gate)
+```
+
+### **Database Relationship Architecture**
+
+#### **Core Entity Relationships**
+```prisma
+// Hierarchical School Structure
+School {
+  id: String @id
+  name: String
+  schoolAdmin: User @relation("SchoolAdmin")
+  teachers: User[] @relation("SchoolStaff")
+  students: Student[]
+  parents: Parent[]
+}
+
+// User Base Entity
+User {
+  id: String @id
+  role: UserRole // ADMIN, SCHOOL_ADMIN, TEACHER, PARENT, STUDENT
+  accountType: AccountType // B2C, B2B
+  schoolId: String? // NULL for B2C users
+  school: School?
+}
+
+// Parent-Child Relationships
+Parent {
+  id: String @id
+  userId: String @unique
+  user: User @relation(fields: [userId])
+  children: Student[] // One-to-many relationship
+  schoolId: String? // NULL for B2C parents
+  school: School?
+}
+
+Student {
+  id: String @id
+  userId: String @unique
+  user: User @relation(fields: [userId])
+  parentId: String?
+  parent: Parent? @relation(fields: [parentId])
+  schoolId: String
+  school: School @relation(fields: [schoolId])
+}
+```
+
+#### **Access Control Implementation**
+```typescript
+// Middleware Example: School Admin Student Access
+async function validateSchoolAdminAccess(userId: string, studentId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { school: true }
+  });
+  
+  const student = await prisma.student.findUnique({
+    where: { id: studentId },
+    include: { school: true }
+  });
+  
+  // Ensure school admin can only access students from their school
+  if (user?.schoolId !== student?.schoolId) {
+    throw new UnauthorizedError('Access denied: Student not in your school');
+  }
+}
+
+// Parent Child Access Validation
+async function validateParentChildAccess(parentId: string, childId: string) {
+  const child = await prisma.student.findUnique({
+    where: { id: childId },
+    select: { parentId: true }
+  });
+  
+  if (child?.parentId !== parentId) {
+    throw new UnauthorizedError('Access denied: Not your child');
+  }
+}
+```
+
+### **Data Flow & Workflow Management**
+
+#### **Document Processing Pipeline**
+```mermaid
+graph TD
+    A[Document Upload] --> B{User Type}
+    B -->|Parent| C[Parent Authentication]
+    B -->|Guest| D[Anonymous Processing]
+    
+    C --> E[Child Validation]
+    D --> F[Guest Session Creation]
+    
+    E --> G[Framework Detection]
+    F --> G
+    
+    G --> H[Data Extraction]
+    H --> I[ML Analysis]
+    I --> J[Report Generation]
+    
+    J --> K{Access Check}
+    K -->|Authenticated| L[Report Access]
+    K -->|Guest| M[Signup Gate]
+    
+    M --> N[Registration]
+    N --> L
+    
+    L --> O[PDF Download]
+    L --> P[Analytics Update]
+    P --> Q[ML Pipeline Trigger]
+```
+
+#### **Permission Enforcement Flow**
+```mermaid
+graph TD
+    A[API Request] --> B[JWT Validation]
+    B --> C[Role Extraction]
+    C --> D[Permission Check]
+    
+    D --> E{Has Permission?}
+    E -->|Yes| F[Resource Access Check]
+    E -->|No| G[403 Forbidden]
+    
+    F --> H{Owns Resource?}
+    H -->|Yes| I[Execute Request]
+    H -->|No| J[School/Context Check]
+    
+    J --> K{Same School?}
+    K -->|Yes| I
+    K -->|No| G
+    
+    I --> L[Database Query]
+    L --> M[Response]
+```
+
+### **Scalability & Performance Considerations**
+
+#### **Database Optimization**
+- **Indexed Queries**: Strategic indexing on schoolId, parentId, and userId
+- **Query Optimization**: Role-based query filtering at database level
+- **Connection Pooling**: Efficient database connection management
+- **Caching Strategy**: Redis caching for frequently accessed data
+
+#### **API Performance**
+- **Route Optimization**: Efficient endpoint design with minimal database calls
+- **Pagination**: Built-in pagination for large dataset endpoints
+- **Response Optimization**: Selective field inclusion based on user permissions
+- **Rate Limiting**: Role-based rate limiting to prevent abuse
+
+#### **Security Measures**
+- **Input Validation**: Comprehensive validation using Zod schemas
+- **SQL Injection Prevention**: Prisma ORM with parameterized queries
+- **XSS Protection**: Input sanitization and output encoding
+- **CSRF Protection**: Built-in Next.js CSRF protection
 
 ---
 
@@ -390,6 +786,116 @@ OPENAI_API_KEY="sk-..."
 - **Automated Testing**: CI/CD pipeline integration
 - **Security Audits**: Regular security assessments
 - **Accessibility Testing**: WCAG compliance verification
+
+---
+
+## 🤖 ML Master Database & Analytics Engine
+
+### **System Architecture**
+
+The ML Master Database is a comprehensive analytics data warehouse that continuously processes educational data to provide predictive insights and automated model improvements. Every report generation triggers an automated pipeline that updates master analytics across multiple dimensions.
+
+#### **Core Components**
+
+1. **Data Processing Pipeline**
+   - Automated data ingestion from completed reports
+   - Real-time data validation and normalization
+   - Intelligent data categorization and tagging
+
+2. **Master Analytics Tables**
+   - **School Analytics**: Performance metrics, trends, and predictions per school
+   - **Region Analytics**: Geographic educational insights and comparisons
+   - **Subject Analytics**: Subject-wise performance patterns and difficulty analysis
+   - **Skill Analytics**: Skill development tracking and correlation analysis
+   - **Domain Analytics**: Cross-domain insights (STEM, Arts, Commerce)
+
+3. **ML Model Management**
+   - **Model Performance Tracking**: Accuracy, precision, recall metrics
+   - **Automated Retraining**: Triggers when sufficient new data is available
+   - **Version Control**: Multiple model versions with rollback capability
+   - **A/B Testing**: Model performance comparison in production
+
+### **Predictive Analytics Capabilities**
+
+#### **School-Level Predictions**
+- **Performance Trends**: Upward, downward, or stable trajectory analysis
+- **Risk Assessment**: Early identification of at-risk students
+- **Resource Optimization**: Optimal teacher-student ratio recommendations
+- **Curriculum Effectiveness**: Subject and framework performance analysis
+
+#### **Regional Insights**
+- **Comparative Analysis**: School performance ranking within regions
+- **Educational Gaps**: Identification of skill and subject gaps by geography
+- **Growth Projections**: Regional educational development forecasts
+- **Policy Impact**: Analysis of educational policy effectiveness
+
+#### **Subject & Skill Intelligence**
+- **Difficulty Calibration**: Dynamic difficulty assessment across frameworks
+- **Prerequisite Mapping**: Skill dependency graph for optimal learning paths
+- **Career Correlation**: Subject-to-career pathway predictions
+- **Future Relevance**: Industry-aligned skill importance scoring
+
+### **Automated ML Pipeline Workflow**
+
+```mermaid
+graph TD
+    A[Report Generated] --> B[Data Extraction]
+    B --> C[Quality Validation]
+    C --> D[ML Pipeline Trigger]
+    D --> E[School Analytics Update]
+    D --> F[Region Analytics Update]  
+    D --> G[Subject Analytics Update]
+    D --> H[Skill Analytics Update]
+    D --> I[Domain Analytics Update]
+    E,F,G,H,I --> J[Master Analytics Consolidation]
+    J --> K[ML Model Performance Check]
+    K --> L{Retrain Required?}
+    L -->|Yes| M[Trigger Model Retraining]
+    L -->|No| N[Update Predictions]
+    M --> N
+    N --> O[Deploy Updated Models]
+```
+
+### **Data Processing Jobs**
+
+The system maintains a robust job queue for processing various ML tasks:
+
+- **Report Analysis Jobs**: Process individual assessment reports
+- **Bulk Update Jobs**: Batch processing for large data updates  
+- **Model Training Jobs**: ML model retraining and optimization
+- **Prediction Update Jobs**: Refresh predictions across all analytics tables
+
+### **Real-Time Insights Generation**
+
+Every new data point triggers immediate updates to:
+
+1. **Institutional Insights**: School performance dashboards update in real-time
+2. **Regional Comparisons**: Geographic performance maps refresh automatically
+3. **Subject Difficulty**: Dynamic difficulty scores adjust based on new assessments
+4. **Skill Development**: Progression tracking updates with each new evaluation
+5. **Career Recommendations**: Pathway suggestions evolve with market trends
+
+### **Age-Appropriate Analytics (Nursery to Grade 12)**
+
+#### **Early Years (Nursery - KG2)**
+- **Developmental Milestones**: Motor skills, language development, social interaction
+- **Play-Based Assessment**: Learning through play activity analysis
+- **Parent Engagement**: Home-school collaboration insights
+
+#### **Primary Education (Grade 1-5)**
+- **Foundation Skills**: Reading, writing, basic mathematics proficiency
+- **Learning Style Identification**: Visual, auditory, kinesthetic preferences
+- **Behavioral Pattern Recognition**: Attention span, collaboration skills
+
+#### **Middle School (Grade 6-8)**
+- **Academic Performance**: Subject-wise strength and weakness identification
+- **Interest Mapping**: Early career interest detection
+- **Peer Interaction**: Social skill development tracking
+
+#### **High School (Grade 9-12)**
+- **College Readiness**: University admission probability predictions
+- **Career Path Analysis**: Industry-aligned skill and subject recommendations
+- **Scholarship Opportunities**: Merit-based opportunity identification
 
 ---
 
@@ -523,11 +1029,25 @@ npm run seed-production
 ## 📊 Project Statistics
 
 ### **Codebase Metrics**
-- **Total Files**: 150+ TypeScript/JavaScript files
-- **Components**: 80+ React components
-- **API Routes**: 25+ Next.js API endpoints
-- **Database Tables**: 15+ Prisma models
+- **Total Files**: 200+ TypeScript/JavaScript files
+- **Components**: 120+ React components
+- **API Routes**: 40+ Next.js API endpoints
+- **Database Tables**: 25+ Prisma models
+- **Permission System**: 5 roles, 15+ resource types
 - **Test Coverage**: 85%+ code coverage
+
+### **Feature Implementation Status**
+- **✅ User Management**: Complete RBAC with hierarchical permissions
+- **✅ School Management**: Full B2B enterprise model implementation
+- **✅ Parent-Child Management**: Complete CRUD operations for parent-child relationships
+- **✅ Document Processing**: AI-powered workflow with framework detection
+- **✅ Analytics Dashboard**: Multi-role dashboards with advanced visualizations
+- **✅ Guest Assessment**: Anonymous user flow with conversion funnel
+- **✅ ML Master Database**: Comprehensive analytics pipeline with predictions
+- **✅ Report Generation**: Branded PDF reports with access control
+- **✅ Payment Integration**: Subscription management with INR pricing
+- **🔄 Real-time Updates**: ML pipeline automation (in progress)
+- **🔄 Advanced Analytics**: Predictive insights and recommendations (in progress)
 
 ### **Performance Benchmarks**
 - **Page Load Speed**: <2 seconds average

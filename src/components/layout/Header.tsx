@@ -247,7 +247,7 @@ export function Header() {
           items: [
             { 
               name: 'EduSight 360° Assessment', 
-              href: '/assessments', 
+              href: '/guest-assessment', 
               icon: SparklesIcon, 
               description: 'Comprehensive holistic student evaluation',
               badge: 'Core Feature'
@@ -345,8 +345,8 @@ export function Header() {
       cta: {
         title: 'Start Your Journey',
         description: 'Experience the power of AI-driven educational insights',
-        href: '/auth/signin',
-        buttonText: 'Get Started Free'
+        href: '/guest-assessment',
+        buttonText: 'Try Free Assessment'
       }
     }
   };

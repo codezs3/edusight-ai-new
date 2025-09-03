@@ -42,18 +42,37 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  role          String    @default("STUDENT") // Using String instead of enum
+  role          String    @default("STUDENT") // ADMIN, SCHOOL_ADMIN, TEACHER, PARENT, STUDENT
   phone         String?
   address       String?
+  
+  // School association for hierarchical management
+  schoolId      String?   // School they belong to (for SCHOOL_ADMIN, TEACHER, PARENT, STUDENT)
+  school        School?   @relation("SchoolStaff", fields: [schoolId], references: [id])
+  
+  // Admin schools (for SCHOOL_ADMIN role)
+  adminOfSchools School[] @relation("SchoolAdmin")
+  
+  // Additional profile information
+  designation   String?   // Job title/designation
+  department    String?   // Department/subject area
+  dateOfJoining DateTime? // When they joined the school
+  employeeId    String?   // Internal employee/staff ID
+  
+  // B2C vs B2B identification
+  accountType   String    @default("B2C") // B2C (direct parent), B2B (school-managed)
+  
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  student       Student?
-  teacher       Teacher?
-  parent        Parent?
+  accounts        Account[]
+  sessions        Session[]
+  student         Student?
+  teacher         Teacher?
+  parent          Parent?
+  uploads         DocumentUpload[]
+  uploadSessions  UploadSession[]
 
   @@map("users")
 }
@@ -68,20 +87,57 @@ model VerificationToken {
 
 // Educational Models
 model School {
-  id          String    @id @default(cuid())
-  name        String
-  address     String?
-  phone       String?
-  email       String?
-  website     String?
-  type        String?   // public, private, international
-  board       String?   // CBSE, ICSE, IGCSE, IB
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  name            String
+  address         String?
+  phone           String?
+  email           String?
+  website         String?
+  type            String?   // public, private, international
+  board           String?   // CBSE, ICSE, IGCSE, IB, MULTIPLE
+  logo            String?   // School logo URL
+  description     String?   // School description
+  establishedYear Int?      // Year established
+  capacity        Int?      // Student capacity
+  
+  // Contact information
+  principalName   String?
+  principalEmail  String?
+  principalPhone  String?
+  
+  // Address details
+  city            String?
+  state           String?
+  country         String?   @default("India")
+  pincode         String?
+  
+  // Settings
+  timezone        String?   @default("Asia/Kolkata")
+  language        String?   @default("en")
+  currency        String?   @default("INR")
+  
+  // Admin management
+  schoolAdminId   String?   // Primary school admin
+  schoolAdmin     User?     @relation("SchoolAdmin", fields: [schoolAdminId], references: [id])
+  
+  // Subscription info for enterprise model
+  subscriptionType String?  @default("trial") // trial, basic, premium, enterprise
+  subscriptionEnds DateTime?
+  maxStudents     Int?      @default(100)
+  maxTeachers     Int?      @default(20)
+  
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  students    Student[]
-  teachers    Teacher[]
+  // Relationships
+  students        Student[]
+  teachers        Teacher[]
+  parents         Parent[]  // Parents associated with this school
+  schoolStaff     User[]    @relation("SchoolStaff") // All staff members
+  uploads         DocumentUpload[]
+  uploadSessions  UploadSession[]
+  analytics       SchoolAnalytics?
 
   @@map("schools")
 }
@@ -101,11 +157,21 @@ model Student {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  school       School?   @relation(fields: [schoolId], references: [id])
-  parent       Parent?   @relation(fields: [parentId], references: [id])
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school          School?           @relation(fields: [schoolId], references: [id])
+  parent          Parent?           @relation(fields: [parentId], references: [id])
 
-  assessments  Assessment[]
+  assessments         Assessment[]
+  uploads             DocumentUpload[]
+  uploadSessions      UploadSession[]
+  academicAnalyses    AcademicAnalysis[]
+  behavioralAnalyses  BehavioralAnalysis[]
+  careerAnalyses      CareerAnalysis[]
+  frameworkDetections FrameworkDetection[]
+  dataNormalizations  DataNormalization[]
+  repositories        StudentRepository[]
+  eduSightScores      EduSightScore[]
+  scoreAggregations   ScoreAggregation[]
 
   @@map("students")
 }
@@ -130,14 +196,21 @@ model Teacher {
 model Parent {
   id          String    @id @default(cuid())
   userId      String    @unique
+  schoolId    String?   // School association for B2B parents
   occupation  String?
   income      String?
   education   String?
+  
+  // Relationship to children's school
+  relationship String?  // father, mother, guardian
+  emergencyContact Boolean @default(false)
+  
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school      School?   @relation(fields: [schoolId], references: [id])
   children    Student[]
 
   @@map("parents")
@@ -368,4 +441,483 @@ model BackupConfiguration {
   updatedAt         DateTime @updatedAt
 
   @@map("backup_configurations")
+}
+
+// Document Upload System
+model DocumentUpload {
+  id           String   @id @default(cuid())
+  fileName     String
+  originalName String
+  fileSize     Int
+  mimeType     String
+  filePath     String
+  uploadType   String   // student_data, assessment_results, report_cards, transcripts, medical_records, etc.
+  category     String   // academic, health, behavioral, administrative, other
+  description  String?
+  status       String   @default("pending") // pending, processing, completed, failed, archived
+  
+  // Uploader information
+  uploaderId   String
+  uploaderType String   // parent, teacher, school_admin, admin
+  uploader     User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  
+  // Student/School association
+  studentId    String?
+  schoolId     String?
+  student      Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  school       School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  
+  // Processing information
+  processedAt     DateTime?
+  processedBy     String?
+  processingNotes String?
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  
+  // Metadata and tags
+  metadata        String?  // JSON metadata extracted from file
+  tags            String?  // Comma-separated tags for categorization
+  confidentiality String   @default("standard") // public, standard, confidential, restricted
+  
+  // File validation
+  isValidated     Boolean  @default(false)
+  validationNotes String?
+  
+  // System fields
+  isActive        Boolean  @default(true)
+  isArchived      Boolean  @default(false)
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Analysis relationships
+  academicAnalyses    AcademicAnalysis[]
+  behavioralAnalyses  BehavioralAnalysis[]
+  careerAnalyses      CareerAnalysis[]
+  frameworkDetections FrameworkDetection[]
+  dataNormalizations  DataNormalization[]
+  repositories        StudentRepository[]
+  eduSightScores      EduSightScore[]
+  scoreAggregations   ScoreAggregation[]
+
+  @@map("document_uploads")
+}
+
+model UploadSession {
+  id           String   @id @default(cuid())
+  sessionName  String
+  description  String?
+  uploaderId   String
+  uploaderType String   // parent, teacher, school_admin, admin
+  uploader     User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  
+  // Session settings
+  allowedTypes     String?  // JSON array of allowed file types
+  maxFileSize      Int?     // Max file size in bytes
+  maxFiles         Int?     // Max number of files
+  autoProcess      Boolean  @default(true)
+  requireApproval  Boolean  @default(false)
+  
+  // Associated data
+  studentId        String?
+  schoolId         String?
+  student          Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  school           School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  
+  // Status and tracking
+  status           String   @default("active") // active, completed, cancelled, expired
+  filesUploaded    Int      @default(0)
+  totalSize        Int      @default(0)
+  
+  // Timestamps
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  expiresAt        DateTime?
+
+  @@map("upload_sessions")
+}
+
+// Analysis and ML Models
+model AcademicAnalysis {
+  id           String   @id @default(cuid())
+  documentId   String
+  studentId    String
+  analysisType String   // academic_performance, subject_analysis, etc.
+  inputData    String   // JSON string of input data
+  results      String   // JSON string of analysis results
+  confidence   Float    @default(0.0)
+  status       String   @default("pending") // pending, completed, failed
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  document     DocumentUpload @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  student      Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("academic_analyses")
+}
+
+model BehavioralAnalysis {
+  id           String   @id @default(cuid())
+  documentId   String
+  studentId    String
+  analysisType String   // behavioral_risk, social_emotional, etc.
+  inputData    String   // JSON string of input data
+  results      String   // JSON string of analysis results
+  riskLevel    String   @default("low") // low, medium, high, critical
+  confidence   Float    @default(0.0)
+  status       String   @default("pending") // pending, completed, failed
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  document     DocumentUpload @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  student      Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("behavioral_analyses")
+}
+
+model CareerAnalysis {
+  id                 String   @id @default(cuid())
+  documentId         String
+  studentId          String
+  analysisType       String   // career_prediction, interest_analysis, etc.
+  inputData          String   // JSON string of input data
+  results            String   // JSON string of analysis results
+  recommendedCareers String   // JSON array of recommended careers
+  confidence         Float    @default(0.0)
+  status             String   @default("pending") // pending, completed, failed
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  document           DocumentUpload @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  student            Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("career_analyses")
+}
+
+model FrameworkDetection {
+  id                   String   @id @default(cuid())
+  documentId           String
+  studentId            String
+  detectedFramework    String?  // IB, IGCSE, CBSE, ICSE, etc.
+  confidence           Float    @default(0.0)
+  indicators           String   // JSON array of detection indicators
+  suggestedFrameworks  String   // JSON array of suggested frameworks
+  status               String   @default("pending") // pending, completed, failed
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  document             DocumentUpload @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  student              Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("framework_detections")
+}
+
+model DataNormalization {
+  id             String   @id @default(cuid())
+  documentId     String
+  studentId      String
+  framework      String   // Target framework for normalization
+  originalData   String   // JSON string of original data
+  normalizedData String   // JSON string of normalized data
+  mappings       String   // JSON string of transformation mappings
+  warnings       String   // JSON array of warnings
+  status         String   @default("pending") // pending, completed, failed
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  document       DocumentUpload @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  student        Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("data_normalizations")
+}
+
+model StudentRepository {
+  id                String   @id @default(cuid())
+  studentId         String
+  documentId        String
+  repositoryType    String   @default("academic") // academic, medical, behavioral, etc.
+  dataCategory      String   // grades, attendance, assessments, etc.
+  structuredData    String   // JSON string of structured data
+  metadata          String   // JSON string of metadata
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  student           Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  document          DocumentUpload @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("student_repositories")
+}
+
+model EduSightScore {
+  id               String   @id @default(cuid())
+  studentId        String
+  documentId       String?  // Optional - can be calculated from multiple sources
+  academicScore    Float    @default(0.0)   // 0-100 scale
+  psychologicalScore Float  @default(0.0)   // 0-100 scale
+  physicalScore    Float    @default(0.0)   // 0-100 scale
+  overallScore     Float    @default(0.0)   // 0-100 scale
+  framework        String?  // Framework used for calculation
+  missingFrameworks String? // JSON array of missing frameworks
+  calculations     String   // JSON string of detailed calculations
+  recommendations  String   // JSON string of recommendations
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  student          Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  document         DocumentUpload? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("edusight_scores")
+}
+
+model ScoreAggregation {
+  id                    String   @id @default(cuid())
+  studentId             String
+  documentId            String
+  aggregationType       String   @default("comprehensive") // comprehensive, academic_only, behavioral_only
+  academicAggregation   String   // JSON string of academic aggregation results
+  behavioralAggregation String   // JSON string of behavioral aggregation results
+  trendAnalysis         String   // JSON string of trend analysis
+  dataPoints            Int      @default(0)
+  confidence            Float    @default(0.0)
+  status                String   @default("pending") // pending, completed, failed
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  student               Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  document              DocumentUpload @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("score_aggregations")
+}
+
+// ML Master Database Models
+model MasterAnalytics {
+  id                String    @id @default(cuid())
+  dataType          String    // school, region, subject, skill, domain
+  entityId          String    // ID of the entity being analyzed
+  entityName        String    // Name of the entity
+  metrics           String    // JSON of calculated metrics
+  predictions       String    // JSON of ML predictions
+  trends            String    // JSON of trend analysis
+  lastUpdated       DateTime  @default(now())
+  version           Int       @default(1)
+  
+  @@unique([dataType, entityId])
+  @@index([dataType])
+  @@index([lastUpdated])
+}
+
+model SchoolAnalytics {
+  id                  String    @id @default(cuid())
+  schoolId            String
+  school              School    @relation(fields: [schoolId], references: [id])
+  
+  // Performance metrics
+  avgAcademicScore    Float
+  avgSkillsScore      Float
+  avgPhysicalScore    Float
+  avgPsychologicalScore Float
+  overallRating       Float
+  
+  // Subject performance
+  subjectPerformance  String    // JSON of subject-wise scores
+  topSubjects         String    // JSON array of best performing subjects
+  strugglingSubjects  String    // JSON array of subjects needing attention
+  
+  // Skills analysis
+  skillsDistribution  String    // JSON of skills distribution
+  emergingSkills      String    // JSON of trending skills
+  skillGaps           String    // JSON of identified skill gaps
+  
+  // Predictions
+  performanceTrend    String    // upward, downward, stable
+  riskStudents        Int       // predicted number of at-risk students
+  potentialToppers    Int       // predicted high performers
+  
+  // Demographics
+  totalStudents       Int
+  gradeDistribution   String    // JSON of grade-wise student count
+  
+  calculatedAt        DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@unique([schoolId])
+}
+
+model RegionAnalytics {
+  id                  String    @id @default(cuid())
+  regionName          String    // City, State, Country
+  regionType          String    // city, state, country
+  
+  // Aggregate metrics
+  totalSchools        Int
+  totalStudents       Int
+  avgPerformance      Float
+  
+  // Educational insights
+  topFrameworks       String    // JSON of most used frameworks
+  subjectStrengths    String    // JSON of regional subject strengths
+  skillTrends         String    // JSON of skill development trends
+  
+  // Comparative analysis
+  rankingPosition     Int?      // Position compared to other regions
+  performanceGrade    String?   // A, B, C, D grade
+  
+  // Predictions
+  growthProjection    String    // JSON of growth predictions
+  emergingTrends      String    // JSON of emerging educational trends
+  
+  calculatedAt        DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@unique([regionName, regionType])
+}
+
+model SubjectAnalytics {
+  id                  String    @id @default(cuid())
+  subjectName         String
+  framework           String    // CBSE, ICSE, IB, IGCSE, etc.
+  
+  // Performance metrics
+  avgScore            Float
+  passRate            Float
+  excellenceRate      Float     // % scoring >90
+  
+  // Difficulty analysis
+  difficultyLevel     String    // easy, medium, hard
+  conceptualGaps      String    // JSON of common problem areas
+  improvementAreas    String    // JSON of areas needing focus
+  
+  // Skill correlation
+  relatedSkills       String    // JSON of skills developed by this subject
+  prerequisiteSkills  String    // JSON of skills needed for this subject
+  
+  // Trends
+  performanceTrend    String    // improving, declining, stable
+  popularityTrend     String    // increasing, decreasing, stable
+  
+  // Predictions
+  futureRelevance     Float     // 0-100 score of future importance
+  careerConnections   String    // JSON of related career paths
+  
+  totalAssessments    Int
+  calculatedAt        DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@unique([subjectName, framework])
+}
+
+model SkillAnalytics {
+  id                  String    @id @default(cuid())
+  skillName           String
+  skillCategory       String    // cognitive, practical, social, creative, etc.
+  
+  // Distribution metrics
+  avgLevel            Float     // 0-100 average skill level
+  developmentRate     Float     // rate of skill improvement
+  
+  // Correlations
+  subjectCorrelations String    // JSON of subjects that develop this skill
+  careerRelevance     String    // JSON of careers requiring this skill
+  
+  // Demographics
+  ageGroupStrengths   String    // JSON of age groups excelling in this skill
+  genderDistribution  String    // JSON of gender-based distribution
+  
+  // Predictions
+  futureImportance    Float     // 0-100 predicted importance
+  developmentTrend    String    // growing, stable, declining
+  
+  // Learning insights
+  bestPractices       String    // JSON of effective development methods
+  commonChallenges    String    // JSON of typical learning obstacles
+  
+  totalAssessments    Int
+  calculatedAt        DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@unique([skillName])
+}
+
+model DomainAnalytics {
+  id                  String    @id @default(cuid())
+  domainName          String    // STEM, Arts, Commerce, etc.
+  
+  // Performance overview
+  avgPerformance      Float
+  studentInterest     Float     // 0-100 interest level
+  marketDemand        Float     // 0-100 job market demand
+  
+  // Skills landscape
+  coreSkills          String    // JSON of essential skills
+  emergingSkills      String    // JSON of new skills in demand
+  
+  // Career prospects
+  careerPaths         String    // JSON of career opportunities
+  salaryProjections   String    // JSON of salary ranges
+  growthOpportunities String    // JSON of growth potential
+  
+  // Educational pathways
+  recommendedSubjects String    // JSON of subjects for this domain
+  topInstitutions     String    // JSON of leading educational institutions
+  
+  // Trends and predictions
+  industryTrends      String    // JSON of industry developments
+  skillGapAnalysis    String    // JSON of identified skill gaps
+  futureOutlook       String    // JSON of future predictions
+  
+  totalStudents       Int
+  calculatedAt        DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@unique([domainName])
+}
+
+model MLModelMetrics {
+  id                  String    @id @default(cuid())
+  modelName           String
+  modelType           String    // prediction, classification, clustering
+  accuracy            Float
+  precision           Float
+  recall              Float
+  f1Score             Float
+  
+  trainingDataSize    Int
+  lastTrainingDate    DateTime
+  modelVersion        String
+  
+  performance         String    // JSON of detailed performance metrics
+  hyperparameters     String    // JSON of model configuration
+  
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@index([modelName])
+  @@index([isActive])
+}
+
+model DataProcessingJob {
+  id                  String    @id @default(cuid())
+  jobType             String    // report_analysis, bulk_update, model_training
+  status              String    // pending, running, completed, failed
+  
+  inputData           String    // JSON of input parameters
+  outputData          String?   // JSON of results
+  errorDetails        String?   // Error information if failed
+  
+  startedAt           DateTime?
+  completedAt         DateTime?
+  processingTime      Int?      // milliseconds
+  
+  triggeredBy         String    // user_id or system
+  priority            Int       @default(5) // 1-10, 1 being highest
+  
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@index([status])
+  @@index([jobType])
+  @@index([priority])
 }

@@ -1,8 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { toast } from 'react-hot-toast';
+import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout';
+import AddChildModal from '@/components/dashboard/parent/AddChildModal';
 import {
   ChartBarIcon,
   DocumentTextIcon,
@@ -31,15 +34,20 @@ import {
   CheckCircleIcon,
   ClockIcon,
   ArrowTrendingUpIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
-import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout';
 import StatCard from '@/components/dashboard/StatCard';
 import DashboardCard from '@/components/dashboard/DashboardCard';
+import CompactMetricCard from '@/components/dashboard/CompactMetricCard';
+import MiniWidget from '@/components/dashboard/MiniWidget';
 import ModernChart from '@/components/dashboard/ModernChart';
 
 export default function ParentDashboard() {
   const { data: session, status } = useSession();
+  const [children, setChildren] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddChildModal, setShowAddChildModal] = useState(false);
 
   if (status === 'unauthenticated') {
     redirect('/auth/signin');
@@ -48,6 +56,42 @@ export default function ParentDashboard() {
   if (!session || session.user.role !== 'PARENT') {
     redirect('/dashboard');
   }
+
+  // Fetch children data
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchChildren();
+    }
+  }, [session]);
+
+  const fetchChildren = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/parent/children');
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setChildren(data.children || []);
+      } else {
+        console.error('Failed to fetch children:', data);
+        toast.error(data.error || 'Failed to fetch children');
+      }
+    } catch (error) {
+      console.error('Error fetching children:', error);
+      toast.error('Failed to fetch children. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChildAdded = (newChild: any) => {
+    console.log('Child added to dashboard:', newChild);
+    setChildren(prev => [newChild, ...prev]);
+    setShowAddChildModal(false);
+    toast.success('Child added successfully!');
+    // Refresh the data to ensure consistency
+    fetchChildren();
+  };
 
   // Sidebar Menu Items for Parent
   const menuItems = [
@@ -67,6 +111,11 @@ export default function ParentDashboard() {
         { title: 'Psychological Insights', href: '/dashboard/parent/psychology', icon: LightBulbIcon },
         { title: 'Career Guidance', href: '/dashboard/parent/career', icon: MapPinIcon }
       ]
+    },
+    {
+      title: 'Upload Documents',
+      href: '/dashboard/parent/upload',
+      icon: CloudArrowUpIcon
     },
     {
       title: 'Assessments',
@@ -113,18 +162,7 @@ export default function ParentDashboard() {
     }
   ];
 
-  // Mock student data
-  const students = [
-    {
-      id: 1,
-      name: 'Alex Thompson',
-      grade: 'Grade 8',
-      section: 'A',
-      overallScore: 87,
-      lastAssessment: '2024-01-15',
-      profileImage: null
-    }
-  ];
+  // Use real children data
 
   const quickStats = [
     {
@@ -168,54 +206,137 @@ export default function ParentDashboard() {
   return (
     <VerticalDashboardLayout
       title="Parent Dashboard"
-      subtitle={`Welcome back, ${session.user.name} - Managing ${students.length} student${students.length > 1 ? 's' : ''}`}
+      subtitle={`Welcome back, ${session.user.name} - Managing ${children.length} child${children.length !== 1 ? 'ren' : ''}`}
       menuItems={menuItems}
       activeItem="/dashboard/parent"
     >
       <div className="space-y-6">
         {/* Student Overview Cards */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Children</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {students.map((student) => (
-              <DashboardCard
-                key={student.id}
-                title={student.name}
-                value={`E360: ${student.overallScore}/100`}
-                subtitle={`${student.grade} - Section ${student.section}`}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-              >
-                <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>Last Assessment</span>
-                    <span>{new Date(student.lastAssessment).toLocaleDateString()}</span>
-                  </div>
-                  <div className="mt-2 bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-purple-600 h-2 rounded-full transition-all" 
-                      style={{ width: `${student.overallScore}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </DashboardCard>
-            ))}
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-lg font-semibold text-gray-900">Your Children</h3>
+            <button
+              onClick={() => setShowAddChildModal(true)}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            >
+              <PlusIcon className="w-4 h-4 mr-2" />
+              Add Child
+            </button>
           </div>
+          
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-lg shadow-sm p-4 animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          ) : children.length === 0 ? (
+            <div className="text-center py-8 bg-white rounded-lg shadow-sm">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <PlusIcon className="w-8 h-8 text-blue-600" />
+              </div>
+              <h4 className="text-lg font-medium text-gray-900 mb-2">No Children Added Yet</h4>
+              <p className="text-gray-600 mb-4">Add your first child to start tracking their academic progress</p>
+              <button
+                onClick={() => setShowAddChildModal(true)}
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <PlusIcon className="w-5 h-5 mr-2" />
+                Add Your First Child
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              {children.map((child) => (
+                <DashboardCard
+                  key={child.id}
+                  title={child.user.name}
+                  value={`Grade ${child.grade}`}
+                  subtitle={child.school ? child.school.name : 'No school assigned'}
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                >
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>Added</span>
+                      <span>{new Date(child.user.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    {child.section && (
+                      <div className="mt-1 text-xs text-gray-500">
+                        Section: {child.section}
+                      </div>
+                    )}
+                  </div>
+                </DashboardCard>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Key Performance Indicators */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {quickStats.map((stat, index) => (
-            <StatCard
+            <CompactMetricCard
               key={index}
               title={stat.title}
               value={stat.value}
-              change={stat.change}
-              changeType={stat.changeType}
               icon={stat.icon}
               color={stat.color}
-              description={stat.description}
+              trend={{
+                value: stat.change,
+                direction: stat.changeType === 'positive' ? 'up' : 'down'
+              }}
             />
           ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <MiniWidget
+            title="Upload"
+            value="New"
+            icon={CloudArrowUpIcon}
+            color="blue"
+            subtitle="Documents"
+          />
+          <MiniWidget
+            title="Messages"
+            value="3"
+            icon={ChatBubbleLeftRightIcon}
+            color="green"
+            subtitle="Unread"
+          />
+          <MiniWidget
+            title="Events"
+            value="5"
+            icon={CalendarIcon}
+            color="purple"
+            subtitle="This week"
+          />
+          <MiniWidget
+            title="Tasks"
+            value="2"
+            icon={CheckCircleIcon}
+            color="orange"
+            subtitle="Pending"
+          />
+          <MiniWidget
+            title="Grades"
+            value="A+"
+            icon={TrophyIcon}
+            color="yellow"
+            subtitle="Latest"
+          />
+          <MiniWidget
+            title="Profile"
+            value="98%"
+            icon={UserCircleIcon}
+            color="indigo"
+            subtitle="Complete"
+          />
         </div>
 
         {/* Analytics Grid */}
@@ -396,6 +517,14 @@ export default function ParentDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Add Child Modal */}
+      <AddChildModal
+        isOpen={showAddChildModal}
+        onClose={() => setShowAddChildModal(false)}
+        onChildAdded={handleChildAdded}
+        schoolId={(session?.user as any)?.schoolId || null}
+      />
     </VerticalDashboardLayout>
   );
 }

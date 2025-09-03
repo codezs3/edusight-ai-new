@@ -74,15 +74,15 @@ export default function StatCard({
         <div className={`w-full h-full bg-gradient-to-br ${colorClasses.bg} rounded-full transform translate-x-8 -translate-y-8`}></div>
       </div>
       
-      <div className="relative p-6">
+      <div className="relative p-4">
         {/* Icon */}
-        <div className="flex items-center justify-between mb-4">
-          <div className={`w-14 h-14 ${colorClasses.light} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-            <Icon className={`w-7 h-7 ${colorClasses.text}`} />
+        <div className="flex items-center justify-between mb-3">
+          <div className={`w-10 h-10 ${colorClasses.light} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+            <Icon className={`w-5 h-5 ${colorClasses.text}`} />
           </div>
           
           {change && (
-            <div className={`px-3 py-1 rounded-full text-xs font-semibold ${getChangeColor(changeType)}`}>
+            <div className={`px-2 py-1 rounded-full text-xs font-semibold ${getChangeColor(changeType)}`}>
               {changeType === 'positive' ? '+' : changeType === 'negative' ? '-' : ''}{change}
             </div>
           )}
@@ -90,14 +90,14 @@ export default function StatCard({
 
         {/* Content */}
         <div className="space-y-1">
-          <h3 className="text-slate-600 font-medium text-sm uppercase tracking-wide">
+          <h3 className="text-slate-600 font-medium text-xs uppercase tracking-wide">
             {title}
           </h3>
-          <div className="text-3xl font-bold text-slate-900">
+          <div className="text-2xl font-bold text-slate-900">
             {value}
           </div>
           {description && (
-            <p className="text-slate-500 text-sm">
+            <p className="text-slate-500 text-xs">
               {description}
             </p>
           )}

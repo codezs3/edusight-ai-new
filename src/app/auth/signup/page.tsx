@@ -1,746 +1,408 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { toast } from 'react-hot-toast'
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { toast } from 'react-hot-toast';
+import Link from 'next/link';
 import { 
-  EyeIcon, 
-  EyeSlashIcon,
   UserIcon,
-  AcademicCapIcon,
-  BuildingOfficeIcon,
-  HeartIcon,
-  UserGroupIcon
-} from '@heroicons/react/24/outline'
+  EnvelopeIcon,
+  LockClosedIcon,
+  PhoneIcon,
+  CheckCircleIcon,
+  SparklesIcon,
+  EyeIcon, 
+  ChartPieIcon,
+  ArrowRightIcon,
+  GiftIcon
+} from '@heroicons/react/24/outline';
 
-// Base schema for all users
-const baseSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string(),
-  phone: z.string().optional(),
-  address: z.string().optional(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-})
-
-// Extended schemas for specific user types
-const parentSchema = baseSchema.extend({
-  occupation: z.string().optional(),
-  income: z.string().optional(),
-  education: z.string().optional(),
-  emergencyContact: z.string().optional(),
-})
-
-const schoolAdminSchema = baseSchema.extend({
-  schoolName: z.string().min(2, 'School name is required'),
-  schoolAddress: z.string().optional(),
-  schoolPhone: z.string().optional(),
-  schoolEmail: z.string().email('Please enter a valid school email').optional(),
-  schoolWebsite: z.string().url('Please enter a valid website URL').optional(),
-  schoolType: z.enum(['public', 'private', 'international']).optional(),
-  schoolBoard: z.enum(['CBSE', 'ICSE', 'IGCSE', 'IB', 'STATE']).optional(),
-  position: z.string().optional(),
-  employeeId: z.string().optional(),
-})
-
-const psychologistSchema = baseSchema.extend({
-  specialization: z.string().min(2, 'Specialization is required'),
-  licenseNumber: z.string().min(2, 'License number is required'),
-  experience: z.string().optional(),
-  qualifications: z.string().optional(),
-  certifications: z.string().optional(),
-})
-
-const peExpertSchema = baseSchema.extend({
-  qualifications: z.string().min(2, 'Qualifications are required'),
-  certifications: z.string().optional(),
-  experience: z.string().optional(),
-  sportsSpecialty: z.string().optional(),
-})
-
-type UserType = 'PARENT' | 'ADMIN' | 'COUNSELOR' | 'TEACHER'
-
-interface UserTypeConfig {
-  id: UserType
-  title: string
-  description: string
-  icon: React.ComponentType<any>
-  color: string
-  schema: any
-}
-
-const userTypes: UserTypeConfig[] = [
-  {
-    id: 'PARENT',
-    title: 'Parent/Guardian',
-    description: 'Monitor your child\'s educational progress and assessments',
-    icon: UserGroupIcon,
-    color: 'purple',
-    schema: parentSchema
-  },
-  {
-    id: 'ADMIN',
-    title: 'School Administrator',
-    description: 'Manage school operations and student assessments',
-    icon: BuildingOfficeIcon,
-    color: 'blue',
-    schema: schoolAdminSchema
-  },
-  {
-    id: 'COUNSELOR',
-    title: 'Psychologist',
-    description: 'Provide psychological assessments and mental health support',
-    icon: HeartIcon,
-    color: 'green',
-    schema: psychologistSchema
-  },
-  {
-    id: 'TEACHER',
-    title: 'Physical Education Expert',
-    description: 'Conduct physical assessments and fitness evaluations',
-    icon: AcademicCapIcon,
-    color: 'orange',
-    schema: peExpertSchema
-  }
-]
-
-export default function SignUpPage() {
-  const [selectedUserType, setSelectedUserType] = useState<UserType | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const router = useRouter()
-
-  const selectedConfig = userTypes.find(type => type.id === selectedUserType)
+export default function SignupPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
-    resolver: selectedConfig ? zodResolver(selectedConfig.schema) : zodResolver(baseSchema)
-  })
+  const guestSession = searchParams.get('guestSession');
+  const studentName = searchParams.get('studentName');
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    acceptTerms: false
+  });
+  
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [guestSessionData, setGuestSessionData] = useState<any>(null);
 
-  const onSubmit = async (data: any) => {
-    if (!selectedUserType) {
-      toast.error('Please select a user type')
-      return
+  useEffect(() => {
+    // If coming from guest assessment, fetch session data
+    if (guestSession) {
+      fetchGuestSessionData();
     }
+  }, [guestSession]);
 
-    setIsLoading(true)
-
+  const fetchGuestSessionData = async () => {
     try {
-      const payload = {
-        ...data,
-        role: selectedUserType,
-        ...(selectedUserType === 'TEACHER' && { specialization: 'PHYSICAL_EDUCATION' })
-      }
-
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        toast.success('Registration successful! Please sign in.')
-        router.push('/auth/signin?message=registration-success')
-      } else {
-        toast.error(result.error || 'Registration failed')
-        console.error('Registration error:', result.details)
+      const response = await fetch(`/api/guest/upload?sessionId=${guestSession}`);
+      if (response.ok) {
+        const data = await response.json();
+        setGuestSessionData(data.session);
       }
     } catch (error) {
-      console.error('Registration error:', error)
-      toast.error('An error occurred during registration')
+      console.error('Error fetching guest session:', error);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.name.trim()) newErrors.name = 'Name is required';
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email';
+    
+    if (!formData.password) newErrors.password = 'Password is required';
+    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    if (!formData.acceptTerms) {
+      newErrors.acceptTerms = 'Please accept the terms and conditions';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error('Please fix the form errors');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Create account
+      const signupResponse = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          role: 'PARENT',
+          accountType: 'B2C',
+          guestSessionId: guestSession, // Link guest session to new account
+          studentName: studentName
+        })
+      });
+
+      const signupData = await signupResponse.json();
+
+      if (signupData.success) {
+        // Sign in the user
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false
+        });
+
+        if (result?.ok) {
+          toast.success('Account created successfully!');
+          
+          // Redirect to report or dashboard
+          if (guestSession) {
+            router.push(`/guest-report?session=${guestSession}&welcome=true`);
+          } else {
+            router.push('/dashboard');
+          }
+        } else {
+          toast.error('Account created but sign in failed. Please try signing in manually.');
+          router.push('/auth/signin');
+        }
+      } else {
+        toast.error(signupData.error || 'Failed to create account');
+      }
+    } catch (error) {
+      toast.error('Error creating account');
+      console.error('Signup error:', error);
     } finally {
-      setIsLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const getColorClasses = (color: string) => {
-    const colors = {
-      purple: 'border-purple-200 hover:border-purple-300 bg-purple-50 hover:bg-purple-100',
-      blue: 'border-blue-200 hover:border-blue-300 bg-blue-50 hover:bg-blue-100',
-      green: 'border-green-200 hover:border-green-300 bg-green-50 hover:bg-green-100',
-      orange: 'border-orange-200 hover:border-orange-300 bg-orange-50 hover:bg-orange-100',
-    }
-    return colors[color as keyof typeof colors] || colors.blue
-  }
-
-  const getIconColorClasses = (color: string) => {
-    const colors = {
-      purple: 'text-purple-600',
-      blue: 'text-blue-600',
-      green: 'text-green-600',
-      orange: 'text-orange-600',
-    }
-    return colors[color as keyof typeof colors] || colors.blue
-  }
-
-  const handleUserTypeSelect = (userType: UserType) => {
-    setSelectedUserType(userType)
-    reset() // Reset form when user type changes
-  }
-
-  const handleBack = () => {
-    setSelectedUserType(null)
-    reset()
-  }
-
-  if (!selectedUserType) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl w-full space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
           <div className="text-center">
-            <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100">
-              <UserIcon className="h-8 w-8 text-primary-600" />
+          <div className="flex justify-center mb-4">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-full">
+              <SparklesIcon className="w-8 h-8 text-white" />
             </div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Join EduSight
+            </div>
+          <h2 className="text-3xl font-bold text-gray-900">
+            {guestSession ? 'Claim Your Report!' : 'Create Your Account'}
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Choose your role to get started with our educational platform
+          <p className="mt-2 text-gray-600">
+            {guestSession 
+              ? `Access ${studentName || 'your'}'s comprehensive assessment report`
+              : 'Join thousands of parents using EduSight'
+            }
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            {userTypes.map((userType) => {
-              const IconComponent = userType.icon
-              return (
-                <button
-                  key={userType.id}
-                  onClick={() => handleUserTypeSelect(userType.id)}
-                  className={`p-6 border-2 rounded-lg transition-all duration-200 text-left hover:shadow-md ${getColorClasses(userType.color)}`}
-                >
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <IconComponent className={`h-8 w-8 ${getIconColorClasses(userType.color)}`} />
+        {/* Guest Session Benefits */}
+        {guestSession && guestSessionData && (
+          <div className="bg-gradient-to-r from-green-500 to-blue-600 text-white p-6 rounded-xl">
+            <div className="flex items-center space-x-2 mb-3">
+              <GiftIcon className="w-5 h-5" />
+              <span className="font-semibold">Your Report is Ready!</span>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {userType.title}
-                      </h3>
-                      <p className="mt-2 text-sm text-gray-600">
-                        {userType.description}
-                      </p>
+            <div className="text-sm space-y-2">
+              <div className="flex items-center space-x-2">
+                <CheckCircleIcon className="w-4 h-4" />
+                <span>Complete academic analysis for {guestSessionData.studentName}</span>
                     </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircleIcon className="w-4 h-4" />
+                <span>Personalized career recommendations</span>
                   </div>
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link
-                href="/auth/signin"
-                className="font-medium text-primary-600 hover:text-primary-500"
-              >
-                Sign in here
-              </Link>
-            </p>
+              <div className="flex items-center space-x-2">
+                <CheckCircleIcon className="w-4 h-4" />
+                <span>Detailed performance insights & charts</span>
           </div>
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <button
-            onClick={handleBack}
-            className="mb-4 text-sm text-primary-600 hover:text-primary-500 flex items-center"
-          >
-            ← Back to user type selection
-          </button>
-          
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100">
-            {selectedConfig && <selectedConfig.icon className="h-8 w-8 text-primary-600" />}
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Register as {selectedConfig?.title}
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {selectedConfig?.description}
+            <p className="text-xs mt-3 opacity-90">
+              Sign up below to download your complete assessment report
           </p>
         </div>
+        )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4">
-            {/* Basic Information */}
-            <div className="grid grid-cols-1 gap-4">
+        {/* Signup Form */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name Field */}
               <div>
-                <label htmlFor="name" className="form-label">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                   Full Name *
                 </label>
+              <div className="relative">
+                <UserIcon className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
                 <input
-                  {...register('name')}
+                  id="name"
+                  name="name"
                   type="text"
-                  className="form-input"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.name ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="Enter your full name"
                 />
-                {errors.name && (
-                  <p className="form-error">{errors.name.message as string}</p>
-                )}
+              </div>
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
 
+            {/* Email Field */}
               <div>
-                <label htmlFor="email" className="form-label">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                   Email Address *
                 </label>
+              <div className="relative">
+                <EnvelopeIcon className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
                 <input
-                  {...register('email')}
+                  id="email"
+                  name="email"
                   type="email"
-                  className="form-input"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="Enter your email"
                 />
-                {errors.email && (
-                  <p className="form-error">{errors.email.message as string}</p>
-                )}
+              </div>
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
 
+            {/* Phone Field */}
               <div>
-                <label htmlFor="phone" className="form-label">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                   Phone Number
                 </label>
+              <div className="relative">
+                <PhoneIcon className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
                 <input
-                  {...register('phone')}
+                  id="phone"
+                  name="phone"
                   type="tel"
-                  className="form-input"
-                  placeholder="Enter your phone number"
-                />
-                {errors.phone && (
-                  <p className="form-error">{errors.phone.message as string}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="address" className="form-label">
-                  Address
-                </label>
-                <textarea
-                  {...register('address')}
-                  className="form-input"
-                  rows={2}
-                  placeholder="Enter your address"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="+91 1234567890"
                 />
               </div>
+              </div>
 
+            {/* Password Field */}
               <div>
-                <label htmlFor="password" className="form-label">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   Password *
                 </label>
                 <div className="relative">
+                <LockClosedIcon className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
                   <input
-                    {...register('password')}
+                  id="password"
+                  name="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="form-input pr-10"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.password ? 'border-red-500' : 'border-gray-300'
+                  }`}
                     placeholder="Create a password"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeSlashIcon className="h-5 w-5 text-gray-400" />
-                    ) : (
-                      <EyeIcon className="h-5 w-5 text-gray-400" />
-                    )}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                >
+                  <EyeIcon className="w-5 h-5" />
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="form-error">{errors.password.message as string}</p>
-                )}
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
               </div>
 
+            {/* Confirm Password Field */}
               <div>
-                <label htmlFor="confirmPassword" className="form-label">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                   Confirm Password *
                 </label>
                 <div className="relative">
+                <LockClosedIcon className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
                   <input
-                    {...register('confirmPassword')}
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    className="form-input pr-10"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                  }`}
                     placeholder="Confirm your password"
                   />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeSlashIcon className="h-5 w-5 text-gray-400" />
-                    ) : (
-                      <EyeIcon className="h-5 w-5 text-gray-400" />
-                    )}
-                  </button>
                 </div>
-                {errors.confirmPassword && (
-                  <p className="form-error">{errors.confirmPassword.message as string}</p>
-                )}
-              </div>
+              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
 
-            {/* Role-specific fields */}
-            {selectedUserType === 'PARENT' && (
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="text-lg font-medium text-gray-900">Parent Information</h3>
-                
-                <div>
-                  <label htmlFor="occupation" className="form-label">
-                    Occupation
-                  </label>
+            {/* Terms and Conditions */}
+            <div className="flex items-start">
                   <input
-                    {...register('occupation')}
-                    type="text"
-                    className="form-input"
-                    placeholder="Your occupation"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="education" className="form-label">
-                    Education Level
+                id="acceptTerms"
+                name="acceptTerms"
+                type="checkbox"
+                checked={formData.acceptTerms}
+                onChange={handleChange}
+                className={`w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mt-1 ${
+                  errors.acceptTerms ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              <label htmlFor="acceptTerms" className="ml-3 text-sm text-gray-600">
+                I agree to the{' '}
+                <Link href="/terms" className="text-blue-600 hover:text-blue-500">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy" className="text-blue-600 hover:text-blue-500">
+                  Privacy Policy
+                </Link>
                   </label>
-                  <select {...register('education')} className="form-input">
-                    <option value="">Select education level</option>
-                    <option value="High School">High School</option>
-                    <option value="Bachelor's Degree">Bachelor's Degree</option>
-                    <option value="Master's Degree">Master's Degree</option>
-                    <option value="Doctorate">Doctorate</option>
-                    <option value="Other">Other</option>
-                  </select>
                 </div>
+            {errors.acceptTerms && <p className="text-red-500 text-sm">{errors.acceptTerms}</p>}
 
-                <div>
-                  <label htmlFor="income" className="form-label">
-                    Annual Income Range
-                  </label>
-                  <select {...register('income')} className="form-input">
-                    <option value="">Select income range</option>
-                    <option value="Below 3 LPA">Below ₹3 LPA</option>
-                    <option value="3-6 LPA">₹3-6 LPA</option>
-                    <option value="6-12 LPA">₹6-12 LPA</option>
-                    <option value="12-25 LPA">₹12-25 LPA</option>
-                    <option value="Above 25 LPA">Above ₹25 LPA</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="emergencyContact" className="form-label">
-                    Emergency Contact
-                  </label>
-                  <input
-                    {...register('emergencyContact')}
-                    type="tel"
-                    className="form-input"
-                    placeholder="Emergency contact number"
-                  />
-                </div>
-              </div>
-            )}
-
-            {selectedUserType === 'ADMIN' && (
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="text-lg font-medium text-gray-900">School Information</h3>
-                
-                <div>
-                  <label htmlFor="schoolName" className="form-label">
-                    School Name *
-                  </label>
-                  <input
-                    {...register('schoolName')}
-                    type="text"
-                    className="form-input"
-                    placeholder="Enter school name"
-                  />
-                  {errors.schoolName && (
-                    <p className="form-error">{errors.schoolName.message as string}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="position" className="form-label">
-                    Your Position
-                  </label>
-                  <input
-                    {...register('position')}
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g., Principal, Vice Principal, Admin"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="employeeId" className="form-label">
-                    Employee ID
-                  </label>
-                  <input
-                    {...register('employeeId')}
-                    type="text"
-                    className="form-input"
-                    placeholder="Your employee ID"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="schoolType" className="form-label">
-                    School Type
-                  </label>
-                  <select {...register('schoolType')} className="form-input">
-                    <option value="">Select school type</option>
-                    <option value="public">Public School</option>
-                    <option value="private">Private School</option>
-                    <option value="international">International School</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="schoolBoard" className="form-label">
-                    School Board
-                  </label>
-                  <select {...register('schoolBoard')} className="form-input">
-                    <option value="">Select board</option>
-                    <option value="CBSE">CBSE</option>
-                    <option value="ICSE">ICSE</option>
-                    <option value="IGCSE">IGCSE</option>
-                    <option value="IB">IB</option>
-                    <option value="STATE">State Board</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="schoolAddress" className="form-label">
-                    School Address
-                  </label>
-                  <textarea
-                    {...register('schoolAddress')}
-                    className="form-input"
-                    rows={2}
-                    placeholder="School address"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="schoolPhone" className="form-label">
-                    School Phone
-                  </label>
-                  <input
-                    {...register('schoolPhone')}
-                    type="tel"
-                    className="form-input"
-                    placeholder="School contact number"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="schoolEmail" className="form-label">
-                    School Email
-                  </label>
-                  <input
-                    {...register('schoolEmail')}
-                    type="email"
-                    className="form-input"
-                    placeholder="School email address"
-                  />
-                  {errors.schoolEmail && (
-                    <p className="form-error">{errors.schoolEmail.message as string}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="schoolWebsite" className="form-label">
-                    School Website
-                  </label>
-                  <input
-                    {...register('schoolWebsite')}
-                    type="url"
-                    className="form-input"
-                    placeholder="https://www.schoolname.com"
-                  />
-                  {errors.schoolWebsite && (
-                    <p className="form-error">{errors.schoolWebsite.message as string}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {selectedUserType === 'COUNSELOR' && (
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="text-lg font-medium text-gray-900">Professional Information</h3>
-                
-                <div>
-                  <label htmlFor="specialization" className="form-label">
-                    Specialization *
-                  </label>
-                  <input
-                    {...register('specialization')}
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g., Child Psychology, Educational Psychology"
-                  />
-                  {errors.specialization && (
-                    <p className="form-error">{errors.specialization.message as string}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="licenseNumber" className="form-label">
-                    License Number *
-                  </label>
-                  <input
-                    {...register('licenseNumber')}
-                    type="text"
-                    className="form-input"
-                    placeholder="Professional license number"
-                  />
-                  {errors.licenseNumber && (
-                    <p className="form-error">{errors.licenseNumber.message as string}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="qualifications" className="form-label">
-                    Qualifications
-                  </label>
-                  <textarea
-                    {...register('qualifications')}
-                    className="form-input"
-                    rows={3}
-                    placeholder="List your educational qualifications"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="experience" className="form-label">
-                    Years of Experience
-                  </label>
-                  <select {...register('experience')} className="form-input">
-                    <option value="">Select experience</option>
-                    <option value="0-2 years">0-2 years</option>
-                    <option value="3-5 years">3-5 years</option>
-                    <option value="6-10 years">6-10 years</option>
-                    <option value="11-15 years">11-15 years</option>
-                    <option value="15+ years">15+ years</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="certifications" className="form-label">
-                    Additional Certifications
-                  </label>
-                  <textarea
-                    {...register('certifications')}
-                    className="form-input"
-                    rows={2}
-                    placeholder="List any additional certifications"
-                  />
-                </div>
-              </div>
-            )}
-
-            {selectedUserType === 'TEACHER' && (
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="text-lg font-medium text-gray-900">Physical Education Expertise</h3>
-                
-                <div>
-                  <label htmlFor="qualifications" className="form-label">
-                    Qualifications *
-                  </label>
-                  <textarea
-                    {...register('qualifications')}
-                    className="form-input"
-                    rows={3}
-                    placeholder="List your educational qualifications in Physical Education"
-                  />
-                  {errors.qualifications && (
-                    <p className="form-error">{errors.qualifications.message as string}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="sportsSpecialty" className="form-label">
-                    Sports Specialty
-                  </label>
-                  <input
-                    {...register('sportsSpecialty')}
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g., Athletics, Swimming, Football, etc."
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="experience" className="form-label">
-                    Teaching Experience
-                  </label>
-                  <select {...register('experience')} className="form-input">
-                    <option value="">Select experience</option>
-                    <option value="0-2 years">0-2 years</option>
-                    <option value="3-5 years">3-5 years</option>
-                    <option value="6-10 years">6-10 years</option>
-                    <option value="11-15 years">11-15 years</option>
-                    <option value="15+ years">15+ years</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="certifications" className="form-label">
-                    Coaching Certifications
-                  </label>
-                  <textarea
-                    {...register('certifications')}
-                    className="form-input"
-                    rows={2}
-                    placeholder="List any coaching or fitness certifications"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div>
+            {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="btn-primary w-full"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2"
             >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Creating Account...
-                </div>
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Creating Account...</span>
+                </>
               ) : (
-                'Create Account'
+                <>
+                  <span>{guestSession ? 'Access My Report' : 'Create Account'}</span>
+                  <ArrowRightIcon className="w-5 h-5" />
+                </>
               )}
             </button>
-          </div>
+          </form>
 
-          <div className="text-center">
+          {/* Sign In Link */}
+          <div className="text-center mt-6">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
               <Link
-                href="/auth/signin"
-                className="font-medium text-primary-600 hover:text-primary-500"
+                href={`/auth/signin${guestSession ? `?guestSession=${guestSession}&studentName=${studentName}` : ''}`}
+                className="text-blue-600 hover:text-blue-500 font-medium"
               >
                 Sign in here
               </Link>
             </p>
           </div>
-        </form>
+        </div>
+
+        {/* Benefits for regular signup */}
+        {!guestSession && (
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h3 className="font-semibold text-gray-900 mb-3">Why join EduSight?</h3>
+            <div className="space-y-2 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                <span>AI-powered academic insights</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                <span>Personalized learning recommendations</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                <span>Progress tracking and analytics</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                <span>Career guidance and planning</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
-  )
+  );
 }

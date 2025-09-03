@@ -23,6 +23,7 @@ import {
   CurrencyDollarIcon,
   GlobeAltIcon,
   PresentationChartLineIcon,
+  DocumentTextIcon,
   EnvelopeIcon,
   PhoneIcon,
   CircleStackIcon,
@@ -64,6 +65,8 @@ import {
 import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout'
 import StatCard from '@/components/dashboard/StatCard'
 import DashboardCard from '@/components/dashboard/DashboardCard'
+import CompactMetricCard from '@/components/dashboard/CompactMetricCard'
+import MiniWidget from '@/components/dashboard/MiniWidget'
 import ModernChart from '@/components/dashboard/ModernChart'
 
 export default function AdminDashboard() {
@@ -126,6 +129,7 @@ export default function AdminDashboard() {
         { title: 'Curriculum Frameworks', href: '/dashboard/admin/assessments/frameworks', icon: BookOpenIcon },
         { title: 'Subject Management', href: '/dashboard/admin/subjects', icon: BeakerIcon },
         { title: 'Skills Management', href: '/dashboard/admin/skills', icon: BeakerIcon, badge: 'New' },
+        { title: 'Document Management', href: '/dashboard/admin/documents', icon: DocumentTextIcon, badge: 'New' },
         { title: 'Grade Books', href: '/dashboard/admin/gradebooks', icon: DocumentChartBarIcon },
         { title: 'Academic Calendar', href: '/dashboard/admin/calendar', icon: CalendarDaysIcon },
         { title: 'Examinations', href: '/dashboard/admin/exams', icon: PencilSquareIcon },
@@ -284,23 +288,88 @@ export default function AdminDashboard() {
         </div>
 
         {/* Key Performance Indicators */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {quickStats.map((stat, index) => (
-            <StatCard
+            <CompactMetricCard
               key={index}
               title={stat.title}
               value={stat.value}
-              change={stat.change}
-              changeType={stat.changeType}
               icon={stat.icon}
               color={stat.color}
-              description={stat.description}
+              trend={{
+                value: stat.change,
+                direction: stat.changeType === 'positive' ? 'up' : stat.changeType === 'negative' ? 'down' : 'neutral'
+              }}
             />
           ))}
         </div>
 
+        {/* Mini Widgets Section */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+          <MiniWidget
+            title="Assessments"
+            value="847"
+            icon={AcademicCapIcon}
+            color="blue"
+            subtitle="This month"
+            onClick={() => router.push('/dashboard/admin/assessments')}
+          />
+          <MiniWidget
+            title="Reports"
+            value="324"
+            icon={DocumentChartBarIcon}
+            color="green"
+            subtitle="Generated"
+            onClick={() => router.push('/dashboard/admin/reports')}
+          />
+          <MiniWidget
+            title="Support Tickets"
+            value="12"
+            icon={LifebuoyIcon}
+            color="orange"
+            subtitle="Open"
+            onClick={() => router.push('/dashboard/admin/support')}
+          />
+          <MiniWidget
+            title="Schools"
+            value="156"
+            icon={BuildingOfficeIcon}
+            color="purple"
+            subtitle="Active"
+            onClick={() => router.push('/dashboard/admin/schools')}
+          />
+          <MiniWidget
+            title="Storage"
+            value="67%"
+            icon={ArchiveBoxIcon}
+            color="cyan"
+            subtitle="Used"
+          />
+          <MiniWidget
+            title="API Calls"
+            value="2.4M"
+            icon={CloudIcon}
+            color="indigo"
+            subtitle="Today"
+          />
+          <MiniWidget
+            title="Security"
+            value="98%"
+            icon={ShieldCheckIcon}
+            color="green"
+            subtitle="Score"
+          />
+          <MiniWidget
+            title="Uptime"
+            value="99.9%"
+            icon={ServerIcon}
+            color="emerald"
+            subtitle="30 days"
+          />
+        </div>
+
         {/* Main Analytics Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* System Health */}
           <DashboardCard title="System Health Overview" value="" subtitle="">
             <ModernChart
@@ -312,7 +381,7 @@ export default function AdminDashboard() {
                 { label: 'Network', value: 78 }
               ]}
               type="bar"
-              height={250}
+              height={180}
             />
           </DashboardCard>
 
@@ -329,7 +398,7 @@ export default function AdminDashboard() {
                 { label: 'Jun', value: 2450 }
               ]}
               type="line"
-              height={250}
+              height={180}
             />
           </DashboardCard>
         </div>
@@ -348,7 +417,7 @@ export default function AdminDashboard() {
                   { label: 'Q4', value: 67000 }
                 ]}
                 type="bar"
-                height={300}
+                height={200}
               />
             </DashboardCard>
           </div>
@@ -363,7 +432,7 @@ export default function AdminDashboard() {
                 { label: 'Higher Secondary', value: 25 }
               ]}
               type="donut"
-              height={300}
+              height={200}
             />
           </DashboardCard>
         </div>

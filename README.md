@@ -5,15 +5,15 @@ A comprehensive student assessment platform built with modern open-source techno
 ## 🚀 Technology Stack
 
 ### Frontend & Framework
-- **Next.js 14** - React framework with App Router
-- **React 18** - UI library with hooks and modern patterns
+- **Next.js 15.5.2** - React framework with App Router (Recently Upgraded)
+- **React 18.3.1** - UI library with hooks and modern patterns (Stable Version)
 - **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
+- **Tailwind CSS 3.4.17** - Utility-first CSS framework (Stable Configuration)
 
 ### Authentication & Database
-- **Auth.js (NextAuth.js)** - Authentication with multiple providers
-- **Prisma** - Type-safe database ORM
-- **PostgreSQL** - Primary database
+- **Auth.js (NextAuth.js v5)** - Authentication with multiple providers (Latest Version)
+- **Prisma 6.15.0** - Type-safe database ORM
+- **SQLite** - Development database / **PostgreSQL** - Production database
 - **Stripe.js** - Payment processing and subscriptions
 
 ### Data Processing & ML
@@ -39,24 +39,54 @@ A comprehensive student assessment platform built with modern open-source techno
 
 ## 📋 Features
 
-### Core Assessment Areas
+### 🎯 Core Assessment Areas
 - **Academic Performance** - Grade tracking, subject analysis, study habits
 - **Psychological Wellbeing** - Mood, stress, confidence, social interaction
 - **Physical Health** - BMI, exercise, sleep quality, health conditions
 - **Career Guidance** - Interest mapping, skill development, recommendations
 
-### AI-Powered Insights
+### 🤖 AI-Powered Insights
 - **Academic Prediction** - Performance forecasting using neural networks
 - **Career Path Recommendation** - ML-based career suggestions
 - **Behavioral Risk Assessment** - Early intervention identification
 - **Personalized Recommendations** - Tailored improvement strategies
 
-### Advanced Features
+### 📚 Assessment Management System
+- **Multi-Framework Support** - IGCSE, IB, ICSE, CBSE, STREAM + Custom Frameworks
+- **Subject Management** - Create and manage subjects within each framework
+- **Assessment Types** - Marks, Rubrics, and Custom assessment methods
+- **Assessment Cycles** - Monthly, Quarterly, Six-monthly, Yearly cycles
+- **Template System** - Standard templates for schools and parents
+- **Skills Integration** - Comprehensive skills mapping and assessment
+
+### 🔧 Admin Dashboard Features
+- **User Management** - Complete CRUD operations for all user types
+- **Academic Management** - Framework, subject, and assessment administration
+- **Maintenance Module** - System backup and Google Drive integration
+- **Analytics & Reports** - Comprehensive data visualization and insights
+- **Financial Management** - Billing, subscriptions, and payment tracking
+
+### 👥 Role-Based Dashboards
+- **Admin Dashboard** - Complete system administration and oversight
+- **Teacher Dashboard** - Student management and assessment tools
+- **Parent Dashboard** - Child progress tracking and communication
+- **Student Dashboard** - Personal progress and goal management
+- **Counselor Dashboard** - Student guidance and intervention tools
+
+### 📁 Document Upload System (NEW)
+- **Parent Uploads** - Submit student documents for processing
+- **School Uploads** - Bulk document uploads and management
+- **Admin Viewing** - Document review and management interface
+- **File Processing** - Automated document analysis and categorization
+
+### 🛠️ Advanced Features
 - **Interactive Dashboards** - Real-time data visualization
 - **Multi-file Upload** - CSV, Excel, PDF, and image processing
-- **Role-based Access** - Student, Parent, Teacher, Admin, Counselor roles
-- **Subscription Management** - Flexible pricing tiers with Stripe
+- **Google Drive Integration** - Automated backup and storage
+- **Demo User System** - Quick development and testing access
+- **Workflow Engine** - Automated educational processes
 - **Mobile Responsive** - Optimized for all devices
+- **Subscription Management** - Flexible pricing tiers with Stripe
 
 ## 🛠️ Installation
 
@@ -88,16 +118,20 @@ A comprehensive student assessment platform built with modern open-source techno
    ```bash
    npx prisma generate
    npx prisma db push
-   npx prisma db seed
    ```
 
-5. **Run the development server**
+5. **Create demo users (for development)**
+   ```bash
+   npm run seed:demo
+   ```
+
+6. **Run the development server**
    ```bash
    npm run dev
    ```
 
-6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+7. **Open your browser**
+   Navigate to [http://localhost:3001](http://localhost:3001)
 
 ## 🔧 Configuration
 
@@ -106,11 +140,14 @@ A comprehensive student assessment platform built with modern open-source techno
 Create a `.env.local` file with the following variables:
 
 ```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/edusight"
+# Database (Development - SQLite)
+DATABASE_URL="file:./prisma/dev.db"
+
+# Database (Production - PostgreSQL)
+# DATABASE_URL="postgresql://username:password@localhost:5432/edusight"
 
 # NextAuth.js
-NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL="http://localhost:3001"
 NEXTAUTH_SECRET="your-secret-key"
 
 # Google OAuth
@@ -144,12 +181,45 @@ SUPERSET_URL="http://localhost:8088"
    - Create a new project or select existing
    - Enable Google+ API
    - Create OAuth 2.0 credentials
-   - Add authorized redirect URIs: `http://localhost:3000/api/auth/callback/google`
+   - Add authorized redirect URIs: `http://localhost:3001/api/auth/callback/google`
 
 2. **Stripe Setup**:
    - Create account at [Stripe](https://stripe.com)
    - Get API keys from dashboard
    - Set up webhook endpoints for subscription events
+
+## 👥 Demo Users for Development
+
+For easy development and testing, the application includes a comprehensive demo user system:
+
+### Quick Access
+Visit the sign-in page at `http://localhost:3001/auth/signin` and use the **Demo Users** panel for one-click login.
+
+### Available Demo Users
+
+| Role | Email | Password | Dashboard Access |
+|------|-------|----------|------------------|
+| 👑 **Admin** | `admin@edusight.com` | `admin123` | Complete system administration |
+| 👩‍🏫 **Teacher** | `teacher@edusight.com` | `teacher123` | Student assessment tools |
+| 👨‍👩‍👦 **Parent** | `parent@edusight.com` | `parent123` | Child progress tracking |
+| 🎓 **Student** | `student@edusight.com` | `student123` | Personal dashboard |
+
+### Features
+- **Auto-fill credentials** - Click any demo user to instantly fill login form
+- **Role-based redirects** - Automatic navigation to appropriate dashboard
+- **Development-ready** - Perfect for testing different user perspectives
+- **Secure** - Properly hashed passwords with bcrypt
+
+### Management Commands
+```bash
+# Create/reset demo users
+npm run seed:demo
+
+# The demo users are created automatically and safely
+# (Uses upsert - no duplicates will be created)
+```
+
+For complete demo user documentation, see [DEMO_USERS.md](DEMO_USERS.md).
 
 ## 📊 Data Processing
 
@@ -301,10 +371,72 @@ npm run test:coverage
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🔧 Troubleshooting
+
+### Common Issues & Solutions
+
+#### Database Issues
+```bash
+# Prisma client not initialized
+npx prisma generate
+
+# Database connection issues
+npx prisma db push
+
+# Reset database (development only)
+npx prisma db push --force-reset
+npm run seed:demo
+```
+
+#### Authentication Issues
+```bash
+# NextAuth session errors
+# Ensure NEXTAUTH_SECRET is set in .env.local
+NEXTAUTH_SECRET="your-secret-key"
+
+# Demo users not working
+npm run seed:demo
+```
+
+#### Build/Development Issues
+```bash
+# Clear Next.js cache
+rm -rf .next
+
+# Clear npm cache
+npm cache clean --force
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### Port Conflicts
+The application runs on port **3001** by default. If you need to change it:
+```bash
+# Update package.json
+"dev": "next dev -p YOUR_PORT"
+
+# Update NEXTAUTH_URL in .env.local
+NEXTAUTH_URL="http://localhost:YOUR_PORT"
+```
+
+### Known Issues
+- **Hydration Warnings**: Resolved in latest version
+- **Tailwind CSS v4 Compatibility**: Using stable v3.4.17 configuration
+- **React 19 Compatibility**: Reverted to stable React 18.3.1
+
+### Getting Help
+If you encounter issues:
+1. Check the troubleshooting section above
+2. Search existing [GitHub Issues](https://github.com/your-org/edusight/issues)
+3. Create a new issue with detailed reproduction steps
+
 ## 🆘 Support
 
 ### Documentation
 - [User Guide](docs/user-guide.md)
+- [Demo Users Guide](DEMO_USERS.md)
 - [API Reference](docs/api-reference.md)
 - [Deployment Guide](docs/deployment.md)
 
@@ -317,22 +449,44 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Email: support@edusight.com
 - Enterprise: enterprise@edusight.com
 
-## 🎯 Roadmap
+## 🎯 Current Status & Roadmap
 
-### Q1 2024
-- [ ] Mobile app development
-- [ ] Advanced ML models
-- [ ] Multi-language support
+### ✅ Recently Completed (Latest Release)
+- **Next.js 15 & React 18 Upgrade** - Latest stable versions with improved performance
+- **NextAuth v5 Migration** - Enhanced authentication system with better security
+- **Demo User System** - Complete development user management for easy testing
+- **Assessment Management System** - Full CRUD for frameworks, subjects, types, and cycles
+- **Academic Menu Integration** - Comprehensive admin dashboard with academic tools
+- **Skills Management System** - Advanced skills mapping and assessment capabilities
+- **Google Drive Integration** - Automated backup and maintenance tools
+- **React Hydration Fixes** - Resolved SSR/CSR mismatches for smooth user experience
+- **Prisma Schema Optimization** - Enhanced database models for assessment and user management
 
-### Q2 2024
-- [ ] Real-time collaboration
-- [ ] Advanced reporting
+### 🚧 Currently In Development
+- **Document Upload System** - File upload and processing for parents and schools
+- **Admin Document Viewer** - Comprehensive document management interface
+- **Enhanced Analytics** - Advanced reporting and data visualization
+- **Mobile Responsiveness** - Improved mobile experience across all dashboards
+
+### 📅 Upcoming Features (Q1 2024)
+- [ ] Real-time notifications system
+- [ ] Advanced file processing (OCR, automated categorization)
+- [ ] Enhanced parent-teacher communication tools
+- [ ] Student progress prediction algorithms
+
+### 📅 Future Roadmap (Q2-Q3 2024)
+- [ ] Mobile app development (React Native)
+- [ ] Advanced ML models for educational insights
+- [ ] Multi-language support (i18n)
+- [ ] Real-time collaboration features
 - [ ] Integration marketplace
+- [ ] AI-powered tutoring system
 
-### Q3 2024
-- [ ] AI-powered tutoring
-- [ ] Predictive analytics
-- [ ] Parent mobile app
+### 🔧 Technical Improvements
+- [ ] Performance optimization
+- [ ] Enhanced test coverage
+- [ ] CI/CD pipeline improvements
+- [ ] Advanced caching strategies
 
 ---
 

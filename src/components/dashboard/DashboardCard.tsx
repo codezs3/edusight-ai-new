@@ -54,18 +54,18 @@ export default function DashboardCard({
       <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50/30 rounded-2xl"></div>
       
       {/* Card Content */}
-      <div className="relative p-6">
+      <div className="relative p-4">
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
-            <h3 className="text-slate-600 font-medium text-sm uppercase tracking-wide mb-1">
+            <h3 className="text-slate-600 font-medium text-xs uppercase tracking-wide mb-1">
               {title}
             </h3>
-            <div className="text-3xl font-bold text-slate-900 mb-1">
+            <div className="text-2xl font-bold text-slate-900 mb-1">
               {value}
             </div>
             {subtitle && (
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-500 text-xs">
                 {subtitle}
               </p>
             )}
@@ -73,8 +73,8 @@ export default function DashboardCard({
           
           {/* Icon */}
           {Icon && (
-            <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-              <Icon className="w-6 h-6 text-white" />
+            <div className={`w-10 h-10 bg-gradient-to-br ${gradient} rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
+              <Icon className="w-5 h-5 text-white" />
             </div>
           )}
         </div>
@@ -82,7 +82,7 @@ export default function DashboardCard({
         {/* Trend Indicator */}
         {trend && (
           <div className="flex items-center justify-between">
-            <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getTrendColor(trend.direction)}`}>
+            <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTrendColor(trend.direction)}`}>
               <span className="mr-1">{getTrendIcon(trend.direction)}</span>
               {trend.value}
             </div>
@@ -92,7 +92,7 @@ export default function DashboardCard({
 
         {/* Custom Content */}
         {children && (
-          <div className="mt-4">
+          <div className="mt-3">
             {children}
           </div>
         )}

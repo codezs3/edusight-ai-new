@@ -18,6 +18,7 @@ import {
   CalendarIcon,
   UsersIcon,
   CheckCircleIcon,
+  CloudArrowUpIcon,
   ClockIcon,
   PresentationChartLineIcon,
   StarIcon,
@@ -75,6 +76,11 @@ export default function TeacherDashboard() {
         { title: 'Fitness Assessments', href: '/dashboard/teacher/assessments', icon: HeartIcon },
         { title: 'Performance Tracking', href: '/dashboard/teacher/performance', icon: ChartBarIcon }
       ]
+    },
+    {
+      title: 'Upload Documents',
+      href: '/dashboard/teacher/upload',
+      icon: CloudArrowUpIcon
     },
     {
       title: 'Physical Education',

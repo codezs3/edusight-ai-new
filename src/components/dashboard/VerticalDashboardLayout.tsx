@@ -11,7 +11,15 @@ import {
   UserCircleIcon,
   ArrowRightOnRectangleIcon,
   ChevronDownIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  BellIcon,
+  MagnifyingGlassIcon,
+  Cog6ToothIcon,
+  SunIcon,
+  MoonIcon,
+  SparklesIcon,
+  ChartBarIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline'
 
 interface MenuItem {
@@ -62,7 +70,63 @@ export default function VerticalDashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Top User Menu Bar */}
+      <div className="bg-white shadow-sm border-b border-gray-200 z-10">
+        <div className="flex justify-between items-center px-4 h-12">
+          {/* Left side - can be empty or show breadcrumbs */}
+          <div className="flex items-center">
+            <span className="text-sm text-gray-500">
+              {title && `${title}${subtitle ? ' • ' + subtitle : ''}`}
+            </span>
+          </div>
+
+          {/* Right side - User menu */}
+          <div className="flex items-center space-x-6">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            >
+              <HomeIcon className="w-4 h-4 mr-1.5" />
+              Dashboard
+            </button>
+            <button
+              onClick={() => router.push('/dashboard/profile')}
+              className="flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            >
+              <UserCircleIcon className="w-4 h-4 mr-1.5" />
+              Profile
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+            >
+              <ArrowRightOnRectangleIcon className="w-4 h-4 mr-1.5" />
+              Sign Out
+            </button>
+
+            {/* User Avatar */}
+            <div className="flex items-center space-x-2 pl-3 border-l border-gray-200">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-blue-600">
+                  {session?.user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div className="hidden sm:block">
+                <div className="text-sm font-medium text-gray-900">
+                  {session?.user?.name || 'User'}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {session?.user?.email}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Layout with Sidebar */}
+      <div className="flex flex-1 overflow-hidden">
       {/* Sidebar */}
       <div className={`${
         sidebarOpen ? 'w-64' : 'w-16'
@@ -94,8 +158,8 @@ export default function VerticalDashboardLayout({
         </div>
 
         {/* Navigation Menu */}
-        <nav className="flex-1 overflow-y-auto py-4">
-          <div className="px-2 space-y-1">
+        <nav className="flex-1 overflow-y-auto py-2">
+          <div className="px-1 space-y-0.5">
             {menuItems.map((item) => (
               <div key={item.title}>
                 <button
@@ -106,24 +170,24 @@ export default function VerticalDashboardLayout({
                       handleNavigation(item.href)
                     }
                   }}
-                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`w-full flex items-center px-2 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
                     activeItem === item.href
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700 shadow-sm'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm'
                   }`}
                 >
-                  <item.icon className={`${sidebarOpen ? 'mr-3' : 'mx-auto'} h-5 w-5 flex-shrink-0`} />
+                  <item.icon className={`${sidebarOpen ? 'mr-2' : 'mx-auto'} h-4 w-4 flex-shrink-0`} />
                   {sidebarOpen && (
                     <>
-                      <span className="flex-1 text-left">{item.title}</span>
+                      <span className="flex-1 text-left truncate">{item.title}</span>
                       {item.badge && (
-                        <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-600 rounded-full">
+                        <span className="ml-1 px-1.5 py-0.5 text-xs bg-red-100 text-red-600 rounded-full min-w-[20px] text-center">
                           {item.badge}
                         </span>
                       )}
                       {item.children && (
                         <ChevronDownIcon
-                          className={`ml-2 h-4 w-4 transition-transform ${
+                          className={`ml-1 h-3 w-3 transition-transform ${
                             expandedMenus.has(item.title) ? 'transform rotate-180' : ''
                           }`}
                         />
@@ -134,21 +198,21 @@ export default function VerticalDashboardLayout({
 
                 {/* Submenu */}
                 {item.children && sidebarOpen && expandedMenus.has(item.title) && (
-                  <div className="ml-6 mt-1 space-y-1">
+                  <div className="ml-4 mt-0.5 space-y-0.5">
                     {item.children.map((subItem) => (
                       <button
                         key={subItem.title}
                         onClick={() => handleNavigation(subItem.href)}
-                        className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
+                        className={`w-full flex items-center px-2 py-1 text-xs font-medium rounded transition-colors ${
                           activeItem === subItem.href
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                            ? 'bg-blue-50 text-blue-700 shadow-sm'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                         }`}
                       >
-                        <subItem.icon className="mr-3 h-4 w-4 flex-shrink-0" />
-                        <span>{subItem.title}</span>
+                        <subItem.icon className="mr-2 h-3 w-3 flex-shrink-0" />
+                        <span className="flex-1 text-left truncate">{subItem.title}</span>
                         {subItem.badge && (
-                          <span className="ml-auto px-2 py-0.5 text-xs bg-green-100 text-green-600 rounded-full">
+                          <span className="ml-1 px-1 py-0.5 text-xs bg-green-100 text-green-600 rounded-full min-w-[16px] text-center">
                             {subItem.badge}
                           </span>
                         )}
@@ -162,51 +226,7 @@ export default function VerticalDashboardLayout({
         </nav>
 
         {/* User Profile & Actions */}
-        <div className="border-t border-gray-200 p-4">
-          <div className={`flex items-center ${sidebarOpen ? '' : 'justify-center'}`}>
-            <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">
-                {session?.user?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </span>
-            </div>
-            {sidebarOpen && (
-              <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {session?.user?.name || 'User'}
-                </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {session?.user?.email || ''}
-                </p>
-              </div>
-            )}
-          </div>
-          
-          {sidebarOpen && (
-            <div className="mt-3 space-y-1">
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="w-full flex items-center px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <HomeIcon className="mr-3 h-4 w-4" />
-                Dashboard
-              </button>
-              <button
-                onClick={() => router.push('/profile')}
-                className="w-full flex items-center px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <UserCircleIcon className="mr-3 h-4 w-4" />
-                Profile
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="w-full flex items-center px-3 py-2 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-              >
-                <ArrowRightOnRectangleIcon className="mr-3 h-4 w-4" />
-                Sign Out
-              </button>
-            </div>
-          )}
-        </div>
+
       </div>
 
       {/* Main Content */}
@@ -233,6 +253,7 @@ export default function VerticalDashboardLayout({
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
           {children}
         </main>
+      </div>
       </div>
     </div>
   )
