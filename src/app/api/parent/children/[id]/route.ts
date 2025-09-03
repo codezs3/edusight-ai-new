@@ -7,34 +7,41 @@ import { GRADE_OPTIONS } from '@/constants/grades';
 // Validation schema for updating children
 const updateChildSchema = z.object({
   name: z.string().min(1, 'Name is required').optional(),
-  grade: z.enum(GRADE_OPTIONS.map(g => g.value) as [string, ...string[]], {
-    errorMap: () => ({ message: 'Please select a valid grade' })
-  }).optional(),
+  email: z.string().email().optional(),
+  grade: z.enum(GRADE_OPTIONS.map(g => g.value) as [string, ...string[]]).optional(),
   section: z.string().optional(),
-  rollNumber: z.string().optional(),
   dateOfBirth: z.string().optional().transform((val) => val ? new Date(val) : undefined),
   gender: z.enum(['Male', 'Female', 'Other']).optional(),
   bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
-  schoolId: z.string().optional(),
+  emergencyContact: z.string().optional(),
+  medicalInfo: z.string().optional(),
+  specialNeeds: z.string().optional(),
+  learningStyle: z.string().optional(),
+  interests: z.string().optional(),
 });
 
 // GET /api/parent/children/[id] - Get specific child details
 async function getChild(request: NextRequest, { user, params }: { user: any; params: { id: string } }) {
   try {
-    // Get parent record
+    const childId = params.id;
+
+    // Get parent record to verify ownership
     const parent = await prisma.parent.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     if (!parent) {
-      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Parent profile not found' },
+        { status: 404 }
+      );
     }
 
-    // Get child details (ensure it belongs to this parent)
+    // Get the specific child
     const child = await prisma.student.findFirst({
       where: {
-        id: params.id,
-        parentId: parent.id
+        id: childId,
+        parentId: parent.id,
       },
       include: {
         user: {
@@ -44,7 +51,6 @@ async function getChild(request: NextRequest, { user, params }: { user: any; par
             email: true,
             image: true,
             createdAt: true,
-            updatedAt: true,
           }
         },
         school: {
@@ -52,37 +58,39 @@ async function getChild(request: NextRequest, { user, params }: { user: any; par
             id: true,
             name: true,
             board: true,
-            type: true,
           }
         },
-        uploads: {
+        assessments: {
           select: {
             id: true,
-            originalName: true,
-            uploadType: true,
             createdAt: true,
+            score: true,
+            subject: true,
           },
           orderBy: {
             createdAt: 'desc'
           },
-          take: 5
+          take: 10
         }
       }
     });
 
     if (!child) {
-      return NextResponse.json({ error: 'Child not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Child not found' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      child
+      child,
     });
 
   } catch (error) {
-    console.error('Error fetching child details:', error);
+    console.error('Error fetching child:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch child details' },
+      { success: false, error: 'Failed to fetch child details' },
       { status: 500 }
     );
   }
@@ -91,23 +99,29 @@ async function getChild(request: NextRequest, { user, params }: { user: any; par
 // PUT /api/parent/children/[id] - Update child information
 async function updateChild(request: NextRequest, { user, params }: { user: any; params: { id: string } }) {
   try {
+    const childId = params.id;
     const body = await request.json();
+
+    // Validate the request body
     const validatedData = updateChildSchema.parse(body);
 
-    // Get parent record
+    // Get parent record to verify ownership
     const parent = await prisma.parent.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     if (!parent) {
-      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Parent profile not found' },
+        { status: 404 }
+      );
     }
 
-    // Check if child belongs to this parent
+    // Verify child belongs to this parent
     const existingChild = await prisma.student.findFirst({
       where: {
-        id: params.id,
-        parentId: parent.id
+        id: childId,
+        parentId: parent.id,
       },
       include: {
         user: true
@@ -115,42 +129,36 @@ async function updateChild(request: NextRequest, { user, params }: { user: any; 
     });
 
     if (!existingChild) {
-      return NextResponse.json({ error: 'Child not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Child not found or access denied' },
+        { status: 404 }
+      );
     }
 
-    // Prepare update data for both User and Student models
-    const userUpdateData: any = {};
-    const studentUpdateData: any = {};
-
-    if (validatedData.name) {
-      userUpdateData.name = validatedData.name;
-    }
-
-    if (validatedData.schoolId) {
-      userUpdateData.schoolId = validatedData.schoolId;
-      studentUpdateData.schoolId = validatedData.schoolId;
-    }
-
-    if (validatedData.grade) studentUpdateData.grade = validatedData.grade;
-    if (validatedData.section) studentUpdateData.section = validatedData.section;
-    if (validatedData.rollNumber) studentUpdateData.rollNumber = validatedData.rollNumber;
-    if (validatedData.dateOfBirth) studentUpdateData.dateOfBirth = validatedData.dateOfBirth;
-    if (validatedData.gender) studentUpdateData.gender = validatedData.gender;
-    if (validatedData.bloodGroup) studentUpdateData.bloodGroup = validatedData.bloodGroup;
-
-    // Use transaction to update both User and Student
+    // Update child and user information in a transaction
     const updatedChild = await prisma.$transaction(async (tx) => {
-      // Update user record if needed
+      // Update user information if provided
+      const userUpdateData: any = {};
+      if (validatedData.name) userUpdateData.name = validatedData.name;
+      if (validatedData.email) userUpdateData.email = validatedData.email;
+
       if (Object.keys(userUpdateData).length > 0) {
         await tx.user.update({
           where: { id: existingChild.userId },
-          data: userUpdateData
+          data: userUpdateData,
         });
       }
 
-      // Update student record
-      const student = await tx.student.update({
-        where: { id: params.id },
+      // Update student information
+      const studentUpdateData: any = {};
+      if (validatedData.grade) studentUpdateData.grade = validatedData.grade;
+      if (validatedData.section !== undefined) studentUpdateData.section = validatedData.section;
+      if (validatedData.dateOfBirth !== undefined) studentUpdateData.dateOfBirth = validatedData.dateOfBirth;
+      if (validatedData.gender !== undefined) studentUpdateData.gender = validatedData.gender;
+      if (validatedData.bloodGroup !== undefined) studentUpdateData.bloodGroup = validatedData.bloodGroup;
+
+      const updatedStudent = await tx.student.update({
+        where: { id: childId },
         data: studentUpdateData,
         include: {
           user: {
@@ -159,7 +167,7 @@ async function updateChild(request: NextRequest, { user, params }: { user: any; 
               name: true,
               email: true,
               image: true,
-              updatedAt: true,
+              createdAt: true,
             }
           },
           school: {
@@ -172,13 +180,13 @@ async function updateChild(request: NextRequest, { user, params }: { user: any; 
         }
       });
 
-      return student;
+      return updatedStudent;
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Child updated successfully',
-      child: updatedChild
+      message: 'Child information updated successfully',
+      child: updatedChild,
     });
 
   } catch (error) {
@@ -186,13 +194,13 @@ async function updateChild(request: NextRequest, { user, params }: { user: any; 
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid data', details: error.errors },
+        { success: false, error: 'Invalid data provided', details: error.errors },
         { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to update child' },
+      { success: false, error: 'Failed to update child information' },
       { status: 500 }
     );
   }
@@ -201,20 +209,25 @@ async function updateChild(request: NextRequest, { user, params }: { user: any; 
 // DELETE /api/parent/children/[id] - Remove child (soft delete)
 async function deleteChild(request: NextRequest, { user, params }: { user: any; params: { id: string } }) {
   try {
-    // Get parent record
+    const childId = params.id;
+
+    // Get parent record to verify ownership
     const parent = await prisma.parent.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     if (!parent) {
-      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Parent profile not found' },
+        { status: 404 }
+      );
     }
 
-    // Check if child belongs to this parent
+    // Verify child belongs to this parent
     const existingChild = await prisma.student.findFirst({
       where: {
-        id: params.id,
-        parentId: parent.id
+        id: childId,
+        parentId: parent.id,
       },
       include: {
         user: true
@@ -222,48 +235,56 @@ async function deleteChild(request: NextRequest, { user, params }: { user: any; 
     });
 
     if (!existingChild) {
-      return NextResponse.json({ error: 'Child not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Child not found or access denied' },
+        { status: 404 }
+      );
     }
 
-    // Soft delete by setting isActive to false for both User and Student
+    // Soft delete (deactivate) the child and user in a transaction
     await prisma.$transaction(async (tx) => {
-      await tx.user.update({
-        where: { id: existingChild.userId },
-        data: { isActive: false }
+      // Deactivate the student record
+      await tx.student.update({
+        where: { id: childId },
+        data: { isActive: false },
       });
 
-      await tx.student.update({
-        where: { id: params.id },
-        data: { isActive: false }
+      // Deactivate the user record
+      await tx.user.update({
+        where: { id: existingChild.userId },
+        data: { isActive: false },
       });
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Child removed successfully'
+      message: 'Child removed successfully',
     });
 
   } catch (error) {
-    console.error('Error removing child:', error);
+    console.error('Error deleting child:', error);
     return NextResponse.json(
-      { error: 'Failed to remove child' },
+      { success: false, error: 'Failed to remove child' },
       { status: 500 }
     );
   }
 }
 
-// Export route handlers with middleware
+// Apply authentication middleware and export handlers
 export const GET = withAuth(getChild, {
-  permissions: ['MANAGE_OWN_CHILDREN'],
-  resourceType: 'student'
+  resource: 'STUDENT',
+  action: 'READ',
+  scope: 'OWN'
 });
 
 export const PUT = withAuth(updateChild, {
-  permissions: ['MANAGE_OWN_CHILDREN'],
-  resourceType: 'student'
+  resource: 'STUDENT',
+  action: 'UPDATE',
+  scope: 'OWN'
 });
 
 export const DELETE = withAuth(deleteChild, {
-  permissions: ['MANAGE_OWN_CHILDREN'],
-  resourceType: 'student'
+  resource: 'STUDENT',
+  action: 'DELETE',
+  scope: 'OWN'
 });
