@@ -154,6 +154,8 @@ export default function AdminDashboard() {
       href: '/dashboard/admin/analytics',
       icon: ChartBarIcon,
       children: [
+        { title: 'Admin Analysis', href: '/dashboard/admin/analysis', icon: ChartBarIcon, badge: 'No Payment' },
+        { title: 'Tasks Completed', href: '/dashboard/admin/tasks-completed', icon: ClockIcon, badge: 'Internal' },
         { title: 'Performance', href: '/dashboard/admin/performance', icon: ChartPieIcon },
         { title: 'User Analytics', href: '/dashboard/admin/user-analytics', icon: UsersIcon },
         { title: 'Revenue Reports', href: '/dashboard/admin/revenue', icon: BanknotesIcon },

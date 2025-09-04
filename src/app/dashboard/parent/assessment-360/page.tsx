@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast';
 import {
   AcademicCapIcon,
   HeartIcon,
-  BrainIcon,
+  LightBulbIcon,
   ChartBarIcon,
   TrophyIcon,
   ExclamationTriangleIcon,
@@ -345,7 +345,7 @@ export default function Assessment360Page() {
               </div>
               {category.name === 'Academic' && <AcademicCapIcon className="h-10 w-10" style={{ color: category.color }} />}
               {category.name === 'Physical' && <HeartIcon className="h-10 w-10" style={{ color: category.color }} />}
-              {category.name === 'Psychological' && <BrainIcon className="h-10 w-10" style={{ color: category.color }} />}
+              {category.name === 'Psychological' && <LightBulbIcon className="h-10 w-10" style={{ color: category.color }} />}
             </div>
           </div>
         ))}
@@ -464,7 +464,7 @@ export default function Assessment360Page() {
         {/* Psychological Profile */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <BrainIcon className="h-5 w-5 mr-2 text-purple-600" />
+            <LightBulbIcon className="h-5 w-5 mr-2 text-purple-600" />
             Psychological Profile
           </h3>
           <div className="space-y-3">
