@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { useClientOnly } from '@/hooks/useClientOnly';
 import { 
   StarIcon,
   SparklesIcon,
@@ -26,6 +27,7 @@ interface FloatingElement {
 
 export function FloatingElements() {
   const [elements, setElements] = useState<FloatingElement[]>([]);
+  const mounted = useClientOnly();
   const [parent] = useAutoAnimate();
 
   const icons = [
@@ -51,6 +53,8 @@ export function FloatingElements() {
   ];
 
   useEffect(() => {
+    if (!mounted) return;
+    
     const generateElements = () => {
       const newElements: FloatingElement[] = [];
       
@@ -74,7 +78,12 @@ export function FloatingElements() {
     };
 
     generateElements();
-  }, []);
+  }, [mounted]);
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div ref={parent} className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -108,9 +117,12 @@ export function ParticleSystem() {
     delay: number;
     duration: number;
   }>>([]);
+  const mounted = useClientOnly();
   const [parent] = useAutoAnimate();
 
   useEffect(() => {
+    if (!mounted) return;
+    
     const generateParticles = () => {
       const newParticles = [];
       
@@ -129,7 +141,12 @@ export function ParticleSystem() {
     };
 
     generateParticles();
-  }, []);
+  }, [mounted]);
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div ref={parent} className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -188,8 +205,11 @@ export function GradientOrbs() {
 export function InteractiveCursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const mounted = useClientOnly();
 
   useEffect(() => {
+    if (!mounted) return;
+    
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
         x: e.clientX,
@@ -209,7 +229,12 @@ export function InteractiveCursor() {
       document.removeEventListener('mouseenter', handleMouseEnter);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, []);
+  }, [mounted]);
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div

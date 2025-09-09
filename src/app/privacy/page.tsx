@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
             <header className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
               <p className="text-lg text-gray-600">
-                Last updated: {new Date().toLocaleDateString()}
+                Last updated: January 1, 2025
               </p>
               <p className="text-gray-600 mt-2">
                 This Privacy Policy describes how EduSight AI Technologies Pvt. Ltd. ("we," "our," or "us") collects, uses, and protects your information when you use our educational analytics platform.

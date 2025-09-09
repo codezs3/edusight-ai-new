@@ -251,7 +251,7 @@ export default function UnifiedAssessmentWorkflow({
         grade: 'Grade 10',
         school: userRole === 'SCHOOL_ADMIN' ? 'Your School' : 'Sample School',
         dateOfBirth: '2008-05-15',
-        assessmentId: `ES-${Date.now().toString().slice(-8)}`
+        assessmentId: `ES-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`
       },
       scores: {
         academic: 82,

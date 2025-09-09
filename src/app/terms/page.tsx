@@ -20,7 +20,7 @@ export default function TermsOfServicePage() {
             <header className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">Terms of Service</h1>
               <p className="text-lg text-gray-600">
-                Last updated: {new Date().toLocaleDateString()}
+                Last updated: January 1, 2025
               </p>
               <p className="text-gray-600 mt-2">
                 These Terms of Service ("Terms") govern your use of the EduSight AI educational analytics platform operated by EduSight AI Technologies Pvt. Ltd.

@@ -1,46 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
- * Custom hook to ensure a component only renders content on the client side
- * This prevents hydration mismatches for time-sensitive or client-only content
+ * Hook to ensure a component only renders on the client side
+ * This prevents hydration mismatches for components that use browser-only APIs
  */
 export function useClientOnly() {
-  const [hasMounted, setHasMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setHasMounted(true);
+    setMounted(true);
   }, []);
 
-  return hasMounted;
+  return mounted;
 }
 
 /**
- * Custom hook for safely displaying current time without hydration issues
- */
-export function useCurrentTime(updateInterval: number = 60000) {
-  const [currentTime, setCurrentTime] = useState('');
-  const hasMounted = useClientOnly();
-
-  useEffect(() => {
-    if (!hasMounted) return;
-
-    const updateTime = () => {
-      setCurrentTime(new Date().toLocaleTimeString());
-    };
-
-    updateTime(); // Set immediately
-    const interval = setInterval(updateTime, updateInterval);
-
-    return () => clearInterval(interval);
-  }, [hasMounted, updateInterval]);
-
-  return hasMounted ? currentTime : '--:--:--';
-}
-
-/**
- * Custom hook for safely getting current year without hydration issues
+ * Hook to get the current year, only on client side
+ * This prevents hydration mismatches when displaying dynamic dates
  */
 export function useCurrentYear() {
-  const hasMounted = useClientOnly();
-  return hasMounted ? new Date().getFullYear() : 2024;
+  const [year, setYear] = useState<number | null>(null);
+  const mounted = useClientOnly();
+
+  useEffect(() => {
+    if (mounted) {
+      setYear(new Date().getFullYear());
+    }
+  }, [mounted]);
+
+  return year;
 }

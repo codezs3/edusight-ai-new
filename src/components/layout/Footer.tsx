@@ -171,7 +171,7 @@ export function Footer() {
               </p>
             </div>
             <p className="mt-8 text-xs leading-5 text-gray-400 md:order-1 md:mt-0">
-              &copy; 2024 EduSight. All rights reserved.
+              &copy; {currentYear || '2024'} EduSight. All rights reserved.
             </p>
           </div>
         </div>

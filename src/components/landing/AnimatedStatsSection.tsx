@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useClientOnly } from '@/hooks/useClientOnly';
 import { 
   UserGroupIcon,
   GlobeAltIcon,
@@ -52,18 +53,33 @@ const stats: Stat[] = [
 ];
 
 export function AnimatedStatsSection() {
+  const [particles, setParticles] = useState<Array<{ id: number; left: number; top: number }>>([]);
+  const mounted = useClientOnly();
+
+  useEffect(() => {
+    if (!mounted) return;
+    
+    // Generate particles only on client side
+    const newParticles = Array.from({ length: 30 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100
+    }));
+    setParticles(newParticles);
+  }, [mounted]);
+
   return (
     <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0">
         {/* Floating Particles */}
-        {Array.from({ length: 30 }).map((_, i) => (
+        {mounted && particles.map((particle) => (
           <div
-            key={i}
+            key={particle.id}
             className="absolute w-1 h-1 bg-white/20 rounded-full animate-pulse"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`
+              left: `${particle.left}%`,
+              top: `${particle.top}%`
             }}
           />
         ))}

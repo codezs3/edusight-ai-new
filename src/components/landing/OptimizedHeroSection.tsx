@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useClientOnly } from '@/hooks/useClientOnly';
 import Link from 'next/link';
 import { 
   PlayIcon,
@@ -19,6 +20,8 @@ import {
 export function OptimizedHeroSection() {
   const [currentFeature, setCurrentFeature] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [particles, setParticles] = useState<Array<{ id: number; left: number; top: number; delay: number; duration: number }>>([]);
+  const mounted = useClientOnly();
 
   const dynamicFeatures = [
     {
@@ -52,6 +55,20 @@ export function OptimizedHeroSection() {
     return () => clearInterval(timer);
   }, [dynamicFeatures.length]);
 
+  useEffect(() => {
+    if (!mounted) return;
+    
+    // Generate particles only on client side
+    const newParticles = Array.from({ length: 20 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      delay: Math.random() * 3,
+      duration: 2 + Math.random() * 3
+    }));
+    setParticles(newParticles);
+  }, [mounted]);
+
   const currentFeatureData = dynamicFeatures[currentFeature];
 
   return (
@@ -83,15 +100,15 @@ export function OptimizedHeroSection() {
 
       {/* Floating Particles */}
       <div className="absolute inset-0">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {mounted && particles.map((particle) => (
           <div
-            key={i}
+            key={particle.id}
             className="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
+              animationDelay: `${particle.delay}s`,
+              animationDuration: `${particle.duration}s`
             }}
           />
         ))}
