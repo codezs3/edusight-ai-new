@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-_p51guq@s_m@g!qzbi1l56p^e6#upcs@gzx)_#y^!#3l#yx#q7')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-_p51guq@s_m@g!qzbi1l56p^e6#upcs@gzx)_#y^!#3l#yx#q7')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,*.vercel.app,*.now.sh', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,*.vercel.app,*.now.sh').split(',')
 
 
 # Application definition
@@ -214,7 +215,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Apache Airflow Configuration
 AIRFLOW_HOME = os.path.join(BASE_DIR, 'airflow_home')
-AIRFLOW_BASE_URL = config('AIRFLOW_BASE_URL', default='http://localhost:8080')
+AIRFLOW_BASE_URL = os.environ.get('AIRFLOW_BASE_URL', 'http://localhost:8080')
 AIRFLOW_USERNAME = ''  # Set if authentication is enabled
 AIRFLOW_PASSWORD = ''  # Set if authentication is enabled
 
@@ -304,18 +305,18 @@ LOGGING = {
 }
 
 # ML Engine settings
-ML_ENGINE_URL = config('ML_ENGINE_URL', default='http://localhost:5000')
-ML_CACHE_TIMEOUT = config('ML_CACHE_TIMEOUT', default=3600, cast=int)
+ML_ENGINE_URL = os.environ.get('ML_ENGINE_URL', 'http://localhost:5000')
+ML_CACHE_TIMEOUT = int(os.environ.get('ML_CACHE_TIMEOUT', '3600'))
 
 # Analytics settings
-ANALYTICS_CACHE_TIMEOUT = config('ANALYTICS_CACHE_TIMEOUT', default=1800, cast=int)
+ANALYTICS_CACHE_TIMEOUT = int(os.environ.get('ANALYTICS_CACHE_TIMEOUT', '1800'))
 
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
-SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False').lower() == 'true'
+SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
 
 # Create logs directory if it doesn't exist
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)

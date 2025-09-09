@@ -124,7 +124,11 @@ export default function AdminDashboard() {
       href: '/dashboard/admin/academic',
       icon: AcademicCapIcon,
       children: [
-        { title: 'Assessment Systems', href: '/dashboard/admin/assessments', icon: ClipboardDocumentListIcon, badge: 'Enhanced' },
+        { title: 'Start Assessment', href: '/assessments/', icon: ClipboardDocumentListIcon, badge: 'New' },
+        { title: 'Academic (IB/IGCSE/CBSE/ICSE)', href: '/assessments/academic/', icon: BookOpenIcon },
+        { title: 'Psychological & Mental Health', href: '/assessments/psychometric/', icon: AcademicCapIcon },
+        { title: 'Physical Education', href: '/assessments/physical/', icon: TrophyIcon },
+        { title: 'Reports', href: '/assessments/reports/', icon: DocumentChartBarIcon },
         { title: 'Curriculum Mapper', href: '/dashboard/admin/curriculum-mapper', icon: BookOpenIcon, badge: 'New' },
         { title: 'Curriculum Frameworks', href: '/dashboard/admin/assessments/frameworks', icon: BookOpenIcon },
         { title: 'Subject Management', href: '/dashboard/admin/subjects', icon: BeakerIcon },

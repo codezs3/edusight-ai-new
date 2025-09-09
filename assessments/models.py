@@ -97,3 +97,15 @@ class AssessmentResult(models.Model):
             return 'Below Average'
         else:
             return 'Needs Improvement'
+
+
+# Import CRUD models
+from .crud_models import (
+    Subject, Calendar, Exam, Progress, Curriculum, 
+    Skill, Template, Maintenance
+)
+
+# Import Test Catalog models
+from .test_catalog_models import (
+    TestCategory, TestCatalog, TestReview, TestAttempt
+)

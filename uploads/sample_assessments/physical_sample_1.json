@@ -1,0 +1,77 @@
+{
+  "assessment_id": "PHYS_001_2024",
+  "student_id": "STU_001",
+  "student_name": "Arjun Sharma",
+  "school": "Greenwood International School",
+  "grade": "10",
+  "assessment_type": "Physical Education",
+  "date_completed": "2024-01-17",
+  "physical_measurements": {
+    "height": "170 cm",
+    "weight": "65 kg",
+    "bmi": 22.5,
+    "bmi_category": "Normal"
+  },
+  "fitness_tests": {
+    "cardiovascular_endurance": {
+      "test": "12-minute run",
+      "distance": "2.1 km",
+      "score": 85,
+      "rating": "Good"
+    },
+    "muscular_strength": {
+      "test": "Push-ups",
+      "count": 25,
+      "score": 80,
+      "rating": "Good"
+    },
+    "muscular_endurance": {
+      "test": "Plank hold",
+      "duration": "90 seconds",
+      "score": 88,
+      "rating": "Excellent"
+    },
+    "flexibility": {
+      "test": "Sit and reach",
+      "distance": "15 cm",
+      "score": 75,
+      "rating": "Average"
+    },
+    "agility": {
+      "test": "Shuttle run",
+      "time": "9.2 seconds",
+      "score": 82,
+      "rating": "Good"
+    }
+  },
+  "sports_participation": {
+    "primary_sport": "Basketball",
+    "secondary_sports": ["Swimming", "Badminton"],
+    "participation_level": "Competitive",
+    "hours_per_week": 8
+  },
+  "health_indicators": {
+    "resting_heart_rate": 68,
+    "blood_pressure": "110/70",
+    "sleep_quality": 8,
+    "nutrition_score": 7,
+    "hydration_level": 8
+  },
+  "injury_history": {
+    "recent_injuries": [],
+    "chronic_conditions": [],
+    "rehabilitation_needed": false
+  },
+  "physical_goals": {
+    "strength_improvement": "Increase upper body strength",
+    "endurance_goal": "Complete 5K run",
+    "flexibility_goal": "Improve hamstring flexibility"
+  },
+  "recommendations": [
+    "Continue regular basketball practice",
+    "Add flexibility training to routine",
+    "Maintain current nutrition habits",
+    "Consider swimming for cross-training"
+  ],
+  "overall_physical_score": 82.4
+}

@@ -9,11 +9,12 @@ import {
   EyeIcon,
   PencilIcon,
   TrashIcon,
-  DownloadIcon,
+  ArrowDownTrayIcon,
   ShareIcon,
   TagIcon,
   AcademicCapIcon,
-  ClockIcon
+  ClockIcon,
+  HomeIcon
 } from '@heroicons/react/24/outline'
 import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout'
 
@@ -159,8 +160,8 @@ export default function TemplatesManagement() {
   })
 
   const menuItems = [
-    { title: 'Dashboard', href: '/dashboard/admin', icon: DocumentTextIcon },
-    { title: 'Back to Academic', href: '/dashboard/admin', icon: DocumentTextIcon }
+    { title: 'Dashboard', href: '/dashboard/admin', icon: HomeIcon },
+    { title: 'Templates', href: '/dashboard/admin/templates', icon: DocumentTextIcon }
   ]
 
   if (status === 'loading') {
@@ -356,7 +357,7 @@ export default function TemplatesManagement() {
                             <PencilIcon className="h-4 w-4" />
                           </button>
                           <button className="text-green-600 hover:text-green-900">
-                            <DownloadIcon className="h-4 w-4" />
+                            <ArrowDownTrayIcon className="h-4 w-4" />
                           </button>
                           <button className="text-purple-600 hover:text-purple-900">
                             <ShareIcon className="h-4 w-4" />

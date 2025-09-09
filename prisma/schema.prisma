@@ -74,6 +74,7 @@ model User {
   parent          Parent?
   uploads         DocumentUpload[]
   uploadSessions  UploadSession[]
+  assessmentSessions AssessmentSession[]
 
   @@map("users")
 }
@@ -84,6 +85,467 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Assessment and Questionnaire Models
+model AssessmentSession {
+  id                String   @id @default(cuid())
+  studentId         String?
+  parentId          String?
+  sessionType       String   // 'GUEST', 'REGISTERED', 'SCHOOL'
+  status            String   @default("IN_PROGRESS") // 'IN_PROGRESS', 'COMPLETED', 'ABANDONED'
+  currentStep       String   @default("DATA_COLLECTION")
+  progress          Float    @default(0.0) // 0.0 to 1.0
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  lastActivityAt    DateTime @default(now())
+  
+  // Student information
+  studentName       String?
+  studentAge        Int?
+  studentGrade      String?
+  ageGroup          String?
+  
+  // Data collection status
+  academicDataCollected     Boolean @default(false)
+  psychometricDataCollected Boolean @default(false)
+  physicalDataCollected     Boolean @default(false)
+  parentInsightsCollected   Boolean @default(false)
+  
+  // Relationships
+  student          Student? @relation(fields: [studentId], references: [id])
+  parent           User?    @relation(fields: [parentId], references: [id])
+  questionnaires   QuestionnaireResponse[]
+  assessments      Assessment[]
+  aiInsights       AIInsight[]
+  finalReport      AssessmentReport?
+  careerMappings   CareerMapping[]
+  skillAssessments SkillAssessment[]
+  stressAssessments StressAssessment[]
+  pressureAssessments PressureAssessment[]
+  stressManagementPlans StressManagementPlan[]
+  
+  @@index([studentId])
+  @@index([parentId])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model Questionnaire {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  category        String   // 'PSYCHOMETRIC', 'ACADEMIC', 'PHYSICAL', 'PARENT'
+  subcategory     String?  // 'BIG_FIVE', 'LEARNING_STYLE', 'ATTENTION', etc.
+  ageGroup        String   // 'EARLY_CHILDHOOD', 'PRIMARY', 'MIDDLE', 'SECONDARY', 'SENIOR_SECONDARY', 'ALL'
+  difficulty      String   // 'EASY', 'MEDIUM', 'HARD'
+  domain          String   // 'ACADEMIC', 'PSYCHOMETRIC', 'PHYSICAL'
+  reference       String   // Scientific reference
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  questions       Question[]
+  responses       QuestionnaireResponse[]
+  
+  @@index([category])
+  @@index([ageGroup])
+  @@index([domain])
+}
+
+model Question {
+  id              String   @id @default(cuid())
+  questionnaireId String
+  questionText    String
+  category        String
+  subcategory     String?
+  reference       String
+  order           Int
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  
+  // Relationships
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  options         QuestionOption[]
+  responses       QuestionResponse[]
+  
+  @@index([questionnaireId])
+  @@index([category])
+}
+
+model QuestionOption {
+  id          String   @id @default(cuid())
+  questionId  String
+  value       Int
+  label       String
+  description String?
+  order       Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  // Relationships
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  responses   QuestionResponse[]
+  
+  @@index([questionId])
+}
+
+model QuestionnaireResponse {
+  id                String   @id @default(cuid())
+  sessionId         String
+  questionnaireId   String
+  status            String   @default("IN_PROGRESS") // 'IN_PROGRESS', 'COMPLETED', 'ABANDONED'
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  timeSpent         Int?     // in seconds
+  totalQuestions    Int
+  answeredQuestions Int      @default(0)
+  score             Float?
+  interpretation    String?
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  questionnaire   Questionnaire     @relation(fields: [questionnaireId], references: [id])
+  responses       QuestionResponse[]
+  
+  @@index([sessionId])
+  @@index([questionnaireId])
+  @@index([status])
+}
+
+model QuestionResponse {
+  id                    String   @id @default(cuid())
+  questionnaireResponseId String
+  questionId            String
+  optionId              String?
+  value                 Int?
+  textResponse          String?
+  timeSpent             Int?     // in seconds
+  answeredAt            DateTime @default(now())
+  
+  // Relationships
+  questionnaireResponse QuestionnaireResponse @relation(fields: [questionnaireResponseId], references: [id], onDelete: Cascade)
+  question              Question             @relation(fields: [questionId], references: [id])
+  option                QuestionOption?      @relation(fields: [optionId], references: [id])
+  
+  @@index([questionnaireResponseId])
+  @@index([questionId])
+}
+
+model Assessment {
+  id              String   @id @default(cuid())
+  sessionId       String
+  studentId       String?
+  type            String   // 'ACADEMIC', 'PSYCHOMETRIC', 'PHYSICAL'
+  subtype         String?  // 'BIG_FIVE', 'LEARNING_STYLE', 'FITNESS', etc.
+  status          String   @default("PENDING") // 'PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED'
+  data            Json?    // Assessment-specific data
+  results         Json?    // Assessment results
+  score           Float?
+  interpretation  String?
+  recommendations Json?    // AI-generated recommendations
+  startedAt       DateTime @default(now())
+  completedAt     DateTime?
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student         Student? @relation(fields: [studentId], references: [id])
+  
+  @@index([sessionId])
+  @@index([type])
+  @@index([status])
+}
+
+model AIInsight {
+  id              String   @id @default(cuid())
+  sessionId       String
+  domain          String   // 'ACADEMIC', 'PSYCHOMETRIC', 'PHYSICAL', 'OVERALL'
+  insight         String
+  confidence      Float    // 0.0 to 1.0
+  recommendations Json     // Array of recommendations
+  priority        String   // 'HIGH', 'MEDIUM', 'LOW'
+  source          String?  // Which AI model or analysis method
+  prompt          String?  // Original prompt used
+  response        String?  // Full AI response
+  createdAt       DateTime @default(now())
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+  @@index([domain])
+  @@index([priority])
+}
+
+model AssessmentReport {
+  id              String   @id @default(cuid())
+  sessionId       String   @unique
+  reportType      String   @default("COMPREHENSIVE") // 'COMPREHENSIVE', 'SUMMARY', 'DETAILED'
+  status          String   @default("GENERATING") // 'GENERATING', 'COMPLETED', 'FAILED'
+  content         Json?    // Full report content
+  summary         String?  // Executive summary
+  recommendations Json?    // Key recommendations
+  insights        Json?    // Key insights
+  metadata        Json?    // Report metadata
+  generatedAt     DateTime @default(now())
+  completedAt     DateTime?
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+  @@index([status])
+}
+
+model DatasetReference {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  authors         Json     // Array of author names
+  year            Int
+  journal         String
+  doi             String?
+  url             String?
+  sampleSize      Int
+  demographics    String
+  instruments     Json     // Array of instruments
+  domains         Json     // Array of domains
+  reliability     Float
+  validity        Float
+  citation        String
+  license         String
+  accessType      String   // 'OPEN', 'RESTRICTED', 'COMMERCIAL'
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([domains])
+  @@index([accessType])
+  @@index([license])
+}
+
+model PersonalityProfile {
+  id              String   @id @default(cuid())
+  age             Int
+  gender          String   // 'M', 'F', 'OTHER'
+  education       String
+  country         String
+  bigFive         Json     // Big Five scores
+  mbti            Json?    // MBTI scores
+  academicPerformance Json? // Academic performance data
+  careerOutcomes  Json?    // Career outcome data
+  source          String   // Dataset source
+  reference       String   // Scientific reference
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  
+  @@index([age])
+  @@index([gender])
+  @@index([country])
+  @@index([source])
+}
+
+// Career Mapping Models
+model CareerField {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  description     String
+  category        String   // 'STEM', 'HEALTHCARE', 'BUSINESS', 'ARTS', 'EDUCATION', 'TECHNOLOGY', 'SERVICE'
+  subcategory     String?  // More specific categorization
+  growthRate      Float    // Projected growth rate (percentage)
+  avgSalary       Float?   // Average salary range
+  educationLevel  String   // 'HIGH_SCHOOL', 'BACHELORS', 'MASTERS', 'DOCTORATE', 'CERTIFICATION'
+  skills          Json     // Required skills array
+  personalityTraits Json   // Preferred personality traits
+  workEnvironment Json     // Work environment characteristics
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  careerMappings  CareerMapping[]
+  careerPaths     CareerPath[]
+  
+  @@index([category])
+  @@index([educationLevel])
+  @@index([growthRate])
+}
+
+model CareerPath {
+  id              String   @id @default(cuid())
+  careerFieldId   String
+  name            String
+  description     String
+  level           String   // 'ENTRY', 'MID', 'SENIOR', 'EXECUTIVE'
+  requirements    Json     // Educational and experience requirements
+  skills          Json     // Required skills for this level
+  salaryRange     Json     // Salary range for this level
+  timeline        String   // Typical timeline to reach this level
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  
+  // Relationships
+  careerField     CareerField @relation(fields: [careerFieldId], references: [id])
+  careerMappings  CareerMapping[]
+  
+  @@index([careerFieldId])
+  @@index([level])
+}
+
+model CareerMapping {
+  id              String   @id @default(cuid())
+  sessionId       String
+  careerFieldId   String
+  careerPathId    String?
+  matchScore      Float    // 0.0 to 1.0
+  confidence      Float    // 0.0 to 1.0
+  reasoning       String   // Why this career matches
+  strengths       Json     // Matching strengths
+  gaps            Json     // Areas that need development
+  recommendations Json     // Specific recommendations
+  timeline        String?  // Suggested timeline
+  priority        String   // 'HIGH', 'MEDIUM', 'LOW'
+  isRecommended   Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  careerField     CareerField @relation(fields: [careerFieldId], references: [id])
+  careerPath      CareerPath? @relation(fields: [careerPathId], references: [id])
+  
+  @@index([sessionId])
+  @@index([careerFieldId])
+  @@index([matchScore])
+  @@index([priority])
+}
+
+model Skill {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  description     String
+  category        String   // 'TECHNICAL', 'SOFT', 'CREATIVE', 'ANALYTICAL', 'LEADERSHIP'
+  subcategory     String?
+  importance      String   // 'CRITICAL', 'IMPORTANT', 'NICE_TO_HAVE'
+  difficulty      String   // 'BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'
+  learningTime    String?  // Estimated time to learn
+  resources       Json?    // Learning resources
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  skillAssessments SkillAssessment[]
+  
+  @@index([category])
+  @@index([importance])
+  @@index([difficulty])
+}
+
+model SkillAssessment {
+  id              String   @id @default(cuid())
+  sessionId       String
+  skillId         String
+  currentLevel    String   // 'BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'
+  targetLevel     String?  // Desired level
+  assessment      String   // How the level was determined
+  evidence        Json?    // Evidence of skill level
+  improvementPlan Json?    // Plan to improve this skill
+  priority        String   // 'HIGH', 'MEDIUM', 'LOW'
+  createdAt       DateTime @default(now())
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  skill           Skill @relation(fields: [skillId], references: [id])
+  
+  @@index([sessionId])
+  @@index([skillId])
+  @@index([priority])
+}
+
+// Stress and Pressure Assessment Models
+model StressAssessment {
+  id              String   @id @default(cuid())
+  sessionId       String
+  assessmentType  String   // 'ACADEMIC', 'SOCIAL', 'FAMILY', 'CAREER', 'OVERALL'
+  stressLevel     String   // 'LOW', 'MODERATE', 'HIGH', 'SEVERE'
+  score           Float    // 0.0 to 1.0
+  factors         Json     // Stress factors and their impact
+  symptoms        Json     // Physical and emotional symptoms
+  copingStrategies Json?   // Current coping mechanisms
+  recommendations Json     // Stress management recommendations
+  assessedAt      DateTime @default(now())
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+  @@index([assessmentType])
+  @@index([stressLevel])
+}
+
+model PressureSource {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  category        String   // 'ACADEMIC', 'SOCIAL', 'FAMILY', 'PEER', 'SELF', 'CAREER'
+  description     String
+  intensity       String   // 'LOW', 'MODERATE', 'HIGH', 'EXTREME'
+  impact          String   // 'POSITIVE', 'NEGATIVE', 'MIXED'
+  commonSymptoms  Json     // Common symptoms associated with this pressure
+  copingStrategies Json    // Recommended coping strategies
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  pressureAssessments PressureAssessment[]
+  
+  @@index([category])
+  @@index([intensity])
+  @@index([impact])
+}
+
+model PressureAssessment {
+  id              String   @id @default(cuid())
+  sessionId       String
+  pressureSourceId String
+  intensity       String   // 'LOW', 'MODERATE', 'HIGH', 'EXTREME'
+  frequency       String   // 'RARELY', 'SOMETIMES', 'OFTEN', 'ALWAYS'
+  impact          String   // 'POSITIVE', 'NEGATIVE', 'MIXED'
+  copingEffectiveness String // 'INEFFECTIVE', 'SOMEWHAT_EFFECTIVE', 'EFFECTIVE', 'VERY_EFFECTIVE'
+  notes           String?
+  assessedAt      DateTime @default(now())
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  pressureSource  PressureSource @relation(fields: [pressureSourceId], references: [id])
+  
+  @@index([sessionId])
+  @@index([pressureSourceId])
+  @@index([intensity])
+  @@index([impact])
+}
+
+model StressManagementPlan {
+  id              String   @id @default(cuid())
+  sessionId       String
+  planType        String   // 'PREVENTIVE', 'REACTIVE', 'COMPREHENSIVE'
+  strategies      Json     // Array of stress management strategies
+  timeline        String   // Implementation timeline
+  goals           Json     // Stress reduction goals
+  monitoring      Json     // How to monitor progress
+  resources       Json     // Resources and tools
+  effectiveness   Float?   // 0.0 to 1.0
+  status          String   @default("ACTIVE") // 'ACTIVE', 'COMPLETED', 'PAUSED'
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  session         AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+  @@index([planType])
+  @@index([status])
 }
 
 // Educational Models
@@ -173,6 +635,7 @@ model Student {
   repositories        StudentRepository[]
   eduSightScores      EduSightScore[]
   scoreAggregations   ScoreAggregation[]
+  assessmentSessions  AssessmentSession[]
 
   @@map("students")
 }
@@ -217,23 +680,7 @@ model Parent {
   @@map("parents")
 }
 
-// Simplified Assessment Models
-model Assessment {
-  id          String   @id @default(cuid())
-  studentId   String
-  title       String
-  description String?
-  assessmentType String // academic, behavioral, physical
-  data        String?  // JSON as string
-  score       Float?
-  maxScore    Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
-  @@map("assessments")
-}
+// Simplified Assessment Models - Removed duplicate
 
 // Subscription Management
 model Subscription {

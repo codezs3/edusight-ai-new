@@ -1,0 +1,87 @@
+{
+  "assessment_id": "ACAD_002_2024",
+  "student_id": "STU_002",
+  "student_name": "Priya Patel",
+  "school": "Delhi Public School",
+  "grade": "9",
+  "assessment_type": "Academic",
+  "curriculum": "CBSE",
+  "date_completed": "2024-01-20",
+  "subjects": {
+    "mathematics": {
+      "score": 78,
+      "max_score": 100,
+      "topics": {
+        "algebra": 75,
+        "geometry": 80,
+        "trigonometry": 76,
+        "statistics": 81
+      },
+      "skills": {
+        "problem_solving": 77,
+        "logical_reasoning": 79,
+        "analytical_thinking": 78
+      }
+    },
+    "science": {
+      "score": 85,
+      "max_score": 100,
+      "topics": {
+        "physics": 82,
+        "chemistry": 87,
+        "biology": 86
+      },
+      "skills": {
+        "scientific_method": 84,
+        "data_analysis": 86,
+        "critical_thinking": 85
+      }
+    },
+    "english": {
+      "score": 92,
+      "max_score": 100,
+      "topics": {
+        "literature": 94,
+        "grammar": 90,
+        "writing": 92
+      },
+      "skills": {
+        "communication": 93,
+        "creativity": 91,
+        "comprehension": 92
+      }
+    },
+    "social_science": {
+      "score": 88,
+      "max_score": 100,
+      "topics": {
+        "history": 86,
+        "geography": 90,
+        "civics": 88
+      },
+      "skills": {
+        "research": 89,
+        "analysis": 87,
+        "presentation": 88
+      }
+    }
+  },
+  "overall_academic_score": 85.75,
+  "learning_style": "Auditory-Visual",
+  "strengths": [
+    "Excellent communication skills",
+    "Strong in social sciences",
+    "Good scientific thinking"
+  ],
+  "areas_for_improvement": [
+    "Mathematics problem-solving",
+    "Algebraic concepts",
+    "Time management"
+  ],
+  "recommendations": [
+    "Focus on mathematics fundamentals",
+    "Practice problem-solving daily",
+    "Consider mathematics tutoring",
+    "Use visual aids for learning"
+  ]
+}

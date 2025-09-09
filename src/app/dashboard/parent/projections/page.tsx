@@ -278,7 +278,7 @@ export default function ProjectionsPage() {
               <option value="all">All Levels</option>
               <option value="high">High (90%+)</option>
               <option value="medium">Medium (75-89%)</option>
-              <option value="low">Low (<75%)</option>
+              <option value="low">Low (&lt;75%)</option>
             </select>
           </div>
         </div>

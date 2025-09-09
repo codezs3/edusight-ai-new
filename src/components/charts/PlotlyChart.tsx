@@ -4,63 +4,34 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Spinner } from '@/components/ui/Spinner';
 
-// Dynamically import Plotly to avoid SSR issues
-const Plot = dynamic(() => import('react-plotly.js'), {
+// Dynamically import Recharts to avoid SSR issues
+const { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = dynamic(() => import('recharts'), {
   ssr: false,
   loading: () => <Spinner />,
 });
 
-export interface PlotlyChartProps {
+export interface RechartsChartProps {
   data: any[];
-  layout?: any;
-  config?: any;
+  type?: 'bar' | 'line' | 'pie';
   className?: string;
-  onUpdate?: (figure: any) => void;
-  onHover?: (data: any) => void;
-  onClick?: (data: any) => void;
+  height?: number;
+  dataKey?: string;
+  xAxisKey?: string;
 }
 
-export function PlotlyChart({
+export function RechartsChart({
   data,
-  layout = {},
-  config = {},
+  type = 'bar',
   className = '',
-  onUpdate,
-  onHover,
-  onClick,
-}: PlotlyChartProps) {
+  height = 300,
+  dataKey = 'value',
+  xAxisKey = 'name',
+}: RechartsChartProps) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  const defaultLayout = {
-    autosize: true,
-    responsive: true,
-    font: {
-      family: 'Inter, system-ui, sans-serif',
-      size: 12,
-      color: '#374151',
-    },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    margin: {
-      l: 50,
-      r: 50,
-      t: 50,
-      b: 50,
-    },
-    ...layout,
-  };
-
-  const defaultConfig = {
-    displayModeBar: true,
-    modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
-    displaylogo: false,
-    responsive: true,
-    ...config,
-  };
 
   if (!isClient) {
     return (
@@ -70,203 +41,159 @@ export function PlotlyChart({
     );
   }
 
+  const chartComponents = {
+    bar: (
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey={dataKey} fill="#3B82F6" />
+      </BarChart>
+    ),
+    line: (
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey={dataKey} stroke="#3B82F6" strokeWidth={2} />
+      </LineChart>
+    ),
+    pie: (
+      <PieChart>
+        <Pie
+          data={data}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          outerRadius={80}
+          fill="#8884d8"
+          dataKey={dataKey}
+        >
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={['#3B82F6', '#10B981', '#F59E0B', '#EF4444'][index % 4]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    )
+  };
+
   return (
-    <div className={`w-full h-full ${className}`}>
-      <Plot
-        data={data}
-        layout={defaultLayout}
-        config={defaultConfig}
-        useResizeHandler={true}
-        style={{ width: '100%', height: '100%' }}
-        onUpdate={onUpdate}
-        onHover={onHover}
-        onClick={onClick}
-      />
+    <div className={`w-full ${className}`} style={{ height: `${height}px` }}>
+      <ResponsiveContainer width="100%" height="100%">
+        {chartComponents[type]}
+      </ResponsiveContainer>
     </div>
   );
 }
 
 // Specialized chart components
 export function AcademicPerformanceChart({ studentData }: { studentData: any[] }) {
-  const data = [
-    {
-      x: studentData.map(d => d.subject),
-      y: studentData.map(d => d.score),
-      type: 'bar',
-      marker: {
-        color: studentData.map(d => 
-          d.score >= 80 ? '#10b981' : 
-          d.score >= 60 ? '#f59e0b' : '#ef4444'
-        ),
-        line: {
-          color: '#374151',
-          width: 1,
-        },
-      },
-      name: 'Academic Scores',
-    },
-  ];
+  const data = studentData.map(d => ({
+    subject: d.subject,
+    score: d.score,
+    color: d.score >= 80 ? '#10b981' : d.score >= 60 ? '#f59e0b' : '#ef4444'
+  }));
 
-  const layout = {
-    title: {
-      text: 'Academic Performance by Subject',
-      font: { size: 16, color: '#1f2937' },
-    },
-    xaxis: {
-      title: 'Subjects',
-      tickangle: -45,
-    },
-    yaxis: {
-      title: 'Score (%)',
-      range: [0, 100],
-    },
-    showlegend: false,
-  };
-
-  return <PlotlyChart data={data} layout={layout} />;
+  return (
+    <div className="w-full h-64">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Academic Performance by Subject</h3>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="subject" />
+          <YAxis domain={[0, 100]} />
+          <Tooltip />
+          <Bar dataKey="score" fill="#3B82F6" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 export function PsychologicalWellbeingRadar({ wellbeingData }: { wellbeingData: any }) {
-  const categories = [
-    'Mood', 'Stress Management', 'Self Confidence', 
-    'Social Interaction', 'Motivation', 'Sleep Quality'
-  ];
-  
-  const values = [
-    wellbeingData.moodRating || 5,
-    10 - (wellbeingData.stressLevel || 5), // Invert stress
-    wellbeingData.selfConfidence || 3,
-    wellbeingData.socialInteraction || 3,
-    wellbeingData.motivationLevel || 3,
-    wellbeingData.sleepQuality || 3,
-  ];
-
   const data = [
-    {
-      type: 'scatterpolar',
-      r: values,
-      theta: categories,
-      fill: 'toself',
-      fillcolor: 'rgba(99, 102, 241, 0.2)',
-      line: {
-        color: '#6366f1',
-        width: 2,
-      },
-      marker: {
-        color: '#6366f1',
-        size: 8,
-      },
-      name: 'Psychological Wellbeing',
-    },
+    { category: 'Mood', value: wellbeingData.moodRating || 5 },
+    { category: 'Stress Management', value: 10 - (wellbeingData.stressLevel || 5) },
+    { category: 'Self Confidence', value: wellbeingData.selfConfidence || 3 },
+    { category: 'Social Interaction', value: wellbeingData.socialInteraction || 3 },
+    { category: 'Motivation', value: wellbeingData.motivationLevel || 3 },
+    { category: 'Sleep Quality', value: wellbeingData.sleepQuality || 3 },
   ];
 
-  const layout = {
-    title: {
-      text: 'Psychological Wellbeing Profile',
-      font: { size: 16, color: '#1f2937' },
-    },
-    polar: {
-      radialaxis: {
-        visible: true,
-        range: [0, 10],
-        tickfont: { size: 10 },
-      },
-      angularaxis: {
-        tickfont: { size: 12 },
-      },
-    },
-    showlegend: false,
-  };
-
-  return <PlotlyChart data={data} layout={layout} />;
+  return (
+    <div className="w-full h-64">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Psychological Wellbeing Profile</h3>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} layout="horizontal">
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis type="number" domain={[0, 10]} />
+          <YAxis dataKey="category" type="category" width={120} />
+          <Tooltip />
+          <Bar dataKey="value" fill="#6366f1" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 export function ProgressTimelineChart({ progressData }: { progressData: any[] }) {
-  const data = [
-    {
-      x: progressData.map(d => d.date),
-      y: progressData.map(d => d.academicScore),
-      type: 'scatter',
-      mode: 'lines+markers',
-      name: 'Academic',
-      line: { color: '#3b82f6', width: 3 },
-      marker: { size: 8, color: '#3b82f6' },
-    },
-    {
-      x: progressData.map(d => d.date),
-      y: progressData.map(d => d.psychologicalScore),
-      type: 'scatter',
-      mode: 'lines+markers',
-      name: 'Psychological',
-      line: { color: '#8b5cf6', width: 3 },
-      marker: { size: 8, color: '#8b5cf6' },
-    },
-    {
-      x: progressData.map(d => d.date),
-      y: progressData.map(d => d.physicalScore),
-      type: 'scatter',
-      mode: 'lines+markers',
-      name: 'Physical',
-      line: { color: '#10b981', width: 3 },
-      marker: { size: 8, color: '#10b981' },
-    },
-  ];
-
-  const layout = {
-    title: {
-      text: 'Progress Over Time',
-      font: { size: 16, color: '#1f2937' },
-    },
-    xaxis: {
-      title: 'Date',
-      type: 'date',
-    },
-    yaxis: {
-      title: 'Score',
-      range: [0, 100],
-    },
-    hovermode: 'x unified',
-    legend: {
-      orientation: 'h',
-      y: -0.2,
-    },
-  };
-
-  return <PlotlyChart data={data} layout={layout} />;
+  return (
+    <div className="w-full h-64">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Progress Over Time</h3>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={progressData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis domain={[0, 100]} />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="academicScore" stroke="#3b82f6" strokeWidth={2} name="Academic" />
+          <Line type="monotone" dataKey="psychologicalScore" stroke="#8b5cf6" strokeWidth={2} name="Psychological" />
+          <Line type="monotone" dataKey="physicalScore" stroke="#10b981" strokeWidth={2} name="Physical" />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 export function CareerInterestsPieChart({ careerData }: { careerData: any[] }) {
-  const data = [
-    {
-      values: careerData.map(d => d.interest),
-      labels: careerData.map(d => d.field),
-      type: 'pie',
-      marker: {
-        colors: [
-          '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', 
-          '#ef4444', '#06b6d4', '#84cc16', '#f97316'
-        ],
-      },
-      textinfo: 'label+percent',
-      textposition: 'outside',
-      hovertemplate: '<b>%{label}</b><br>Interest Level: %{value}%<extra></extra>',
-    },
-  ];
+  const data = careerData.map(d => ({
+    field: d.field,
+    interest: d.interest
+  }));
 
-  const layout = {
-    title: {
-      text: 'Career Interest Distribution',
-      font: { size: 16, color: '#1f2937' },
-    },
-    showlegend: true,
-    legend: {
-      orientation: 'v',
-      x: 1.02,
-      y: 0.5,
-    },
-  };
-
-  return <PlotlyChart data={data} layout={layout} />;
+  return (
+    <div className="w-full h-64">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Career Interest Distribution</h3>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={({ field, percent }) => `${field} ${(percent * 100).toFixed(0)}%`}
+            outerRadius={80}
+            fill="#8884d8"
+            dataKey="interest"
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#84cc16', '#f97316'][index % 8]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 export function ComparisonChart({ 
@@ -276,53 +203,27 @@ export function ComparisonChart({
   studentData: any; 
   peerAverages: any; 
 }) {
-  const categories = ['Academic', 'Psychological', 'Physical', 'Overall'];
-  
   const data = [
-    {
-      x: categories,
-      y: [
-        studentData.academicScore,
-        studentData.psychologicalScore,
-        studentData.physicalScore,
-        studentData.overallScore,
-      ],
-      type: 'bar',
-      name: 'Student',
-      marker: { color: '#6366f1' },
-    },
-    {
-      x: categories,
-      y: [
-        peerAverages.academicScore,
-        peerAverages.psychologicalScore,
-        peerAverages.physicalScore,
-        peerAverages.overallScore,
-      ],
-      type: 'bar',
-      name: 'Peer Average',
-      marker: { color: '#94a3b8' },
-    },
+    { category: 'Academic', student: studentData.academicScore, peer: peerAverages.academicScore },
+    { category: 'Psychological', student: studentData.psychologicalScore, peer: peerAverages.psychologicalScore },
+    { category: 'Physical', student: studentData.physicalScore, peer: peerAverages.physicalScore },
+    { category: 'Overall', student: studentData.overallScore, peer: peerAverages.overallScore },
   ];
 
-  const layout = {
-    title: {
-      text: 'Performance Comparison with Peers',
-      font: { size: 16, color: '#1f2937' },
-    },
-    xaxis: {
-      title: 'Assessment Categories',
-    },
-    yaxis: {
-      title: 'Score',
-      range: [0, 100],
-    },
-    barmode: 'group',
-    legend: {
-      orientation: 'h',
-      y: -0.2,
-    },
-  };
-
-  return <PlotlyChart data={data} layout={layout} />;
+  return (
+    <div className="w-full h-64">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Performance Comparison with Peers</h3>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="category" />
+          <YAxis domain={[0, 100]} />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="student" fill="#6366f1" name="Student" />
+          <Bar dataKey="peer" fill="#94a3b8" name="Peer Average" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }

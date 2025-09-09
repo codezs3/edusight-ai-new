@@ -1,0 +1,71 @@
+{
+  "assessment_id": "PSYC_001_2024",
+  "student_id": "STU_001",
+  "student_name": "Arjun Sharma",
+  "school": "Greenwood International School",
+  "grade": "10",
+  "assessment_type": "Psychological & Mental Health",
+  "date_completed": "2024-01-16",
+  "cognitive_assessment": {
+    "iq_score": 118,
+    "cognitive_abilities": {
+      "verbal_comprehension": 120,
+      "perceptual_reasoning": 115,
+      "working_memory": 116,
+      "processing_speed": 121
+    },
+    "learning_style": {
+      "visual": 85,
+      "auditory": 70,
+      "kinesthetic": 90,
+      "reading_writing": 75
+    }
+  },
+  "personality_analysis": {
+    "big_five_traits": {
+      "openness": 78,
+      "conscientiousness": 85,
+      "extraversion": 72,
+      "agreeableness": 88,
+      "neuroticism": 35
+    },
+    "personality_type": "ENFJ",
+    "strengths": [
+      "Natural leader",
+      "Empathetic",
+      "Organized",
+      "Creative problem solver"
+    ]
+  },
+  "emotional_wellbeing": {
+    "stress_level": 3,
+    "anxiety_level": 2,
+    "depression_indicators": 1,
+    "self_esteem": 8,
+    "social_confidence": 7,
+    "emotional_regulation": 8
+  },
+  "behavioral_patterns": {
+    "attention_span": 8,
+    "impulse_control": 7,
+    "social_interaction": 9,
+    "conflict_resolution": 8,
+    "teamwork": 9
+  },
+  "mental_health_indicators": {
+    "overall_wellbeing": 8.5,
+    "risk_factors": [],
+    "protective_factors": [
+      "Strong family support",
+      "Good peer relationships",
+      "Active in extracurricular activities"
+    ]
+  },
+  "recommendations": [
+    "Continue current social activities",
+    "Practice stress management techniques",
+    "Consider leadership opportunities",
+    "Maintain balanced study schedule"
+  ],
+  "overall_psychological_score": 87.2
+}

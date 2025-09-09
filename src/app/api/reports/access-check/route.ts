@@ -100,36 +100,46 @@ function isDemoAccount(user: any): boolean {
 }
 
 async function checkPDFDownloadAccess(user: any) {
-  // For now, allow PDF downloads for demo accounts and paid users
-  // In a real implementation, you would check subscription status, payment history, etc.
+  // DEVELOPMENT MODE: Allow all users to download PDFs without payment
+  console.log('🔓 DEV MODE: Allowing PDF download for all users');
   
-  // Check if user has active subscription (placeholder logic)
-  const hasActiveSubscription = await checkSubscriptionStatus(user.id);
-  
-  if (hasActiveSubscription) {
-    return {
-      hasAccess: true,
-      reason: 'Active subscription',
-      isDemo: false
-    };
-  }
-
-  // Check if user has made payment for this specific report
-  const hasPaidForReport = await checkReportPayment(user.id);
-  
-  if (hasPaidForReport) {
-    return {
-      hasAccess: true,
-      reason: 'Paid for report access',
-      isDemo: false
-    };
-  }
-
   return {
-    hasAccess: false,
-    reason: 'PDF download requires subscription or payment',
+    hasAccess: true,
+    reason: 'Development mode - free downloads enabled',
     isDemo: false
   };
+
+  // ORIGINAL PAYMENT LOGIC (DISABLED FOR DEV)
+  // // For now, allow PDF downloads for demo accounts and paid users
+  // // In a real implementation, you would check subscription status, payment history, etc.
+  // 
+  // // Check if user has active subscription (placeholder logic)
+  // const hasActiveSubscription = await checkSubscriptionStatus(user.id);
+  // 
+  // if (hasActiveSubscription) {
+  //   return {
+  //     hasAccess: true,
+  //     reason: 'Active subscription',
+  //     isDemo: false
+  //   };
+  // }
+
+  // // Check if user has made payment for this specific report
+  // const hasPaidForReport = await checkReportPayment(user.id);
+  // 
+  // if (hasPaidForReport) {
+  //   return {
+  //     hasAccess: true,
+  //     reason: 'Paid for report access',
+  //     isDemo: false
+  //   };
+  // }
+
+  // return {
+  //   hasAccess: false,
+  //   reason: 'PDF download requires subscription or payment',
+  //   isDemo: false
+  // };
 }
 
 async function checkAnalyticsAccess(user: any) {

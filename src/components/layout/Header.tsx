@@ -27,7 +27,8 @@ import {
   ClipboardDocumentCheckIcon,
   BuildingOfficeIcon,
   UsersIcon,
-  StarIcon
+  StarIcon,
+  SparklesIcon as SparklesIconOutline
 } from '@heroicons/react/24/outline';
 
 export function Header() {
@@ -353,6 +354,8 @@ export function Header() {
 
   const navigation = [
     { name: 'Home', href: '/', hasDropdown: false },
+    { name: 'TestVault', href: '/testvault', hasDropdown: false },
+    { name: 'DMIT', href: '/dmit', hasDropdown: false },
     { name: 'About Us', href: '/about', hasDropdown: false },
     { name: 'Frameworks', href: '/frameworks', hasDropdown: true, key: 'frameworks' },
     { name: 'Solutions', href: '#', hasDropdown: true, key: 'solutions' },

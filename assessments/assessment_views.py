@@ -802,3 +802,61 @@ def get_performance_level(score):
         return 'Needs Improvement'
     else:
         return 'Unsatisfactory'
+
+
+@login_required
+def academic_assessment_view(request):
+    """Academic-only assessment view"""
+    context = {
+        'assessment_type': 'academic',
+        'title': 'Academic Assessment',
+        'description': 'Comprehensive academic performance evaluation',
+        'frameworks': AcademicFramework.objects.filter(is_active=True),
+        'recent_assessments': ComprehensiveAssessment.objects.filter(
+            assessment_type='academic'
+        ).order_by('-created_at')[:10]
+    }
+    return render(request, 'assessments/academic_assessment.html', context)
+
+
+@login_required
+def psychometric_assessment_view(request):
+    """Psychometric-only assessment view"""
+    context = {
+        'assessment_type': 'psychometric',
+        'title': 'Psychometric Assessment',
+        'description': 'Personality and cognitive assessment',
+        'frameworks': PsychologicalFramework.objects.filter(is_active=True),
+        'recent_assessments': ComprehensiveAssessment.objects.filter(
+            assessment_type='psychometric'
+        ).order_by('-created_at')[:10]
+    }
+    return render(request, 'assessments/psychometric_assessment.html', context)
+
+
+@login_required
+def physical_assessment_view(request):
+    """Physical-only assessment view"""
+    context = {
+        'assessment_type': 'physical',
+        'title': 'Physical Assessment',
+        'description': 'Physical fitness and motor skills evaluation',
+        'frameworks': PhysicalEducationFramework.objects.filter(is_active=True),
+        'recent_assessments': ComprehensiveAssessment.objects.filter(
+            assessment_type='physical'
+        ).order_by('-created_at')[:10]
+    }
+    return render(request, 'assessments/physical_assessment.html', context)
+
+
+@login_required
+def assessment_reports_view(request):
+    """Assessment reports view"""
+    context = {
+        'title': 'Assessment Reports',
+        'description': 'View and download assessment reports',
+        'reports': ComprehensiveAssessment.objects.all().order_by('-created_at'),
+        'total_reports': ComprehensiveAssessment.objects.count(),
+        'recent_reports': ComprehensiveAssessment.objects.order_by('-created_at')[:20]
+    }
+    return render(request, 'assessments/assessment_reports.html', context)

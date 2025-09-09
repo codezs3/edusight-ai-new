@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
-import { toast } from 'react-hot-toast';
-import VerticalDashboardLayout from '@/components/dashboard/VerticalDashboardLayout';
-import AddChildModal from '@/components/dashboard/parent/AddChildModal';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChartBarIcon,
   DocumentTextIcon,
@@ -15,9 +13,16 @@ import {
   LightBulbIcon,
   CalendarIcon,
   BellIcon,
-  ChatBubbleLeftRightIcon,
-  CurrencyDollarIcon,
-  CloudArrowUpIcon,
+  ShareIcon,
+  PlusIcon,
+  MagnifyingGlassIcon,
+  FunnelIcon,
+  ArrowRightIcon,
+  EyeIcon,
+  ArrowDownTrayIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
   UserCircleIcon,
   BookOpenIcon,
   MapPinIcon,
@@ -26,28 +31,298 @@ import {
   MegaphoneIcon,
   ArchiveBoxIcon,
   DevicePhoneMobileIcon,
-  ShareIcon,
-  HomeIcon,
   FolderIcon,
   CogIcon,
   EnvelopeIcon,
-  CheckCircleIcon,
-  ClockIcon,
+  CurrencyDollarIcon,
+  CloudArrowUpIcon,
   ArrowTrendingUpIcon,
-  ExclamationTriangleIcon,
-  PlusIcon
+  BeakerIcon,
+  ClipboardDocumentListIcon,
+  DocumentArrowUpIcon,
+  PencilIcon,
+  TrashIcon,
+  AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
-import StatCard from '@/components/dashboard/StatCard';
-import DashboardCard from '@/components/dashboard/DashboardCard';
-import CompactMetricCard from '@/components/dashboard/CompactMetricCard';
-import MiniWidget from '@/components/dashboard/MiniWidget';
-import ModernChart from '@/components/dashboard/ModernChart';
+import AddChildModal from '@/components/dashboard/parent/AddChildModal';
+
+interface AssessmentCardProps {
+  title: string;
+  description: string;
+  type: 'academic' | 'psychological' | 'physical' | 'skills';
+  progress: number;
+  averageScore: number;
+  completed: boolean;
+  onStart: () => void;
+  onViewReports: () => void;
+  isNew?: boolean;
+  isUrgent?: boolean;
+}
+
+const AssessmentCard: React.FC<AssessmentCardProps> = ({
+  title,
+  description,
+  type,
+  progress,
+  averageScore,
+  completed,
+  onStart,
+  onViewReports,
+  isNew = false,
+  isUrgent = false
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const getTypeConfig = (type: string) => {
+    switch (type) {
+      case 'academic':
+        return {
+          icon: AcademicCapIcon,
+          color: 'from-blue-500 to-cyan-500',
+          bgColor: 'bg-blue-50',
+          textColor: 'text-blue-600',
+          borderColor: 'border-blue-200'
+        };
+      case 'psychological':
+        return {
+          icon: LightBulbIcon,
+          color: 'from-purple-500 to-pink-500',
+          bgColor: 'bg-purple-50',
+          textColor: 'text-purple-600',
+          borderColor: 'border-purple-200'
+        };
+      case 'physical':
+        return {
+          icon: HeartIcon,
+          color: 'from-green-500 to-emerald-500',
+          bgColor: 'bg-green-50',
+          textColor: 'text-green-600',
+          borderColor: 'border-green-200'
+        };
+      case 'skills':
+        return {
+          icon: TrophyIcon,
+          color: 'from-orange-500 to-red-500',
+          bgColor: 'bg-orange-50',
+          textColor: 'text-orange-600',
+          borderColor: 'border-orange-200'
+        };
+      default:
+        return {
+          icon: DocumentTextIcon,
+          color: 'from-gray-500 to-gray-600',
+          bgColor: 'bg-gray-50',
+          textColor: 'text-gray-600',
+          borderColor: 'border-gray-200'
+        };
+    }
+  };
+
+  const config = getTypeConfig(type);
+  const Icon = config.icon;
+
+  return (
+    <motion.div
+      className={`group relative overflow-hidden rounded-2xl bg-white shadow-lg border-2 ${config.borderColor} transition-all duration-300 ${
+        isHovered ? 'shadow-xl scale-105' : 'hover:shadow-lg'
+      }`}
+      whileHover={{ y: -8 }}
+      whileTap={{ scale: 0.98 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+    >
+      {/* Animated Background Gradient */}
+      <motion.div
+        className={`absolute inset-0 opacity-5 bg-gradient-to-br ${config.color}`}
+        animate={{
+          scale: isHovered ? 1.1 : 1,
+          opacity: isHovered ? 0.1 : 0.05
+        }}
+        transition={{ duration: 0.3 }}
+      />
+
+      {/* Badges */}
+      <div className="absolute top-4 right-4 flex space-x-2">
+        {isNew && (
+          <span className="px-2 py-1 text-xs font-bold text-white bg-green-500 rounded-full">
+            New
+          </span>
+        )}
+        {isUrgent && (
+          <span className="px-2 py-1 text-xs font-bold text-white bg-red-500 rounded-full">
+            Urgent
+          </span>
+        )}
+      </div>
+
+      <div className="relative p-6">
+        <div className="flex items-center justify-between mb-4">
+          <motion.div
+            className={`p-3 rounded-xl bg-gradient-to-r ${config.color} shadow-lg`}
+            animate={{ rotate: isHovered ? 5 : 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Icon className="w-6 h-6 text-white" />
+          </motion.div>
+          
+          <div className="text-right">
+            <div className="text-2xl font-bold text-gray-900">{averageScore}%</div>
+            <div className="text-sm text-gray-500">Average Score</div>
+          </div>
+        </div>
+
+        <motion.h3
+          className="text-xl font-bold text-gray-900 mb-2"
+          animate={{ x: isHovered ? 5 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {title}
+        </motion.h3>
+        
+        <p className="text-gray-600 text-sm leading-relaxed mb-4">
+          {description}
+        </p>
+
+        {/* Progress Bar */}
+        <div className="mb-4">
+          <div className="flex justify-between text-sm text-gray-600 mb-1">
+            <span>Progress</span>
+            <span>{progress}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <motion.div
+              className={`h-2 rounded-full bg-gradient-to-r ${config.color}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 1, delay: 0.5 }}
+            />
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className={`${config.bgColor} rounded-lg p-3`}>
+            <div className="text-lg font-bold text-gray-900">{averageScore}%</div>
+            <div className="text-xs text-gray-600">Average Score</div>
+          </div>
+          <div className={`${config.bgColor} rounded-lg p-3`}>
+            <div className="text-lg font-bold text-gray-900">{completed ? 'Yes' : 'No'}</div>
+            <div className="text-xs text-gray-600">Completed</div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex space-x-3">
+          <motion.button
+            className={`flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all duration-200 bg-gradient-to-r ${config.color} text-white shadow-lg hover:shadow-xl`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onStart}
+          >
+            {completed ? 'Retake Assessment' : 'Start Assessment'}
+          </motion.button>
+          <motion.button
+            className="py-2 px-4 rounded-lg font-medium text-sm transition-all duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onViewReports}
+          >
+            <EyeIcon className="w-4 h-4" />
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+interface QuickActionCardProps {
+  title: string;
+  description: string;
+  icon: React.ComponentType<any>;
+  color: string;
+  gradient: string;
+  onClick: () => void;
+  badge?: string;
+  badgeColor?: string;
+}
+
+const QuickActionCard: React.FC<QuickActionCardProps> = ({
+  title,
+  description,
+  icon: Icon,
+  color,
+  gradient,
+  onClick,
+  badge,
+  badgeColor = 'bg-blue-500'
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.button
+      className="group relative overflow-hidden rounded-2xl bg-white shadow-lg border-2 border-gray-100 hover:border-gray-200 transition-all duration-300"
+      whileHover={{ y: -8, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      onClick={onClick}
+    >
+      {/* Animated Background Gradient */}
+      <motion.div
+        className={`absolute inset-0 opacity-10 ${gradient}`}
+        animate={{
+          scale: isHovered ? 1.1 : 1,
+          opacity: isHovered ? 0.15 : 0.1
+        }}
+        transition={{ duration: 0.3 }}
+      />
+
+      <div className="relative p-6">
+        <div className="flex items-center justify-between mb-4">
+          <motion.div
+            className={`p-3 rounded-xl ${color} shadow-lg`}
+            animate={{ rotate: isHovered ? 5 : 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Icon className="w-6 h-6 text-white" />
+          </motion.div>
+          
+          {badge && (
+            <span className={`px-2 py-1 text-xs font-bold text-white ${badgeColor} rounded-full`}>
+              {badge}
+            </span>
+          )}
+        </div>
+
+        <motion.h3
+          className="text-lg font-bold text-gray-900 mb-2"
+          animate={{ x: isHovered ? 5 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {title}
+        </motion.h3>
+        
+        <p className="text-gray-600 text-sm leading-relaxed">
+          {description}
+        </p>
+
+        <div className="flex items-center justify-between mt-4">
+          <span className="text-sm text-gray-500">Click to access</span>
+          <ArrowRightIcon className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+        </div>
+      </div>
+    </motion.button>
+  );
+};
 
 export default function ParentDashboard() {
   const { data: session, status } = useSession();
   const [children, setChildren] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddChildModal, setShowAddChildModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'academic' | 'psychological' | 'physical' | 'skills'>('all');
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   if (status === 'unauthenticated') {
     redirect('/auth/signin');
@@ -74,460 +349,352 @@ export default function ParentDashboard() {
         setChildren(data.children || []);
       } else {
         console.error('Failed to fetch children:', data);
-        toast.error(data.error || 'Failed to fetch children');
       }
     } catch (error) {
       console.error('Error fetching children:', error);
-      toast.error('Failed to fetch children. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleChildAdded = (newChild: any) => {
-    console.log('Child added to dashboard:', newChild);
     setChildren(prev => [newChild, ...prev]);
     setShowAddChildModal(false);
-    toast.success('Child added successfully!');
-    // Refresh the data to ensure consistency
-    fetchChildren();
   };
 
-  // Sidebar Menu Items for Parent
-  const menuItems = [
+  // Mock assessment data
+  const assessments = [
     {
-      title: 'Dashboard',
-      href: '/dashboard/parent',
-      icon: HomeIcon
+      title: 'Academic Assessment',
+      description: 'Comprehensive evaluation based on IB, IGCSE, CBSE, ICSE curricula with skills integration',
+      type: 'academic' as const,
+      progress: 75,
+      averageScore: 87,
+      completed: false,
+      isNew: true
     },
     {
-      title: 'My Children',
-      href: '/dashboard/parent/children',
-      icon: UserCircleIcon,
-      children: [
-        { title: 'Profile Management', href: '/dashboard/parent/profile', icon: UserCircleIcon },
-        { title: 'Academic Progress', href: '/dashboard/parent/academic', icon: AcademicCapIcon },
-        { title: 'Health & Wellness', href: '/dashboard/parent/health', icon: HeartIcon },
-        { title: 'Psychological Insights', href: '/dashboard/parent/psychology', icon: LightBulbIcon },
-        { title: 'Career Guidance', href: '/dashboard/parent/career', icon: MapPinIcon }
-      ]
+      title: 'Psychological & Mental Health',
+      description: 'Deep understanding of student psychology, learning styles, and emotional wellbeing',
+      type: 'psychological' as const,
+      progress: 45,
+      averageScore: 82,
+      completed: false,
+      isUrgent: true
     },
     {
-      title: 'AI Analytics',
-      href: '/dashboard/parent/analytics',
+      title: 'Physical Education Assessment',
+      description: 'Comprehensive physical wellness and fitness evaluation',
+      type: 'physical' as const,
+      progress: 90,
+      averageScore: 91,
+      completed: true
+    },
+    {
+      title: 'Skills Assessment',
+      description: 'Evaluation of critical thinking, creativity, and problem-solving abilities',
+      type: 'skills' as const,
+      progress: 60,
+      averageScore: 78,
+      completed: false
+    }
+  ];
+
+  const quickActions = [
+    {
+      title: 'View All Reports',
+      description: 'Access comprehensive assessment reports and analytics',
       icon: ChartBarIcon,
-      children: [
-        { title: '360° Assessment', href: '/dashboard/parent/assessment-360', icon: TrophyIcon },
-        { title: 'Career Mapping', href: '/dashboard/parent/career-mapping', icon: MapPinIcon },
-        { title: 'Projections', href: '/dashboard/parent/projections', icon: ArrowTrendingUpIcon },
-        { title: 'Predictions', href: '/dashboard/parent/predictions', icon: LightBulbIcon },
-        { title: 'Performance Analytics', href: '/dashboard/parent/analytics', icon: ChartBarIcon }
-      ]
+      color: 'bg-gradient-to-r from-blue-500 to-cyan-500',
+      gradient: 'bg-gradient-to-br from-blue-500 to-cyan-500',
+      onClick: () => console.log('View reports'),
+      badge: 'New'
     },
     {
-      title: 'Upload Documents',
-      href: '/dashboard/parent/upload',
-      icon: CloudArrowUpIcon
+      title: 'Analytics Dashboard',
+      description: 'Deep insights into your child\'s development trends',
+      icon: ArrowTrendingUpIcon,
+      color: 'bg-gradient-to-r from-purple-500 to-pink-500',
+      gradient: 'bg-gradient-to-br from-purple-500 to-pink-500',
+      onClick: () => console.log('Analytics dashboard')
     },
     {
-      title: 'Assessments',
-      href: '/dashboard/parent/assessments',
-      icon: DocumentTextIcon,
-      children: [
-        { title: 'Upload Data', href: '/dashboard/parent/upload', icon: CloudArrowUpIcon, badge: 'Quick' },
-        { title: 'Schedule Tests', href: '/dashboard/parent/schedule', icon: CalendarIcon },
-        { title: 'View Reports', href: '/dashboard/parent/reports', icon: ChartBarIcon },
-        { title: 'Download PDFs', href: '/dashboard/parent/downloads', icon: DocumentTextIcon }
-      ]
+      title: 'Export Data',
+      description: 'Download assessment data in various formats',
+      icon: ArrowDownTrayIcon,
+      color: 'bg-gradient-to-r from-green-500 to-emerald-500',
+      gradient: 'bg-gradient-to-br from-green-500 to-emerald-500',
+      onClick: () => console.log('Export data')
     },
     {
-      title: 'Communication',
-      href: '/dashboard/parent/communication',
-      icon: ChatBubbleLeftRightIcon,
-      children: [
-        { title: 'Messages', href: '/dashboard/parent/messages', icon: EnvelopeIcon, badge: '3' },
-        { title: 'Parent-Teacher Meetings', href: '/dashboard/parent/meetings', icon: VideoCameraIcon },
-        { title: 'School Notifications', href: '/dashboard/parent/notifications', icon: BellIcon },
-        { title: 'Events & News', href: '/dashboard/parent/events', icon: MegaphoneIcon }
-      ]
-    },
-    {
-      title: 'Resources',
-      href: '/dashboard/parent/resources',
-      icon: BookOpenIcon,
-      children: [
-        { title: 'Learning Materials', href: '/dashboard/parent/learning', icon: FolderIcon },
-        { title: 'Parent Guides', href: '/dashboard/parent/guides', icon: BookOpenIcon },
-        { title: 'Support Center', href: '/dashboard/parent/support', icon: QuestionMarkCircleIcon },
-        { title: 'Mobile App', href: '/dashboard/parent/mobile', icon: DevicePhoneMobileIcon }
-      ]
-    },
-    {
-      title: 'Billing',
-      href: '/dashboard/parent/billing',
-      icon: CurrencyDollarIcon,
-      children: [
-        { title: 'Payment History', href: '/dashboard/parent/payments', icon: CurrencyDollarIcon },
-        { title: 'Invoices', href: '/dashboard/parent/invoices', icon: DocumentTextIcon },
-        { title: 'Subscription', href: '/dashboard/parent/subscription', icon: CheckCircleIcon }
-      ]
-    }
-  ];
-
-  // Use real children data
-
-  const quickStats = [
-    {
-      title: 'Overall E360 Score',
-      value: '87/100',
-      change: '5',
-      changeType: 'positive' as const,
-      icon: TrophyIcon,
-      color: 'purple',
-      description: 'Combined assessment score'
-    },
-    {
-      title: 'Academic Performance',
-      value: '91%',
-      change: '3',
-      changeType: 'positive' as const,
-      icon: AcademicCapIcon,
-      color: 'blue',
-      description: 'Current academic average'
-    },
-    {
-      title: 'Health Status',
-      value: 'Excellent',
-      change: '0',
-      changeType: 'neutral' as const,
-      icon: HeartIcon,
-      color: 'green',
-      description: 'Physical wellness rating'
-    },
-    {
-      title: 'Next Assessment',
-      value: '5 days',
-      change: '0',
-      changeType: 'neutral' as const,
+      title: 'Schedule Assessment',
+      description: 'Book evaluation appointments and assessments',
       icon: CalendarIcon,
-      color: 'orange',
-      description: 'Upcoming evaluation'
+      color: 'bg-gradient-to-r from-orange-500 to-red-500',
+      gradient: 'bg-gradient-to-br from-orange-500 to-red-500',
+      onClick: () => console.log('Schedule assessment'),
+      badge: '2',
+      badgeColor: 'bg-red-500'
     }
   ];
+
+  const filteredAssessments = useMemo(() => {
+    return assessments.filter(assessment => {
+      const matchesFilter = selectedFilter === 'all' || assessment.type === selectedFilter;
+      const matchesSearch = assessment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           assessment.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesFilter && matchesSearch;
+    });
+  }, [assessments, selectedFilter, searchQuery]);
 
   return (
-    <VerticalDashboardLayout
-      title="Parent Dashboard"
-      subtitle={`Welcome back, ${session.user.name} - Managing ${children.length} child${children.length !== 1 ? 'ren' : ''}`}
-      menuItems={menuItems}
-      activeItem="/dashboard/parent"
-    >
-      <div className="space-y-6">
-        {/* Student Overview Cards */}
-        <div>
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-lg font-semibold text-gray-900">Your Children</h3>
-            <button
-              onClick={() => setShowAddChildModal(true)}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors text-sm"
-            >
-              <PlusIcon className="w-4 h-4 mr-2" />
-              Add Child
-            </button>
-          </div>
-          
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-lg shadow-sm p-4 animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                </div>
-              ))}
-            </div>
-          ) : children.length === 0 ? (
-            <div className="text-center py-8 bg-white rounded-lg shadow-sm">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <PlusIcon className="w-8 h-8 text-blue-600" />
-              </div>
-              <h4 className="text-lg font-medium text-gray-900 mb-2">No Children Added Yet</h4>
-              <p className="text-gray-600 mb-4">Add your first child to start tracking their academic progress</p>
-              <button
-                onClick={() => setShowAddChildModal(true)}
-                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/50">
+      {/* Header */}
+      <motion.div
+        className="bg-white shadow-sm border-b border-gray-100"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <motion.h1
+                className="text-3xl font-bold text-gray-900"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
               >
-                <PlusIcon className="w-5 h-5 mr-2" />
-                Add Your First Child
+                Assessment Center
+              </motion.h1>
+              <motion.p
+                className="text-gray-600 mt-1"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                Track and manage your children's assessments and development
+              </motion.p>
+            </div>
+            
+            <motion.div
+              className="flex items-center space-x-3"
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                <BellIcon className="w-6 h-6" />
+              </button>
+              <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                <ShareIcon className="w-6 h-6" />
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filters and Search */}
+        <motion.div
+          className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+              {/* Search */}
+              <div className="relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search assessments..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
+                />
+              </div>
+
+              {/* Filter Buttons */}
+              <div className="flex space-x-2">
+                {[
+                  { key: 'all', label: 'All' },
+                  { key: 'academic', label: 'Academic' },
+                  { key: 'psychological', label: 'Psychological' },
+                  { key: 'physical', label: 'Physical' },
+                  { key: 'skills', label: 'Skills' }
+                ].map((filter) => (
+                  <button
+                    key={filter.key}
+                    onClick={() => setSelectedFilter(filter.key as any)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      selectedFilter === filter.key
+                        ? 'bg-blue-500 text-white shadow-lg'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => setShowMoreFilters(!showMoreFilters)}
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <FunnelIcon className="w-4 h-4" />
+                <span>More Filters</span>
               </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-              {children.map((child) => (
-                <DashboardCard
-                  key={child.id}
-                  title={child.user.name}
-                  value={`Grade ${child.grade}`}
-                  subtitle={child.school ? child.school.name : 'No school assigned'}
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
-                >
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>Added</span>
-                      <span>{new Date(child.user.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    {child.section && (
-                      <div className="mt-1 text-xs text-gray-500">
-                        Section: {child.section}
-                      </div>
-                    )}
-                  </div>
-                </DashboardCard>
-              ))}
-            </div>
-          )}
-        </div>
+          </div>
 
-        {/* Key Performance Indicators */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {quickStats.map((stat, index) => (
-            <CompactMetricCard
-              key={index}
-              title={stat.title}
-              value={stat.value}
-              icon={stat.icon}
-              color={stat.color}
-              trend={{
-                value: stat.change,
-                direction: stat.changeType === 'positive' ? 'up' : 'down'
-              }}
-            />
-          ))}
-        </div>
+          {/* More Filters */}
+          <AnimatePresence>
+            {showMoreFilters && (
+              <motion.div
+                className="mt-4 pt-4 border-t border-gray-200"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                    <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      <option>Last 30 days</option>
+                      <option>Last 3 months</option>
+                      <option>Last 6 months</option>
+                      <option>Last year</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Completion %</label>
+                    <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      <option>All</option>
+                      <option>0-25%</option>
+                      <option>25-50%</option>
+                      <option>50-75%</option>
+                      <option>75-100%</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Score Range</label>
+                    <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      <option>All Scores</option>
+                      <option>90-100%</option>
+                      <option>80-89%</option>
+                      <option>70-79%</option>
+                      <option>Below 70%</option>
+                    </select>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          <MiniWidget
-            title="Upload"
-            value="New"
-            icon={CloudArrowUpIcon}
-            color="blue"
-            subtitle="Documents"
-          />
-          <MiniWidget
-            title="Messages"
-            value="3"
-            icon={ChatBubbleLeftRightIcon}
-            color="green"
-            subtitle="Unread"
-          />
-          <MiniWidget
-            title="Events"
-            value="5"
-            icon={CalendarIcon}
-            color="purple"
-            subtitle="This week"
-          />
-          <MiniWidget
-            title="Tasks"
-            value="2"
-            icon={CheckCircleIcon}
-            color="orange"
-            subtitle="Pending"
-          />
-          <MiniWidget
-            title="Grades"
-            value="A+"
-            icon={TrophyIcon}
-            color="yellow"
-            subtitle="Latest"
-          />
-          <MiniWidget
-            title="Profile"
-            value="98%"
-            icon={UserCircleIcon}
-            color="indigo"
-            subtitle="Complete"
-          />
-        </div>
-
-        {/* Analytics Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Academic Progress Chart */}
-          <DashboardCard title="Academic Progress Trend" value="" subtitle="">
-            <ModernChart
-              title="Subject Performance"
-              data={[
-                { label: 'Math', value: 92 },
-                { label: 'Science', value: 89 },
-                { label: 'English', value: 94 },
-                { label: 'History', value: 87 },
-                { label: 'Art', value: 91 }
-              ]}
-              type="bar"
-              height={250}
-            />
-          </DashboardCard>
-
-          {/* E360 Score Breakdown */}
-          <DashboardCard title="E360 Score Breakdown" value="" subtitle="">
-            <ModernChart
-              title="Assessment Categories"
-              data={[
-                { label: 'Academic', value: 91 },
-                { label: 'Physical', value: 85 },
-                { label: 'Psychological', value: 89 }
-              ]}
-              type="donut"
-              height={250}
-            />
-          </DashboardCard>
-        </div>
-
-        {/* Progress Timeline and Activities */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Monthly Progress */}
-          <div className="lg:col-span-2">
-            <DashboardCard title="6-Month Progress Timeline" value="" subtitle="">
-              <ModernChart
-                title="E360 Score Trend"
-                data={[
-                  { label: 'Aug', value: 78 },
-                  { label: 'Sep', value: 81 },
-                  { label: 'Oct', value: 79 },
-                  { label: 'Nov', value: 84 },
-                  { label: 'Dec', value: 86 },
-                  { label: 'Jan', value: 87 }
-                ]}
-                type="line"
-                height={300}
-              />
-            </DashboardCard>
+        <motion.div
+          className="mb-8"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {quickActions.map((action, index) => (
+              <motion.div
+                key={action.title}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+              >
+                <QuickActionCard {...action} />
+              </motion.div>
+            ))}
           </div>
+        </motion.div>
 
-          {/* Quick Actions */}
-          <DashboardCard title="Quick Actions" value="" subtitle="" className="h-fit">
-            <div className="space-y-3">
-              <button className="w-full flex items-center p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
-                <CloudArrowUpIcon className="h-5 w-5 text-blue-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-blue-900">Upload Assessment Data</p>
-                  <p className="text-xs text-blue-600">Add new academic records</p>
-                </div>
-              </button>
-              <button className="w-full flex items-center p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
-                <CalendarIcon className="h-5 w-5 text-green-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-green-900">Schedule Assessment</p>
-                  <p className="text-xs text-green-600">Book evaluation appointment</p>
-                </div>
-              </button>
-              <button className="w-full flex items-center p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
-                <DocumentTextIcon className="h-5 w-5 text-purple-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-purple-900">Download Report</p>
-                  <p className="text-xs text-purple-600">Get detailed PDF report</p>
-                </div>
-              </button>
-            </div>
-          </DashboardCard>
-        </div>
-
-        {/* Recent Activities and Notifications */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Activities */}
-          <DashboardCard title="Recent Activities" value="" subtitle="">
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <AcademicCapIcon className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Math assessment completed</p>
-                  <p className="text-xs text-gray-500">Score: 92/100 - Excellent performance</p>
-                  <span className="text-xs text-gray-400">2 hours ago</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CheckCircleIcon className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Physical health checkup</p>
-                  <p className="text-xs text-gray-500">All metrics within healthy range</p>
-                  <span className="text-xs text-gray-400">1 day ago</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <LightBulbIcon className="h-4 w-4 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Psychological evaluation</p>
-                  <p className="text-xs text-gray-500">Positive development noted</p>
-                  <span className="text-xs text-gray-400">3 days ago</span>
-                </div>
-              </div>
-            </div>
-          </DashboardCard>
-
-          {/* Notifications */}
-          <DashboardCard title="Important Notifications" value="" subtitle="">
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CalendarIcon className="h-4 w-4 text-yellow-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Upcoming Assessment</p>
-                  <p className="text-xs text-gray-500">Science assessment scheduled for January 25th</p>
-                  <span className="text-xs text-gray-400">Reminder</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <EnvelopeIcon className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Teacher Message</p>
-                  <p className="text-xs text-gray-500">Ms. Johnson shared feedback on recent project</p>
-                  <span className="text-xs text-gray-400">New</span>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <TrophyIcon className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Achievement Unlocked</p>
-                  <p className="text-xs text-gray-500">Consistent academic improvement milestone</p>
-                  <span className="text-xs text-gray-400">Achievement</span>
-                </div>
-              </div>
-            </div>
-          </DashboardCard>
-        </div>
-
-        {/* Call to Action Panel */}
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-2xl p-6 text-white">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
-            <div className="mb-4 lg:mb-0">
-              <h3 className="text-xl font-bold mb-2">Track Your Child's Progress</h3>
-              <p className="text-purple-100">Monitor academic, physical, and psychological development with EduSight's comprehensive assessment system</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button className="px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition-colors font-medium text-sm">
-                Upload New Data
-              </button>
-              <button className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-400 transition-colors font-medium text-sm border border-purple-400">
-                Schedule Assessment
-              </button>
-              <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium text-sm border border-indigo-400">
-                Download Report
-              </button>
-            </div>
+        {/* Assessment Cards */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+        >
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Available Assessments</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredAssessments.map((assessment, index) => (
+              <motion.div
+                key={assessment.title}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+              >
+                <AssessmentCard
+                  {...assessment}
+                  onStart={() => console.log(`Start ${assessment.title}`)}
+                  onViewReports={() => console.log(`View reports for ${assessment.title}`)}
+                />
+              </motion.div>
+            ))}
           </div>
-        </div>
+        </motion.div>
+
+        {/* Recent Activity Feed */}
+        <motion.div
+          className="mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1.0 }}
+        >
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Recent Activity</h2>
+          <div className="space-y-4">
+            {[
+              {
+                icon: AcademicCapIcon,
+                title: 'Child X completed Psychological Assessment',
+                description: 'Score: 89/100 - Excellent performance in cognitive analysis',
+                time: 'yesterday',
+                color: 'bg-blue-100 text-blue-600'
+              },
+              {
+                icon: CheckCircleIcon,
+                title: 'Physical Assessment Results Available',
+                description: 'All health metrics within optimal range',
+                time: '2 days ago',
+                color: 'bg-green-100 text-green-600'
+              },
+              {
+                icon: LightBulbIcon,
+                title: 'Skills Assessment In Progress',
+                description: '60% completed - Strong performance in critical thinking',
+                time: '3 days ago',
+                color: 'bg-purple-100 text-purple-600'
+              }
+            ].map((activity, index) => (
+              <motion.div
+                key={index}
+                className="flex items-start space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 1.1 + index * 0.1 }}
+              >
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${activity.color}`}>
+                  <activity.icon className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900">{activity.title}</h4>
+                  <p className="text-sm text-gray-600">{activity.description}</p>
+                  <span className="text-xs text-gray-400">{activity.time}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
 
       {/* Add Child Modal */}
@@ -537,6 +704,6 @@ export default function ParentDashboard() {
         onChildAdded={handleChildAdded}
         schoolId={(session?.user as any)?.schoolId || null}
       />
-    </VerticalDashboardLayout>
+    </div>
   );
 }

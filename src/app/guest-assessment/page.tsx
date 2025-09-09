@@ -13,7 +13,7 @@ import {
   ArrowRightIcon,
   EyeIcon
 } from '@heroicons/react/24/outline';
-import GuestUploadWorkflow from '@/components/guest/GuestUploadWorkflow';
+import EnhancedUnifiedWorkflow from '@/components/workflow/EnhancedUnifiedWorkflow';
 import { GRADE_OPTIONS } from '@/constants/grades';
 
 interface UploadFile {
@@ -162,8 +162,8 @@ export default function GuestAssessmentPage() {
   };
 
   const handleWorkflowComplete = (results: any) => {
-    // Workflow completed - user will need to sign up to access results
-    toast.success('Analysis completed! Sign up to access your report.');
+    // Workflow completed - show detailed report in development mode
+    toast.success('Analysis completed! View your detailed report below.');
   };
 
   const handleWorkflowError = (error: string) => {
@@ -441,12 +441,14 @@ export default function GuestAssessmentPage() {
               </p>
             </div>
 
-            <GuestUploadWorkflow
-              guestSessionId={guestSessionId!}
-              documentId={currentDocumentId!}
+            <EnhancedUnifiedWorkflow
+              userRole="PARENT"
               studentName={studentName}
+              studentAge={parseInt(studentGrade) || 15}
               onComplete={handleWorkflowComplete}
               onError={handleWorkflowError}
+              showUpload={true}
+              initialFiles={files.map(f => f.file)}
             />
           </div>
         )}

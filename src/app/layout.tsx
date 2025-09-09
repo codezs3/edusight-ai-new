@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { generateMetadata, generateStructuredData } from '@/lib/seo/utils';
 import { seoConfig } from '@/lib/seo/config';
 import './globals.css';
+import '../styles/animations.css';
 
 const inter = Inter({ 
   subsets: ['latin'],

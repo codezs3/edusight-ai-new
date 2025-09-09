@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ExclamationTriangleIcon, ArrowPathIcon, HomeIcon, BugAntIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, HomeIcon, BugAntIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
 interface ErrorBoundaryState {
   hasError: boolean;

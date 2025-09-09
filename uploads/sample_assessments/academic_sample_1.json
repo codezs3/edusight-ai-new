@@ -1,0 +1,85 @@
+{
+  "assessment_id": "ACAD_001_2024",
+  "student_id": "STU_001",
+  "student_name": "Arjun Sharma",
+  "school": "Greenwood International School",
+  "grade": "10",
+  "assessment_type": "Academic",
+  "curriculum": "IB",
+  "date_completed": "2024-01-15",
+  "subjects": {
+    "mathematics": {
+      "score": 92,
+      "max_score": 100,
+      "topics": {
+        "algebra": 95,
+        "geometry": 88,
+        "calculus": 94,
+        "statistics": 91
+      },
+      "skills": {
+        "problem_solving": 93,
+        "logical_reasoning": 90,
+        "analytical_thinking": 95
+      }
+    },
+    "science": {
+      "score": 89,
+      "max_score": 100,
+      "topics": {
+        "physics": 87,
+        "chemistry": 91,
+        "biology": 89
+      },
+      "skills": {
+        "scientific_method": 88,
+        "data_analysis": 90,
+        "critical_thinking": 89
+      }
+    },
+    "english": {
+      "score": 94,
+      "max_score": 100,
+      "topics": {
+        "literature": 96,
+        "grammar": 92,
+        "writing": 94
+      },
+      "skills": {
+        "communication": 95,
+        "creativity": 93,
+        "comprehension": 94
+      }
+    },
+    "history": {
+      "score": 87,
+      "max_score": 100,
+      "topics": {
+        "world_history": 85,
+        "indian_history": 89,
+        "civics": 87
+      },
+      "skills": {
+        "research": 88,
+        "analysis": 86,
+        "presentation": 87
+      }
+    }
+  },
+  "overall_academic_score": 90.5,
+  "learning_style": "Visual-Kinesthetic",
+  "strengths": [
+    "Strong mathematical reasoning",
+    "Excellent communication skills",
+    "Good analytical thinking"
+  ],
+  "areas_for_improvement": [
+    "History retention",
+    "Time management in exams"
+  ],
+  "recommendations": [
+    "Focus on history revision techniques",
+    "Practice time-bound assessments",
+    "Consider advanced mathematics courses"
+  ]
+}

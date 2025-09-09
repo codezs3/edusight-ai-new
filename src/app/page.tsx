@@ -4,12 +4,10 @@ import { HeroSection } from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import { AnalyticsShowcase } from '@/components/landing/AnalyticsShowcase';
 import { ReportShowcase } from '@/components/landing/ReportShowcase';
-import { StatsSection } from '@/components/landing/StatsSection';
-import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
-import { PricingSection } from '@/components/landing/PricingSection';
-import { CTASection } from '@/components/landing/CTASection';
-
+import { TestVaultShowcase } from '@/components/landing/TestVaultShowcase';
+import { StoreCallToAction } from '@/components/landing/StoreCallToAction';
 import { DemoSection } from '@/components/landing/DemoSection';
+import { StatsSection } from '@/components/landing/StatsSection';
 import { NewsletterSection } from '@/components/landing/NewsletterSection';
 
 export default function HomePage() {
@@ -21,12 +19,11 @@ export default function HomePage() {
         <FeaturesSection />
         <AnalyticsShowcase />
         <ReportShowcase />
+        <TestVaultShowcase />
+        <StoreCallToAction />
         <DemoSection />
         <StatsSection />
-        <TestimonialsSection />
-        <PricingSection />
         <NewsletterSection />
-        <CTASection />
       </main>
       <Footer />
     </div>

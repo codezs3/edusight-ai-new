@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Guest Assessment Form - EduSight AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .form-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .ai-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .form-section {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .section-title {
+        color: #667eea;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: white;
+    }
+    
+    .form-control {
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-submit {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        width: 100%;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 10px;
+        height: 8px;
+        transition: width 0.3s ease;
+    }
+    
+    .step-indicator {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    
+    .step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 0.5rem;
+        color: #667eea;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .step.active {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .step.completed {
+        background: #28a745;
+        color: white;
+    }
+    
+    .consent-section {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+    
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-card">
+                    <!-- Header -->
+                    <div class="form-header">
+                        <div class="ai-icon">
+                            <i class="fas fa-brain text-white" style="font-size: 2rem;"></i>
+                        </div>
+                        <h1 class="display-6 fw-bold text-primary mb-2">Guest Assessment Form</h1>
+                        <p class="text-muted">Provide information to get started with AI-powered assessment</p>
+                    </div>
+                    
+                    <!-- Progress Indicator -->
+                    <div class="step-indicator">
+                        <div class="step active">1</div>
+                        <div class="step">2</div>
+                        <div class="step">3</div>
+                        <div class="step">4</div>
+                    </div>
+                    
+                    <!-- Form -->
+                    <form method="post" id="guestAssessmentForm">
+                        {% csrf_token %}
+                        
+                        <!-- Student Information Section -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <div class="section-icon">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                Student Information
+                            </h3>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.student_name.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-user me-2 text-primary"></i>Student Name *
+                                    </label>
+                                    {{ form.student_name }}
+                                    {% if form.student_name.errors %}
+                                        <div class="text-danger small mt-1">{{ form.student_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="{{ form.student_age.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-calendar me-2 text-primary"></i>Age *
+                                    </label>
+                                    {{ form.student_age }}
+                                    {% if form.student_age.errors %}
+                                        <div class="text-danger small mt-1">{{ form.student_age.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="{{ form.student_grade.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-graduation-cap me-2 text-primary"></i>Grade *
+                                    </label>
+                                    {{ form.student_grade }}
+                                    {% if form.student_grade.errors %}
+                                        <div class="text-danger small mt-1">{{ form.student_grade.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Information Section -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <div class="section-icon">
+                                    <i class="fas fa-address-book"></i>
+                                </div>
+                                Contact Information
+                            </h3>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.parent_name.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-user me-2 text-primary"></i>Parent/Guardian Name *
+                                    </label>
+                                    {{ form.parent_name }}
+                                    {% if form.parent_name.errors %}
+                                        <div class="text-danger small mt-1">{{ form.parent_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.parent_email.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-envelope me-2 text-primary"></i>Email Address *
+                                    </label>
+                                    {{ form.parent_email }}
+                                    {% if form.parent_email.errors %}
+                                        <div class="text-danger small mt-1">{{ form.parent_email.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.parent_phone.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-phone me-2 text-primary"></i>Phone Number *
+                                    </label>
+                                    {{ form.parent_phone }}
+                                    {% if form.parent_phone.errors %}
+                                        <div class="text-danger small mt-1">{{ form.parent_phone.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Assessment Preferences Section -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <div class="section-icon">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                Assessment Preferences
+                            </h3>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.assessment_type.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-clipboard-list me-2 text-primary"></i>Assessment Type *
+                                    </label>
+                                    {{ form.assessment_type }}
+                                    {% if form.assessment_type.errors %}
+                                        <div class="text-danger small mt-1">{{ form.assessment_type.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.curriculum.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-book me-2 text-primary"></i>Curriculum *
+                                    </label>
+                                    {{ form.curriculum }}
+                                    {% if form.curriculum.errors %}
+                                        <div class="text-danger small mt-1">{{ form.curriculum.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.special_requirements.id_for_label }}" class="form-label fw-bold">
+                                    <i class="fas fa-info-circle me-2 text-primary"></i>Special Requirements
+                                </label>
+                                {{ form.special_requirements }}
+                                {% if form.special_requirements.errors %}
+                                    <div class="text-danger small mt-1">{{ form.special_requirements.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Consent Section -->
+                        <div class="consent-section">
+                            <h4 class="fw-bold text-warning mb-3">
+                                <i class="fas fa-shield-alt me-2"></i>Consent & Privacy
+                            </h4>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ form.consent_data_processing }}
+                                    <label class="form-check-label fw-bold" for="{{ form.consent_data_processing.id_for_label }}">
+                                        I consent to the processing of my child's data for assessment purposes *
+                                    </label>
+                                </div>
+                                {% if form.consent_data_processing.errors %}
+                                    <div class="text-danger small mt-1">{{ form.consent_data_processing.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ form.consent_career_mapping }}
+                                    <label class="form-check-label fw-bold" for="{{ form.consent_career_mapping.id_for_label }}">
+                                        I consent to career mapping and recommendation analysis *
+                                    </label>
+                                </div>
+                                {% if form.consent_career_mapping.errors %}
+                                    <div class="text-danger small mt-1">{{ form.consent_career_mapping.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Privacy Notice:</strong> Your data is processed securely and will only be used for assessment purposes. 
+                                You can request data deletion at any time.
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-arrow-right me-2"></i>Continue to Document Upload
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation and progress tracking
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('guestAssessmentForm');
+        const steps = document.querySelectorAll('.step');
+        
+        // Update progress based on form completion
+        function updateProgress() {
+            const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+            let completedFields = 0;
+            
+            requiredFields.forEach(field => {
+                if (field.type === 'checkbox') {
+                    if (field.checked) completedFields++;
+                } else {
+                    if (field.value.trim() !== '') completedFields++;
+                }
+            });
+            
+            const progress = (completedFields / requiredFields.length) * 100;
+            
+            // Update step indicators
+            if (progress >= 25) steps[0].classList.add('completed');
+            if (progress >= 50) steps[1].classList.add('completed');
+            if (progress >= 75) steps[2].classList.add('completed');
+            if (progress >= 100) steps[3].classList.add('completed');
+        }
+        
+        // Add event listeners to all form fields
+        form.addEventListener('input', updateProgress);
+        form.addEventListener('change', updateProgress);
+        
+        // Form submission with loading state
+        form.addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.btn-submit');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            submitBtn.disabled = true;
+        });
+        
+        // Phone number formatting
+        const phoneField = document.getElementById('{{ form.parent_phone.id_for_label }}');
+        phoneField.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 3) {
+                    value = value;
+                } else if (value.length <= 6) {
+                    value = value.slice(0, 3) + ' ' + value.slice(3);
+                } else {
+                    value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6, 10);
+                }
+            }
+            e.target.value = value;
+        });
+        
+        // Age validation
+        const ageField = document.getElementById('{{ form.student_age.id_for_label }}');
+        ageField.addEventListener('input', function(e) {
+            const age = parseInt(e.target.value);
+            if (age < 3 || age > 18) {
+                e.target.setCustomValidity('Age must be between 3 and 18 years');
+            } else {
+                e.target.setCustomValidity('');
+            }
+        });
+    });
+</script>
+{% endblock %}

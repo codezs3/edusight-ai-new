@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+// import { motion } from 'framer-motion';
 import { StarIcon } from '@heroicons/react/20/solid';
 
 const testimonials = [
@@ -49,13 +49,9 @@ export function TestimonialsSection() {
         <div className="mx-auto mt-16 flow-root max-w-2xl sm:mt-20 lg:mx-0 lg:max-w-none">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {testimonials.map((testimonial, index) => (
-              <motion.div
+              <div
                 key={testimonial.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-2xl shadow-lg p-8"
+                className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="flex items-center gap-x-1 text-yellow-400 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -78,7 +74,7 @@ export function TestimonialsSection() {
                     <div className="text-sm text-gray-600">{testimonial.role}, {testimonial.school}</div>
                   </div>
                 </figcaption>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

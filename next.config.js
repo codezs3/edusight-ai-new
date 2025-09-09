@@ -1,92 +1,58 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable experimental features for better performance
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: [
-      '@heroicons/react',
-      '@tremor/react',
-      '@nivo/core',
-      'recharts',
-      'framer-motion'
-    ],
+    appDir: true,
   },
-  
-  // Bundle analyzer for development
-  webpack: (config, { dev, isServer }) => {
-    // Bundle optimization
-    if (!dev && !isServer) {
-      config.optimization.splitChunks.chunks = 'all';
-      config.optimization.splitChunks.cacheGroups = {
-        ...config.optimization.splitChunks.cacheGroups,
-        
-        // TensorFlow.js - separate chunk
-        tensorflow: {
-          test: /[\\/]node_modules[\\/]@tensorflow[\\/]/,
-          name: 'tensorflow',
-          priority: 30,
-          chunks: 'all',
-        },
-        
-        // Charts - separate chunk
-        charts: {
-          test: /[\\/]node_modules[\\/](@nivo|recharts|@tremor)[\\/]/,
-          name: 'charts',
-          priority: 25,
-          chunks: 'all',
-        },
-        
-        // UI Libraries
-        ui: {
-          test: /[\\/]node_modules[\\/](@headlessui|@heroicons|framer-motion)[\\/]/,
-          name: 'ui',
-          priority: 20,
-          chunks: 'all',
-        },
-        
-        // Vendor libraries
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          priority: 10,
-          chunks: 'all',
-        },
-      };
-    }
-
-    // Performance optimizations
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': require('path').resolve(__dirname, 'src'),
-    };
-
-    return config;
-  },
-  
-  // Compression and caching
-  compress: true,
-  poweredByHeader: false,
-  
-  // Images optimization
   images: {
-    domains: ['localhost'],
-    formats: ['image/webp', 'image/avif'],
+    domains: ['localhost', 'vercel.app', 'edusight.vercel.app'],
+    unoptimized: true
   },
-  
-  // Headers for caching
+  env: {
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    DATABASE_URL: process.env.DATABASE_URL,
+  },
   async headers() {
     return [
       {
-        source: '/_next/static/(.*)',
+        source: '/(.*)',
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
           },
         ],
       },
     ];
   },
-}
+  async redirects() {
+    return [
+      {
+        source: '/dashboard',
+        destination: '/dashboard/admin',
+        permanent: false,
+      },
+    ];
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    return config;
+  },
+};
 
 module.exports = nextConfig;

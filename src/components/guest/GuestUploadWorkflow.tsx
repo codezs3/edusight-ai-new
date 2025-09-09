@@ -16,7 +16,8 @@ import {
   ChartPieIcon,
   SparklesIcon,
   LockClosedIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  DocumentArrowDownIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 
@@ -512,56 +513,168 @@ export default function GuestUploadWorkflow({
         ))}
       </div>
 
-      {/* Signup Prompt */}
+      {/* Analysis Results - Development Mode */}
       <AnimatePresence>
         {showSignupPrompt && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-gradient-to-r from-green-500 to-blue-600 text-white p-8 rounded-xl text-center"
+            className="bg-white rounded-xl shadow-lg p-8"
           >
-            <div className="mb-6">
-              <CheckCircleIcon className="w-16 h-16 mx-auto mb-4 text-green-200" />
-              <h2 className="text-2xl font-bold mb-2">Analysis Complete! 🎉</h2>
-              <p className="text-green-100 mb-4">
-                We've successfully analyzed {studentName}'s academic data and generated a comprehensive report with:
+            <div className="text-center mb-8">
+              <CheckCircleIcon className="w-16 h-16 mx-auto mb-4 text-green-500" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Analysis Complete! 🎉</h2>
+              <p className="text-gray-600 mb-6">
+                We've successfully analyzed {studentName}'s academic data. Here's your comprehensive report:
               </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-                  <SparklesIcon className="w-6 h-6 mx-auto mb-2" />
-                  <p>Performance Analysis</p>
+            </div>
+
+            {/* Sample Report Data - Development Mode */}
+            <div className="space-y-6">
+              {/* Overall Score */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">360° Assessment Score</h3>
+                <div className="flex items-center justify-center mb-4">
+                  <div className="relative w-32 h-32">
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="none"
+                        className="text-gray-200"
+                      />
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 40}`}
+                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.78)}`}
+                        className="text-green-500"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-2xl font-bold text-gray-900">78%</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-                  <ChartPieIcon className="w-6 h-6 mx-auto mb-2" />
-                  <p>Career Recommendations</p>
+                <p className="text-center text-gray-600">Overall Performance Score</p>
+              </div>
+
+              {/* Category Breakdown */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white border border-gray-200 p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-gray-900">Academic</h4>
+                    <span className="text-lg font-bold text-blue-600">82%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '82%' }}></div>
+                  </div>
                 </div>
-                <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-                  <EyeIcon className="w-6 h-6 mx-auto mb-2" />
-                  <p>Visual Reports & Charts</p>
+                <div className="bg-white border border-gray-200 p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-gray-900">Physical</h4>
+                    <span className="text-lg font-bold text-green-600">75%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-green-600 h-2 rounded-full" style={{ width: '75%' }}></div>
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-gray-900">Psychological</h4>
+                    <span className="text-lg font-bold text-purple-600">77%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-purple-600 h-2 rounded-full" style={{ width: '77%' }}></div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-white bg-opacity-20 p-6 rounded-lg mb-6">
-              <LockClosedIcon className="w-8 h-8 mx-auto mb-3 text-yellow-200" />
-              <h3 className="text-lg font-semibold mb-2">Sign up to access your report</h3>
-              <p className="text-sm text-blue-100 mb-4">
-                Create your free account to download the complete analysis and get personalized recommendations for {studentName}.
-              </p>
-              
-              <button
-                onClick={handleSignupRedirect}
-                className="bg-white text-blue-600 font-semibold py-3 px-8 rounded-lg hover:bg-blue-50 transition-colors flex items-center space-x-2 mx-auto"
-              >
-                <span>Sign Up & Access Report</span>
-                <ArrowRightIcon className="w-5 h-5" />
-              </button>
-            </div>
+              {/* Key Insights */}
+              <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Insights</h3>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-start">
+                    <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    Strong performance in Mathematics and Science subjects
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    Excellent problem-solving and analytical skills
+                  </li>
+                  <li className="flex items-start">
+                    <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500 mr-2 mt-0.5 flex-shrink-0" />
+                    Room for improvement in creative writing and communication
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    Well-developed social skills and emotional intelligence
+                  </li>
+                </ul>
+              </div>
 
-            <p className="text-xs text-blue-100">
-              ✨ Free account • No credit card required • Instant access
-            </p>
+              {/* Career Recommendations */}
+              <div className="bg-blue-50 border border-blue-200 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Career Recommendations</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-2">Engineering</h4>
+                    <p className="text-sm text-gray-600">Strong analytical skills make this an excellent fit</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-2">Data Science</h4>
+                    <p className="text-sm text-gray-600">Natural aptitude for problem-solving and analysis</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-2">Medicine</h4>
+                    <p className="text-sm text-gray-600">Combines analytical skills with helping others</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-2">Research</h4>
+                    <p className="text-sm text-gray-600">Curiosity and analytical thinking are key strengths</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Development Mode Notice */}
+              <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                <div className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-medium text-blue-800">🔓 Development Mode - Free Report Access</h3>
+                    <p className="text-sm text-blue-700 mt-1">
+                      This is a sample report for development testing. In production, detailed reports would require signup and payment.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={handleSignupRedirect}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <span>Sign Up for Full Access</span>
+                  <ArrowRightIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <DocumentArrowDownIcon className="w-5 h-5" />
+                  <span>Print Report</span>
+                </button>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

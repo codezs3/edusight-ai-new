@@ -14,11 +14,18 @@
     "test:performance": "node scripts/performance-test.js",
     "test:all": "npm run test:security && npm run test:performance",
     "audit:security": "npm audit && npm run test:security",
-    "deploy:check": "npm run build && npm run test:all"
+    "deploy:check": "npm run build && npm run test:all",
+    "postbuild": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@auth/core": "^0.40.0",
     "@auth/prisma-adapter": "^2.10.0",
+    "@formkit/auto-animate": "^0.9.0",
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.2",
@@ -31,6 +38,7 @@
     "@nivo/treemap": "^0.87.0",
     "@prisma/client": "^6.15.0",
     "@react-pdf/renderer": "^3.4.4",
+    "@react-spring/web": "^10.0.2",
     "@stripe/react-stripe-js": "^3.9.2",
     "@stripe/stripe-js": "^7.9.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
@@ -48,6 +56,7 @@
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
+    "critters": "^0.0.23",
     "date-fns": "^2.30.0",
     "framer-motion": "^12.23.12",
     "googleapis": "^159.0.0",
@@ -91,5 +100,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

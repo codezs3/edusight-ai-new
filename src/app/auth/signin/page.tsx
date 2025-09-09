@@ -18,7 +18,7 @@ import {
 
 const signInSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(3, 'Password must be at least 3 characters'),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;
@@ -26,10 +26,10 @@ type SignInFormData = z.infer<typeof signInSchema>;
 // Demo users - Available for development testing
 const demoUsers = {
   primary: [
-    { email: 'admin@edusight.com', name: 'Admin Demo', role: 'ADMIN', password: 'admin123' },
-    { email: 'teacher@edusight.com', name: 'Teacher Demo', role: 'TEACHER', password: 'teacher123' },
-    { email: 'parent@edusight.com', name: 'Parent Demo', role: 'PARENT', password: 'parent123' },
-    { email: 'student@edusight.com', name: 'Student Demo', role: 'STUDENT', password: 'student123' },
+    { email: 'admin@demo.com', name: '🔑 Super Admin', role: 'ADMIN', password: 'admin' },
+    { email: 'parent@demo.com', name: '👨‍👩‍👧‍👦 Demo Parent', role: 'PARENT', password: 'parent' },
+    { email: 'school@demo.com', name: '🏫 School Principal', role: 'SCHOOL_ADMIN', password: 'school' },
+    { email: 'student@demo.com', name: '🎓 Alex Smith', role: 'STUDENT', password: 'student' },
   ],
 };
 
@@ -41,6 +41,29 @@ export default function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+
+  // Auto-login bypass for development
+  const handleBypassLogin = async () => {
+    setIsLoading(true);
+    try {
+      const result = await signIn('credentials', {
+        email: 'any@email.com',
+        password: 'anypassword',
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        toast.success('🔓 Login bypassed - Auto-logged in as Demo Admin');
+        router.push(callbackUrl);
+      } else {
+        toast.error('Bypass failed');
+      }
+    } catch (error) {
+      toast.error('Bypass error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const {
     register,
@@ -223,6 +246,16 @@ export default function SignInPage() {
             </div>
 
             <div className="space-y-4">
+              {/* BYPASS BUTTON - TEMPORARY */}
+              <button
+                type="button"
+                onClick={handleBypassLogin}
+                disabled={isLoading}
+                className="w-full flex justify-center items-center px-4 py-3 border-2 border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                🔓 BYPASS LOGIN (DEV MODE)
+              </button>
+
               <button
                 type="submit"
                 disabled={isLoading}

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import seedAssessmentData from '../src/lib/seed-assessment-data';
 
 const prisma = new PrismaClient();
 
@@ -184,6 +185,9 @@ async function main() {
       studentId: 'STU002',
     },
   });
+
+  // Seed assessment data
+  await seedAssessmentData();
 
   console.log('✅ Database seeded successfully!');
   console.log('📚 Sample accounts created:');

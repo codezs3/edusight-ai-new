@@ -1,0 +1,71 @@
+{
+  "assessment_id": "PSYC_002_2024",
+  "student_id": "STU_002",
+  "student_name": "Priya Patel",
+  "school": "Delhi Public School",
+  "grade": "9",
+  "assessment_type": "Psychological & Mental Health",
+  "date_completed": "2024-01-21",
+  "cognitive_assessment": {
+    "iq_score": 112,
+    "cognitive_abilities": {
+      "verbal_comprehension": 115,
+      "perceptual_reasoning": 108,
+      "working_memory": 110,
+      "processing_speed": 115
+    },
+    "learning_style": {
+      "visual": 80,
+      "auditory": 90,
+      "kinesthetic": 65,
+      "reading_writing": 85
+    }
+  },
+  "personality_analysis": {
+    "big_five_traits": {
+      "openness": 85,
+      "conscientiousness": 78,
+      "extraversion": 65,
+      "agreeableness": 92,
+      "neuroticism": 45
+    },
+    "personality_type": "ISFJ",
+    "strengths": [
+      "Highly empathetic",
+      "Detail-oriented",
+      "Reliable and responsible",
+      "Good listener"
+    ]
+  },
+  "emotional_wellbeing": {
+    "stress_level": 4,
+    "anxiety_level": 3,
+    "depression_indicators": 2,
+    "self_esteem": 7,
+    "social_confidence": 6,
+    "emotional_regulation": 7
+  },
+  "behavioral_patterns": {
+    "attention_span": 7,
+    "impulse_control": 8,
+    "social_interaction": 7,
+    "conflict_resolution": 8,
+    "teamwork": 9
+  },
+  "mental_health_indicators": {
+    "overall_wellbeing": 7.5,
+    "risk_factors": ["Perfectionism", "Social anxiety"],
+    "protective_factors": [
+      "Strong family support",
+      "Good academic performance",
+      "Creative outlets"
+    ]
+  },
+  "recommendations": [
+    "Practice stress management techniques",
+    "Build confidence in social situations",
+    "Set realistic goals to reduce perfectionism",
+    "Maintain creative activities"
+  ],
+  "overall_psychological_score": 78.5
+}

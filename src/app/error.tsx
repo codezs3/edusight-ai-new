@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ExclamationTriangleIcon, ArrowPathIcon, HomeIcon, WrenchIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, HomeIcon, WrenchIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
 interface ErrorProps {
   error: Error & { digest?: string };

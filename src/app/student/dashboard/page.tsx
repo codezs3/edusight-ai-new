@@ -22,8 +22,8 @@ import {
   FireIcon
 } from '@heroicons/react/24/outline';
 
-// Dynamically import Plotly to avoid SSR issues
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+// Dynamically import Recharts to avoid SSR issues
+const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = dynamic(() => import('recharts'), { ssr: false });
 
 interface StudentDashboardData {
   profile: {
@@ -356,51 +356,19 @@ export default function EnhancedStudentDashboard() {
             {/* Performance Chart */}
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-medium text-gray-900 mb-6">Subject Performance Trends</h3>
-              <Plot
-                data={[
-                  {
-                    x: subjectProgress.map(d => d.month),
-                    y: subjectProgress.map(d => d.math),
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: 'Mathematics',
-                    line: { color: '#3B82F6' }
-                  },
-                  {
-                    x: subjectProgress.map(d => d.month),
-                    y: subjectProgress.map(d => d.science),
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: 'Science',
-                    line: { color: '#10B981' }
-                  },
-                  {
-                    x: subjectProgress.map(d => d.month),
-                    y: subjectProgress.map(d => d.english),
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: 'English',
-                    line: { color: '#F59E0B' }
-                  },
-                  {
-                    x: subjectProgress.map(d => d.month),
-                    y: subjectProgress.map(d => d.history),
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: 'History',
-                    line: { color: '#EF4444' }
-                  }
-                ]}
-                layout={{
-                  height: 300,
-                  margin: { l: 40, r: 40, t: 20, b: 40 },
-                  xaxis: { title: 'Month' },
-                  yaxis: { title: 'Score (%)' },
-                  legend: { x: 0, y: 1 }
-                }}
-                config={{ displayModeBar: false }}
-                className="w-full"
-              />
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={subjectProgress}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="math" stroke="#3B82F6" strokeWidth={2} name="Mathematics" />
+                  <Line type="monotone" dataKey="science" stroke="#10B981" strokeWidth={2} name="Science" />
+                  <Line type="monotone" dataKey="english" stroke="#F59E0B" strokeWidth={2} name="English" />
+                  <Line type="monotone" dataKey="history" stroke="#EF4444" strokeWidth={2} name="History" />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
 
             {/* Recent Assessments */}

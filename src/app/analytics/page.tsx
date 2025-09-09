@@ -18,8 +18,8 @@ import {
   FunnelIcon
 } from '@heroicons/react/24/outline';
 
-// Dynamically import Plotly to avoid SSR issues
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+// Dynamically import Recharts to avoid SSR issues
+const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } = dynamic(() => import('recharts'), { ssr: false });
 
 interface AnalyticsData {
   overview: {
@@ -281,61 +281,31 @@ export default function AnalyticsPage() {
           {/* Performance by Subject */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-6">Performance by Subject</h3>
-            <Plot
-              data={[
-                {
-                  x: performanceData.map(d => d.subject),
-                  y: performanceData.map(d => d.average),
-                  type: 'bar',
-                  marker: {
-                    color: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
-                  }
-                }
-              ]}
-              layout={{
-                height: 300,
-                margin: { l: 40, r: 40, t: 20, b: 40 },
-                xaxis: { title: 'Subject' },
-                yaxis: { title: 'Average Score (%)' },
-                showlegend: false
-              }}
-              config={{ displayModeBar: false }}
-              className="w-full"
-            />
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={performanceData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="subject" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="average" fill="#3B82F6" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Weekly Engagement */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-6">Weekly Engagement</h3>
-            <Plot
-              data={[
-                {
-                  x: engagementData.map(d => d.day),
-                  y: engagementData.map(d => d.logins),
-                  type: 'scatter',
-                  mode: 'lines+markers',
-                  name: 'Logins',
-                  line: { color: '#3B82F6' }
-                },
-                {
-                  x: engagementData.map(d => d.day),
-                  y: engagementData.map(d => d.assessments),
-                  type: 'scatter',
-                  mode: 'lines+markers',
-                  name: 'Assessments',
-                  line: { color: '#10B981' }
-                }
-              ]}
-              layout={{
-                height: 300,
-                margin: { l: 40, r: 40, t: 20, b: 40 },
-                xaxis: { title: 'Day of Week' },
-                yaxis: { title: 'Count' },
-                legend: { x: 0, y: 1 }
-              }}
-              config={{ displayModeBar: false }}
-              className="w-full"
-            />
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={engagementData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="logins" stroke="#3B82F6" strokeWidth={2} />
+                <Line type="monotone" dataKey="assessments" stroke="#10B981" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -344,118 +314,62 @@ export default function AnalyticsPage() {
           {/* Grade Performance Comparison */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-6">Performance by Grade Level</h3>
-            <Plot
-              data={[
-                {
-                  x: subjectPerformance.map(d => d.grade),
-                  y: subjectPerformance.map(d => d.math),
-                  type: 'bar',
-                  name: 'Mathematics',
-                  marker: { color: '#3B82F6' }
-                },
-                {
-                  x: subjectPerformance.map(d => d.grade),
-                  y: subjectPerformance.map(d => d.science),
-                  type: 'bar',
-                  name: 'Science',
-                  marker: { color: '#10B981' }
-                },
-                {
-                  x: subjectPerformance.map(d => d.grade),
-                  y: subjectPerformance.map(d => d.english),
-                  type: 'bar',
-                  name: 'English',
-                  marker: { color: '#F59E0B' }
-                },
-                {
-                  x: subjectPerformance.map(d => d.grade),
-                  y: subjectPerformance.map(d => d.history),
-                  type: 'bar',
-                  name: 'History',
-                  marker: { color: '#EF4444' }
-                }
-              ]}
-              layout={{
-                height: 300,
-                margin: { l: 40, r: 40, t: 20, b: 40 },
-                xaxis: { title: 'Grade Level' },
-                yaxis: { title: 'Average Score (%)' },
-                barmode: 'group',
-                legend: { x: 0, y: 1 }
-              }}
-              config={{ displayModeBar: false }}
-              className="w-full"
-            />
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={subjectPerformance}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="grade" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="math" fill="#3B82F6" name="Mathematics" />
+                <Bar dataKey="science" fill="#10B981" name="Science" />
+                <Bar dataKey="english" fill="#F59E0B" name="English" />
+                <Bar dataKey="history" fill="#EF4444" name="History" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Student Distribution */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-6">Student Distribution by Grade</h3>
-            <Plot
-              data={[
-                {
-                  labels: demographicData.map(d => d.category),
-                  values: demographicData.map(d => d.value),
-                  type: 'pie',
-                  marker: {
-                    colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444']
-                  }
-                }
-              ]}
-              layout={{
-                height: 300,
-                margin: { l: 40, r: 40, t: 20, b: 40 },
-                showlegend: true,
-                legend: { x: 0, y: 0 }
-              }}
-              config={{ displayModeBar: false }}
-              className="w-full"
-            />
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={demographicData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ category, percentage }) => `${category} ${percentage}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {demographicData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={['#3B82F6', '#10B981', '#F59E0B', '#EF4444'][index % 4]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         {/* Time Series Analysis */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <h3 className="text-lg font-medium text-gray-900 mb-6">Assessment Trends Over Time</h3>
-          <Plot
-            data={[
-              {
-                x: timeSeriesData.map(d => d.date),
-                y: timeSeriesData.map(d => d.completions),
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: 'Completions',
-                yaxis: 'y',
-                line: { color: '#3B82F6' }
-              },
-              {
-                x: timeSeriesData.map(d => d.date),
-                y: timeSeriesData.map(d => d.avgScore),
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: 'Avg Score (%)',
-                yaxis: 'y2',
-                line: { color: '#10B981' }
-              }
-            ]}
-            layout={{
-              height: 400,
-              margin: { l: 60, r: 60, t: 20, b: 60 },
-              xaxis: { title: 'Date' },
-              yaxis: { 
-                title: 'Number of Completions',
-                side: 'left'
-              },
-              yaxis2: {
-                title: 'Average Score (%)',
-                side: 'right',
-                overlaying: 'y'
-              },
-              legend: { x: 0, y: 1 }
-            }}
-            config={{ displayModeBar: false }}
-            className="w-full"
-          />
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={timeSeriesData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis yAxisId="left" />
+              <YAxis yAxisId="right" orientation="right" />
+              <Tooltip />
+              <Legend />
+              <Line yAxisId="left" type="monotone" dataKey="completions" stroke="#3B82F6" strokeWidth={2} name="Completions" />
+              <Line yAxisId="right" type="monotone" dataKey="avgScore" stroke="#10B981" strokeWidth={2} name="Avg Score (%)" />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Quick Actions */}
