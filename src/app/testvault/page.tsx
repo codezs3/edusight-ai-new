@@ -14,7 +14,7 @@ import {
   UserGroupIcon,
   AcademicCapIcon,
   HeartIcon,
-  BrainIcon,
+  CpuChipIcon as BrainIcon,
   BeakerIcon,
   ChartBarIcon,
   SparklesIcon,

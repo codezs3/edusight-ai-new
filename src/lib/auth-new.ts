@@ -46,6 +46,7 @@ export const authConfig: NextAuthConfig = {
     signIn: '/auth/signin',
     error: '/auth/error',
   },
+  trustHost: true,
   providers: [
     // TEMPORARILY DISABLED - Login system bypassed
     // GoogleProvider({
@@ -187,6 +188,19 @@ export const authConfig: NextAuthConfig = {
     },
   },
   debug: process.env.NODE_ENV === 'development',
+  logger: {
+    error(code, metadata) {
+      console.error('NextAuth Error:', code, metadata);
+    },
+    warn(code) {
+      console.warn('NextAuth Warning:', code);
+    },
+    debug(code, metadata) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('NextAuth Debug:', code, metadata);
+      }
+    },
+  },
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);

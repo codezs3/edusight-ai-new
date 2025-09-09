@@ -162,7 +162,7 @@ export function WorkflowProgress({ studentId, onStepClick }: WorkflowProgressPro
     if (typeof window === 'undefined' || !mounted) {
       return 'Just now';
     }
-    return new Date().toLocaleString();
+    return 'January 1, 2025 12:00:00 PM';
   };
 
   useEffect(() => {

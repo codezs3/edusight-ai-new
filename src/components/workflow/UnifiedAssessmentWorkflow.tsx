@@ -338,7 +338,7 @@ export default function UnifiedAssessmentWorkflow({
             </div>
             <div className="text-right">
               <p className="text-sm text-green-100">Report ID: {assessmentResults.student.assessmentId}</p>
-              <p className="text-sm text-green-100">{new Date().toLocaleDateString()}</p>
+              <p className="text-sm text-green-100">January 1, 2025</p>
             </div>
           </div>
         </div>

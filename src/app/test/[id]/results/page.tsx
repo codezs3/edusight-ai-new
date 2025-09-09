@@ -10,7 +10,7 @@ import {
   TrophyIcon,
   ChartBarIcon,
   AcademicCapIcon,
-  BrainIcon,
+  CpuChipIcon as BrainIcon,
   HeartIcon,
   BeakerIcon,
   SparklesIcon,

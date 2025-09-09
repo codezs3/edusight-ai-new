@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AcademicCapIcon,
-  BrainIcon,
+  CpuChipIcon as BrainIcon,
   HeartIcon,
   ChartBarIcon,
   PlayIcon,

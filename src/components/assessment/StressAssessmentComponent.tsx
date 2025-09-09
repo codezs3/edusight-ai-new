@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HeartIcon,
-  BrainIcon,
+  CpuChipIcon as BrainIcon,
   AcademicCapIcon,
   UserGroupIcon,
   HomeIcon,

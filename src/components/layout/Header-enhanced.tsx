@@ -25,7 +25,7 @@ import {
   HeartIcon,
   TrophyIcon,
   ClipboardDocumentCheckIcon,
-  BrainIcon,
+  CpuChipIcon as BrainIcon,
   BuildingOfficeIcon,
   UsersIcon,
   StarIcon

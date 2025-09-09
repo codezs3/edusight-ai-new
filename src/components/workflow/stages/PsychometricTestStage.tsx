@@ -7,7 +7,7 @@ import {
   AcademicCapIcon,
   UserIcon,
   HeartIcon,
-  BrainIcon,
+  CpuChipIcon as BrainIcon,
   ArrowRightIcon,
   ArrowLeftIcon,
   ClockIcon,

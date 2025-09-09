@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   images: {
     domains: ['localhost', 'vercel.app', 'edusight.vercel.app'],
     unoptimized: true
+  },
+  compiler: {
+    removeConsole: false,
   },
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,

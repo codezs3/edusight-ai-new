@@ -12,7 +12,7 @@ import {
   StarIcon,
   ArrowTrendingUpIcon,
   HeartIcon,
-  BrainIcon
+  CpuChipIcon as BrainIcon
 } from '@heroicons/react/24/outline';
 import { CpuChipIcon as BrainIconSolid } from '@heroicons/react/24/solid';
 import LineChart from '@/components/charts/LineChart';

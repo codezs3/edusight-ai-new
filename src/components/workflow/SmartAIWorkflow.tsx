@@ -9,7 +9,7 @@ import {
   UserIcon,
   HeartIcon,
   ArrowRightIcon,
-  BrainIcon,
+  CpuChipIcon as BrainIcon,
   SparklesIcon,
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
